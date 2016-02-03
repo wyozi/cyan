@@ -26,14 +26,16 @@ case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: S
   def getResponse: Option[Response] = getResponseId.flatMap(id => Response.getId(id))
 }
 object Ping {
-  def productParser(p: Product): RowParser[Ping] = {
+  val productlessParser = {
     for {
       id <- int("id")
       date <- get[DateTime]("date")
       license <- str("licenseId")
       user <- str("userId")
     } yield {
-      Ping(id, date, p, license, user)
+      Ping(id, date, _: Product, license, user)
     }
   }
+
+  def productParser(p: Product): RowParser[Ping] = productlessParser.map(_.apply(p))
 }

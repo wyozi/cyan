@@ -17,18 +17,7 @@ case class Product(id: Int, name: String, shortName: String) {
     }
   }
 
-  def getLatestPingPerUser: List[Ping] = {
-    DB.withConnection { implicit c =>
-      SQL(
-        "SELECT p1.* " +
-        "FROM Pings p1 LEFT JOIN Pings p2 " +
-        " ON (p1.userId = p2.userId AND p1.id < p2.id) " +
-        "WHERE p1.product = {shortName} AND p2.id IS NULL " +
-        "ORDER BY p1.date DESC")
-        .on('shortName -> shortName)
-        .as(Ping.productParser(this).*)
-    }
-  }
+  def getLicense(license: String): ProductLicense = ProductLicense(this, license)
 }
 object Product {
   import play.api.Play.current

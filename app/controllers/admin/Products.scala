@@ -47,7 +47,7 @@ object Products extends Controller with Secured {
 
   def licenseView(prodId: Int, licenseId: String) = SecureAction {
     val prod = Product.getId(prodId).get
-    Ok(views.html.admin_license_view(prod, licenseId))
+    Ok(views.html.admin_license_view(prod.getLicense(licenseId)))
   }
 
   def setProductLicenseResponse(productId: Int) = SecureAction { req =>

@@ -1,6 +1,7 @@
 @import model.Product
 @import model.Response
-@(prod: Product, licenseId: String)
+@import model.ProductLicense
+@(prodLicense: ProductLicense)
 
 @response_opts(selected: Int) = {
     <select name="response">
@@ -15,9 +16,9 @@
     </select>
 }
 
-@admin_main(s"Viewing license $licenseId for product ${prod.name}") {
+@admin_main(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
     <h3>Users using this license:</h3>
-    <table>
+    <table class="table">
         <thead>
             <tr>
                 <td>User</td>
@@ -26,12 +27,12 @@
             </tr>
         </thead>
         <tbody>
-            @for(ping <- prod.getLatestPingPerUser) {
+            @for(ping <- prodLicense.getLatestPingPerUser) {
                 <tr>
                     <td>@ping.user</td>
                     <td>@ping.date</td>
                     <td>
-                        <form action="@admin.routes.Products.setProductLicenseResponse(prod.id)" method="POST">
+                        <form action="@admin.routes.Products.setProductLicenseResponse(prodLicense.prod.id)" method="POST">
                             <input type="hidden" name="user" value="@ping.user">
                             <input type="hidden" name="license" value="@ping.license">
                             @response_opts(ping.getResponseId.getOrElse(-1))
