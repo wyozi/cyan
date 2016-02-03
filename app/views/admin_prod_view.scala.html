@@ -3,7 +3,23 @@
 
 @admin_main(s"Viewing product: ${prod.name}") {
     <h3>Recent pings:</h3>
-    @for(ping <- prod.getRecentPings) {
-        <a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a> <br>
-    }
+
+    <table class="table">
+        <thead>
+            <tr>
+                <td>User</td>
+                <td>License</td>
+                <td>Timestamp</td>
+            </tr>
+        </thead>
+        <tbody>
+            @for(ping <- prod.getRecentPings) {
+                <tr>
+                    <td>@ping.user</td>
+                    <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a></td>
+                    <td>@ping.date</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

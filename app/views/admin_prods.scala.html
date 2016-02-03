@@ -13,7 +13,20 @@
 
     <h2>Products</h2>
 
-    @for(prod <- Product.getAll) {
-        <a href="@admin.routes.Products.view(prod.id)">@prod.name</a><br>
-    }
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Name</td>
+                <td>Pings</td>
+            </tr>
+        </thead>
+        <tbody>
+            @for(prod <- Product.getAll) {
+                <tr>
+                    <td><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></td>
+                    <td>@prod.getPingCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
 }

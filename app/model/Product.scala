@@ -17,6 +17,14 @@ case class Product(id: Int, name: String, shortName: String) {
     }
   }
 
+  def getPingCount: Int = {
+    DB.withConnection { implicit c =>
+      SQL("SELECT COUNT(*) c FROM Pings WHERE product = {shortName}")
+        .on('shortName -> shortName)
+        .as(SqlParser.int("c").single)
+    }
+  }
+
   def getLicense(license: String): ProductLicense = ProductLicense(this, license)
 }
 object Product {
