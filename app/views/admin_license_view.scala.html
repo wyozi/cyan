@@ -31,7 +31,7 @@
                     <td>@ping.user</td>
                     <td>@ping.date</td>
                     <td>
-                        <form action="@routes.Admin.setProductLicenseResponse(prod.id)" method="POST">
+                        <form action="@admin.routes.Products.setProductLicenseResponse(prod.id)" method="POST">
                             <input type="hidden" name="user" value="@ping.user">
                             <input type="hidden" name="license" value="@ping.license">
                             @response_opts(ping.getResponseId.getOrElse(-1))

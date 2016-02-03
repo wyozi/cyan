@@ -1,17 +1,19 @@
-package controllers
+package controllers.admin
 
 import auth.Secured
-import controllers.Application._
-import controllers.Ping._
-import model.{Response, Product}
+import controllers.routes
+import model.Product
 import play.api.data.Form
 import play.api.db.DB
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.Controller
 
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
-object Admin extends Controller with Secured {
+/**
+  * Created by wyozi on 4.2.2016.
+  */
+object Products extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(
     tuple(
@@ -20,11 +22,16 @@ object Admin extends Controller with Secured {
     )
   )
 
-  def productList = SecureAction {
+  def list = SecureAction {
     Ok(views.html.admin_prods(productForm))
   }
 
-  def createProduct = SecureAction { implicit request =>
+  def view(prodId: Int) = SecureAction {
+    val prod = Product.getId(prodId).get
+    Ok(views.html.admin_prod_view(prod))
+  }
+
+  def create = SecureAction { implicit request =>
     productForm.bindFromRequest().fold(
       formWithErrors => BadRequest(views.html.admin_prods(formWithErrors)),
       prod => {
@@ -32,48 +39,10 @@ object Admin extends Controller with Secured {
         DB.withConnection { c =>
           Product.insert(prod._1, prod._2)
 
-          Redirect(routes.Admin.productList())
+          Redirect(routes.Products.list())
         }
       }
     )
-  }
-
-  val responseForm = Form(
-    tuple(
-      "name" -> text,
-      "response" -> text
-    )
-  )
-
-  def responseList = SecureAction {
-    Ok(views.html.admin_resps(responseForm))
-  }
-
-  def createResponse = SecureAction { implicit request =>
-    responseForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin_resps(formWithErrors)),
-      prod => {
-        import play.api.Play.current
-        DB.withConnection { c =>
-          val s = c.prepareStatement("INSERT INTO Responses(name, response) VALUES (?, ?)")
-          s.setString(1, prod._1)
-          s.setString(2, prod._2)
-          s.execute()
-
-          Redirect(routes.Admin.responseList())
-        }
-      }
-    )
-  }
-
-  def responseView(respId: Int) = SecureAction {
-    val resp = Response.getId(respId).get
-    Ok(views.html.admin_resp_view(resp))
-  }
-
-  def productView(prodId: Int) = SecureAction {
-    val prod = Product.getId(prodId).get
-    Ok(views.html.admin_prod_view(prod))
   }
 
   def licenseView(prodId: Int, licenseId: String) = SecureAction {
@@ -104,8 +73,7 @@ object Admin extends Controller with Secured {
         .on('resp -> responseParsed)
         .executeUpdate()
 
-      Redirect(routes.Admin.licenseView(productId, license))
+      Redirect(routes.Products.licenseView(productId, license))
     }
   }
-
 }

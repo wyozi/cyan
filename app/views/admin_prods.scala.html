@@ -4,7 +4,7 @@
 @admin_main("Products") {
     <h2>Create product</h2>
 
-    @helper.form(action = routes.Admin.createProduct()) {
+    @helper.form(action = admin.routes.Products.create()) {
         @helper.inputText(userForm("name"))
         @helper.inputText(userForm("charId"))
 
@@ -14,6 +14,6 @@
     <h2>Products</h2>
 
     @for(prod <- Product.getAll) {
-        <a href="@routes.Admin.productView(prod.id)">@prod.name</a><br>
+        <a href="@admin.routes.Products.view(prod.id)">@prod.name</a><br>
     }
 }
