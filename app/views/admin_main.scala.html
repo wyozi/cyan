@@ -1,0 +1,46 @@
+@import model.Product
+@import model.Response
+@(subTitle: String)(content: Html)
+
+@main("Admin: " + subTitle) {
+
+    <div class="navmenu navmenu-default navmenu-fixed-left offcanvas-sm" role="navigation">
+        <a class="navmenu-brand" href="#">Cyan</a>
+
+        <ul class="nav navmenu-nav">
+            <li class="active"><a href="#">Overview</a></li>
+            <li><a href="#">Link</a></li>
+        </ul>
+        <ul class="nav navmenu-nav">
+            <li><a href="@routes.Admin.productList()">Product overview</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Products <b class="caret"></b></a>
+                <ul class="dropdown-menu navmenu-nav" role="menu">
+                @for(prod <- Product.getAll) {
+                    <li><a href="@routes.Admin.productView(prod.id)">@prod.name</a></li>
+                }
+                </ul>
+            </li>
+        </ul>
+        <ul class="nav navmenu-nav">
+            <li><a href="@routes.Admin.responseList()">Response overview</a></li>
+        </ul>
+        <ul class="nav navmenu-nav">
+            <li><a href="@routes.AdminAnomalies.overview()">Anomaly overview</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Anomalies <b class="caret"></b></a>
+                <ul class="dropdown-menu navmenu-nav" role="menu">
+                    @for(anomaly <- AdminAnomalies.activeDetections) {
+                        <li><a href="#">@anomaly.name</a></li>
+                    }
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h1 class="page-header">@subTitle</h1>
+
+        @content
+    </div>
+}

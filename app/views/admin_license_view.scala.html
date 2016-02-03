@@ -1,0 +1,45 @@
+@import model.Product
+@import model.Response
+@(prod: Product, licenseId: String)
+
+@response_opts(selected: Int) = {
+    <select name="response">
+        <option value="null">Default (empty response)</option>
+        @for(resp <- Response.getAll) {
+            <option value="@resp.id"
+                @if(selected == resp.id) {
+                    selected="selected"
+                }
+            >@resp.name</option>
+        }
+    </select>
+}
+
+@admin_main(s"Viewing license $licenseId for product ${prod.name}") {
+    <h3>Users using this license:</h3>
+    <table>
+        <thead>
+            <tr>
+                <td>User</td>
+                <td>Last used</td>
+                <td></td>
+            </tr>
+        </thead>
+        <tbody>
+            @for(ping <- prod.getLatestPingPerUser) {
+                <tr>
+                    <td>@ping.user</td>
+                    <td>@ping.date</td>
+                    <td>
+                        <form action="@routes.Admin.setProductLicenseResponse(prod.id)" method="POST">
+                            <input type="hidden" name="user" value="@ping.user">
+                            <input type="hidden" name="license" value="@ping.license">
+                            @response_opts(ping.getResponseId.getOrElse(-1))
+                            <input type="submit" value="Set" />
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,19 @@
+@import model.Response
+@(userForm: Form[(String, String)])(implicit messages: Messages)
+
+@admin_main("Responses") {
+    <h2>Create response</h2>
+
+    @helper.form(action = routes.Admin.createResponse()) {
+        @helper.inputText(userForm("name"))
+        @helper.textarea(userForm("response"))
+
+        <input type="submit" value="Save" />
+    }
+
+    <h2>Responses</h2>
+
+    @for(resp <- Response.getAll) {
+        <a href="@routes.Admin.responseView(resp.id)">@resp.name</a> <br>
+    }
+}

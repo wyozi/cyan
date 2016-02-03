@@ -1,0 +1,8 @@
+@import model.Response
+@(resp: Response)
+
+@admin_main(s"Viewing response: ${resp.name}") {
+    <pre>
+        @resp.response
+    </pre>
+}

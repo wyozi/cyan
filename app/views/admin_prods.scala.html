@@ -1,0 +1,19 @@
+@import model.Product
+@(userForm: Form[(String, String)])(implicit messages: Messages)
+
+@admin_main("Products") {
+    <h2>Create product</h2>
+
+    @helper.form(action = routes.Admin.createProduct()) {
+        @helper.inputText(userForm("name"))
+        @helper.inputText(userForm("charId"))
+
+        <input type="submit" value="Submit" />
+    }
+
+    <h2>Products</h2>
+
+    @for(prod <- Product.getAll) {
+        <a href="@routes.Admin.productView(prod.id)">@prod.name</a><br>
+    }
+}

@@ -1,0 +1,9 @@
+@import model.Product
+@(prod: Product)
+
+@admin_main(s"Viewing product: ${prod.name}") {
+    <h3>Recent pings:</h3>
+    @for(ping <- prod.getRecentPings) {
+        <a href="@routes.Admin.licenseView(prod.id, ping.license)">@ping.license</a> <br>
+    }
+}
