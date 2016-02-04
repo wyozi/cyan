@@ -8,6 +8,6 @@ object Anomalies extends Controller with Secured {
   val activeDetections = List(ManyUsersOneLicense)
 
   def overview = SecureAction {
-    Ok(":D")
+    Ok(views.html.admin_anomaly_overview())
   }
 }

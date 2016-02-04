@@ -17,14 +17,18 @@ object ManyUsersOneLicense extends AnomalyDetector {
       import anorm.SqlParser._
 
       // TODO test
-      
-      val dbEntries = SQL("""
-          |SELECT product, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
-          |GROUP BY product
-        """.stripMargin)
-        .as(get[String]("product")~get[Int]("distinctUserCount")*)
 
-      dbEntries.map { case p~uc => Anomaly(s"Many users on license in $p", Medium) }
+      val dbEntries = SQL("""
+          |SELECT product, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
+          |GROUP BY product, licenseId
+        """.stripMargin)
+        .as(get[String]("product")~get[String]("licenseId")~get[Int]("distinctUserCount")*)
+
+      dbEntries.map { case p~l~uc => Anomaly(s"$uc users on license $l in $p", Medium) }
     }
+  }
+
+  class MUOLAnomaly(name: String, severity: AnomalySeverity) extends Anomaly(name, severity) {
+    override def toShortString: String = s"$name [${severity.getClass.getSimpleName}]"
   }
 }
