@@ -38,13 +38,26 @@ object Ping extends Controller {
           .on('product -> product)
           .executeInsert()
 
-        val responseOpt = SQL("SELECT Responses.response as response FROM PingResponses pr " +
-          "LEFT JOIN Responses ON pr.response = Responses.id " +
-          "WHERE pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}")
+        // First try to get specific response
+        val responseOpt = SQL("""
+              |SELECT Responses.response as response FROM PingResponses pr
+              |LEFT JOIN Responses ON pr.response = Responses.id
+              |WHERE pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
+            """.stripMargin)
           .on('user -> userId)
           .on('license -> licenseId)
           .on('productId -> productId)
           .as(str("response").singleOpt)
+        .orElse(
+          SQL("""
+                |SELECT Responses.response as response FROM Products
+                |LEFT JOIN Responses ON Products.defaultresp_unreg = Responses.id
+                |WHERE Products.id = {productId}
+              """.stripMargin)
+            .on('productId -> productId)
+            .as(get[Option[String]]("response").singleOpt)
+            .flatten
+        )
 
         Ok(responseOpt.getOrElse(""))
       }

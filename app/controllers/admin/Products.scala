@@ -31,6 +31,24 @@ object Products extends Controller with Secured {
     Ok(views.html.admin_prod_view(prod))
   }
 
+  def configure(prodId: Int) = SecureAction { req =>
+    val fue = req.body.asFormUrlEncoded
+
+    val opt = fue.get("opt").head
+    val prod = Product.getId(prodId).get
+
+    opt match {
+      case "unreg_response" => {
+        prod.updateDefaultUnregResponse(fue.get("response").head match { case "null" => Option.empty; case x => Some(x.toInt) })
+      }
+      case "reg_response" => {
+        prod.updateDefaultRegResponse(fue.get("response").head match { case "null" => Option.empty; case x => Some(x.toInt) })
+      }
+    }
+
+    Redirect(routes.Products.view(prodId))
+  }
+
   def create = SecureAction { implicit request =>
     productForm.bindFromRequest().fold(
       formWithErrors => BadRequest(views.html.admin_prods(formWithErrors)),

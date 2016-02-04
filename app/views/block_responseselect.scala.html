@@ -1,0 +1,13 @@
+@import model.Response
+@(selected: Int = -1)
+
+<select name="response">
+    <option value="null">Default (empty response)</option>
+    @for(resp <- Response.getAll) {
+        <option value="@resp.id"
+            @if(selected == resp.id) {
+                selected="selected"
+            }
+        >@resp.name</option>
+    }
+</select>

@@ -6,7 +6,7 @@ import play.api.db.DB
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Product(id: Int, name: String, shortName: String) {
+case class Product(id: Int, name: String, shortName: String, var defaultUnregResponse: Option[Int] = None, var defaultRegResponse: Option[Int] = None) {
   import play.api.Play.current
 
   def getRecentPings: List[Ping] = {
@@ -26,6 +26,23 @@ case class Product(id: Int, name: String, shortName: String) {
   }
 
   def getLicense(license: String): ProductLicense = ProductLicense(this, license)
+
+  def updateDefaultUnregResponse(responseId: Option[Int]): Unit = {
+    DB.withConnection { implicit c =>
+      SQL("UPDATE Products SET defaultresp_unreg = {responseId} WHERE id = {id}")
+        .on('id -> id, 'responseId -> responseId)
+        .executeUpdate()
+    }
+    defaultUnregResponse = responseId
+  }
+  def updateDefaultRegResponse(responseId: Option[Int]): Unit = {
+    DB.withConnection { implicit c =>
+      SQL("UPDATE Products SET defaultresp_reg = {responseId} WHERE id = {id}")
+        .on('id -> id, 'responseId -> responseId)
+        .executeUpdate()
+    }
+    defaultRegResponse = responseId
+  }
 }
 object Product {
   import play.api.Play.current
@@ -36,8 +53,11 @@ object Product {
     id <- int("id")
     name <- str("name")
     shortName <- str("shortName")
+
+    defUnreg <- get[Option[Int]]("defaultresp_unreg")
+    defReg <- get[Option[Int]]("defaultresp_reg")
   } yield {
-    Product(id, name, shortName)
+    Product(id, name, shortName, defUnreg, defReg)
   }
 
   def getAll: List[Product] = {

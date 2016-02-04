@@ -2,6 +2,27 @@
 @(prod: Product)
 
 @admin_main(s"Viewing product: ${prod.name}") {
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">Configuration</h3>
+        </div>
+        <div class="panel-body">
+            <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
+                <input type="hidden" name="opt" value="unreg_response">
+                <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
+                @block_responseselect(prod.defaultUnregResponse.getOrElse(-1))
+                <button type="submit" class="btn btn-primary btn-xs">Set</button>
+            </form>
+            <br>
+            <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
+                <input type="hidden" name="opt" value="reg_response">
+                <label for="" class="col-sm-4">Default response for registered licenses:</label>
+                @block_responseselect(prod.defaultRegResponse.getOrElse(-1))
+                <button type="submit" class="btn btn-primary btn-xs">Set</button>
+            </form>
+        </div>
+    </div>
+
     <h3>Recent pings:</h3>
 
     <table class="table">
