@@ -5,4 +5,5 @@ package controllers.admin.anomalydetection
   */
 abstract class AnomalyDetector {
   def name: String
+  def detectAnomalies(): List[Anomaly]
 }
