@@ -22,8 +22,8 @@ case class ProductLicense(prod: Product, license: String) {
         // In that case retain left side
         """
           |SELECT p1.*
-          |FROM `Pings` p1
-          |  LEFT JOIN `Pings` p2
+          |FROM Pings p1
+          |  LEFT JOIN Pings p2
           |      ON p1.userId = p2.userId AND p1.product = p2.product AND p1.licenseId = p2.licenseId AND p1.id < p2.id
           |WHERE p2.id is NULL AND p1.product = {shortName} AND p1.licenseId = {license}
         """.stripMargin
