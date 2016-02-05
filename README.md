@@ -6,7 +6,7 @@ It is primarily meant to be used for managing licences for services/applications
 In addition to managing licences, Cyan will come with tools to detect anomalies in received data.
 
 Future versions of Cyan might include small-scale error reporting server (something like [Sentry](https://getsentry.com))
-and statistic collection (with Graphite support?)
+, statistic collection (with Graphite support?) and some utilities for A/B testing.
 
 ### Terminology briefly
 
@@ -22,4 +22,9 @@ __Product__ = a product that contains its own default Responses and licenses.
 
 __License__ = a Product- specific id that is usually given to a single person/entity
 
-__User (id)__ = an identifier identifying specific instance of the license (this could be MAC or IP address)
+__User name/id__ = an identifier identifying specific instance of the license (this could be MAC or IP address)
+
+
+### Code conventions
+
+If a variable/SQL column is suffixed with `_id` or `Id`, it usually (preferably always) refers to an integer identifier.
