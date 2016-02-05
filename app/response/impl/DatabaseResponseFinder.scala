@@ -1,7 +1,10 @@
 package response.impl
 
+import javax.inject.Inject
+
 import anorm.SqlParser._
 import anorm._
+import dbrepo.{ResponseRepository, ProductRepository, PingResponseRepository}
 import model.Response
 import play.api.db.DB
 import response.{ResponseFindParameters, ResponseFinder}
@@ -9,34 +12,13 @@ import response.{ResponseFindParameters, ResponseFinder}
 /**
   * Created by wyozi on 5.2.2016.
   */
-class DatabaseResponseFinder extends ResponseFinder {
+class DatabaseResponseFinder @Inject() (pingRepo: PingResponseRepository, respRepo: ResponseRepository) extends ResponseFinder {
   /**
     * Finds suitable response to given parameters.
     */
   override def find(params: ResponseFindParameters): Option[Response] = {
-
-    import play.api.Play.current
-    DB.withConnection { implicit connection =>
-      SQL(
-        """
-          |SELECT * FROM PingResponses pr
-          |LEFT JOIN Responses ON pr.response = Responses.id
-          |WHERE pr.response IS NOT NULL AND pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
-        """.stripMargin)
-        .on('user -> params.user.get)
-        .on('license -> params.license.get)
-        .on('productId -> params.productId.get)
-        .as(Response.Parser.singleOpt)
-        .orElse(
-          SQL(
-            """
-                |SELECT * FROM Products
-                |JOIN Responses ON Products.defaultresp_unreg = Responses.id
-                |WHERE Products.id = {productId}
-              """.stripMargin)
-            .on('productId -> params.productId.get)
-            .as(Response.Parser.singleOpt)
-        )
-    }
+    pingRepo
+      .getResponse(params.productId, params.license, params.user)
+      .orElse(respRepo.getUnregisteredProdLicenseResponse(params.productId.get))
   }
 }

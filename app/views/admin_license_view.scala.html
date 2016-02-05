@@ -3,7 +3,8 @@
 @import model.ProductLicense
 @import response.ResponseFinder
 @import response.ResponseFindParameters
-@(prodLicense: ProductLicense)(implicit responseFinder: ResponseFinder)
+@import dbrepo.PingResponseRepository
+@(prodLicense: ProductLicense)(implicit responseFinder: ResponseFinder, pingRespRepo: PingResponseRepository)
 
 @admin_main(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
     <h3>Users using this license:</h3>
@@ -25,11 +26,10 @@
                             <input type="hidden" name="user" value="@ping.user">
                             <input type="hidden" name="license" value="@ping.license">
                             @defining(
-                                responseFinder.find(
-                                    ResponseFindParameters(
+                                pingRespRepo.getResponse(
                                         Some(prodLicense.prod.id),
                                         Some(prodLicense.license),
-                                        Some(ping.user)))) { resp =>
+                                        Some(ping.user))) { resp =>
                                 @block_responseselect(resp.map(_.id).getOrElse(-1))
                             }
                             <input type="submit" value="Set" />
