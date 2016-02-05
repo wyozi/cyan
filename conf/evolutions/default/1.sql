@@ -3,7 +3,7 @@
 # --- !Ups
 
 CREATE TABLE Responses(
-  id SERIAL,
+  id SERIAL UNIQUE,
 
   name VARCHAR(64) NOT NULL,
   response TEXT NOT NULL,
@@ -12,7 +12,7 @@ CREATE TABLE Responses(
 );
 
 CREATE TABLE Products(
-  id SERIAL,
+  id SERIAL UNIQUE,
 
   name VARCHAR(255),
   shortName VARCHAR(16),
@@ -24,7 +24,7 @@ CREATE TABLE Products(
 );
 
 CREATE TABLE Pings(
-  id SERIAL,
+  id SERIAL UNIQUE,
 
   date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   userId VARCHAR(64) NOT NULL,
@@ -37,7 +37,7 @@ CREATE TABLE Pings(
 );
 
 CREATE TABLE PingResponses(
-  id SERIAL,
+  id SERIAL UNIQUE,
 
   userId VARCHAR(64),
   licenseId VARCHAR(255),
