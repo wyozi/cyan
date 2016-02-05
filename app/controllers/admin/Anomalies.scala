@@ -1,13 +1,13 @@
 package controllers.admin
 
 import auth.Secured
-import controllers.admin.anomalydetection.MultiLicenseUser
+import controllers.admin.anomalydetection.ManyUsersOneLicense
 import play.api.mvc.Controller
 
 object Anomalies extends Controller with Secured {
-  val activeDetections = List(MultiLicenseUser)
+  val activeDetections = List(ManyUsersOneLicense)
 
   def overview = SecureAction {
-    Ok(":D")
+    Ok(views.html.admin_anomaly_overview())
   }
 }

@@ -1,5 +1,9 @@
 @()
 
 @admin_main("Anomaly overview") {
-
+    @for(det <- controllers.admin.Anomalies.activeDetections) {
+        @for(a <- det.detectAnomalies()) {
+            <div>@a.name @a.severity</div>
+        }
+    }
 }

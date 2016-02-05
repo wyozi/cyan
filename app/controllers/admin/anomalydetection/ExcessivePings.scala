@@ -5,4 +5,6 @@ package controllers.admin.anomalydetection
   */
 object ExcessivePings extends AnomalyDetector {
   override def name: String = "Excessive pings"
+
+  override def detectAnomalies(): List[Anomaly] = Nil
 }
