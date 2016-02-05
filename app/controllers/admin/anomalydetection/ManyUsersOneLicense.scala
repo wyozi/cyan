@@ -7,7 +7,7 @@ import play.api.mvc.Call
   * Created by wyozi on 3.2.2016.
   */
 object ManyUsersOneLicense extends AnomalyDetector {
-  val USER_PER_LICENSE_THRESHOLD = 4
+  val USER_PER_LICENSE_THRESHOLD = 3
 
   override def name: String = "Many users on license"
 
@@ -20,14 +20,14 @@ object ManyUsersOneLicense extends AnomalyDetector {
       val dbEntries = SQL("""
           |SELECT *
           |FROM (
-          |  SELECT Products.id AS productId, Products.name AS productName, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
-          |    LEFT JOIN Products ON Pings.product = Products.shortName
-          |  GROUP BY productId, licenseId
+          |  SELECT Products.id AS product_id, Products.name AS product_name, license, COUNT(DISTINCT user_name) AS distinctUserCount FROM Pings
+          |    LEFT JOIN Products ON Pings.product = Products.short_name
+          |  GROUP BY product_id, license
           |) AS t
           |WHERE distinctUserCount >= {threshold}
         """.stripMargin)
         .on('threshold -> USER_PER_LICENSE_THRESHOLD)
-        .as(get[String]("productName")~get[Int]("productId")~get[String]("licenseId")~get[Int]("distinctUserCount")*)
+        .as(get[String]("product_name")~get[Int]("product_id")~get[String]("license")~get[Int]("distinctUserCount")*)
 
       dbEntries.map { case pnm~p~l~uc => new MUOLAnomaly(pnm, p, l, uc) }
     }
