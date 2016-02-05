@@ -6,7 +6,7 @@ CREATE TABLE Responses(
   id SERIAL,
 
   name VARCHAR(64) NOT NULL,
-  response VARCHAR(MAX) NOT NULL,
+  response TEXT NOT NULL,
 
   PRIMARY KEY (id)
 );
@@ -33,7 +33,7 @@ CREATE TABLE Pings(
 
   responseId INT DEFAULT NULL REFERENCES Responses(id),
 
-  PRIMARY KEY (id),
+  PRIMARY KEY (id)
 );
 
 CREATE TABLE PingResponses(
@@ -45,7 +45,7 @@ CREATE TABLE PingResponses(
 
   response INT REFERENCES Responses(id),
 
-  PRIMARY KEY (id),
+  PRIMARY KEY (id)
 );
 CREATE UNIQUE INDEX ping_userlicprod ON PingResponses (userId, licenseId, productId);
 
