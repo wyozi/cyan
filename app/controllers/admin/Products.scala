@@ -72,16 +72,12 @@ class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo:
     Ok(views.html.admin_license_view(prod.getLicense(licenseId)))
   }
 
-  def setProductLicenseResponse(productId: Int) = SecureAction { req =>
+  def setProductLicenseResponse(productId: Int, license: String) = SecureAction { req =>
     val params = req.body.asFormUrlEncoded.get
 
-    val user = params.get("user").map(_.head.mkString).get
-    val license = params.get("license").map(_.head.mkString).get
-    val response = params.get("response").map(_.head.mkString).get
-
-    val responseParsed = response match {
+    val response = params.get("response").map(_.head.mkString).get match {
       case "null" => Option.empty
-      case _ => Some(response.toInt)
+      case x => Some(x.toInt)
     }
 
     import play.api.Play.current
@@ -89,10 +85,10 @@ class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo:
       import anorm._
 
       SQL("MERGE INTO PingResponses(userId, licenseId, productId, response) KEY(userId, licenseId, productId) VALUES({user}, {license}, {product}, {resp})")
-        .on('user -> user)
-        .on('license -> license)
+        .on('user -> None)
         .on('product -> productId)
-        .on('resp -> responseParsed)
+        .on('license -> license)
+        .on('resp -> response)
         .executeUpdate()
 
       Redirect(routes.Products.licenseView(productId, license))

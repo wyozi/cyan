@@ -13,13 +13,22 @@ class PingResponseRepository {
     DB.withConnection { implicit connection =>
       SQL(
         """
-          |SELECT * FROM PingResponses pr
-          |LEFT JOIN Responses ON pr.response = Responses.id
-          |WHERE pr.response IS NOT NULL AND pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
+          |SELECT *
+          |FROM Responses
+          |WHERE id = (
+          |  SELECT response FROM PingResponses WHERE (productId = {productId} AND licenseId = {license}) AND userId = {user}
+          |  UNION ALL
+          |  SELECT response FROM PingResponses WHERE userId = {user}
+          |  UNION ALL
+          |  SELECT response FROM PingResponses WHERE (productId = {productId} AND licenseId = {license})
+          |  UNION ALL
+          |  SELECT response FROM PingResponses WHERE productId = {productId}
+          |  LIMIT  1
+          |)
         """.stripMargin)
         .on('productId -> productId.get)
-        .on('user -> user.get)
         .on('license -> license.get)
+        .on('user -> user)
         .as(Response.Parser.singleOpt)
     }
   }

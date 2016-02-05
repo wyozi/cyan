@@ -10,7 +10,7 @@ GET     /admin/products                          @controllers.admin.Products.lis
 POST    /admin/products                          @controllers.admin.Products.create
 GET     /admin/products/:id                      @controllers.admin.Products.view(id: Int)
 POST    /admin/products/:id                      @controllers.admin.Products.configure(id: Int)
-POST    /admin/products/:id/response             @controllers.admin.Products.setProductLicenseResponse(id: Int)
+POST    /admin/products/:pid/:lid/response       @controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
 
 GET     /admin/products/:id/licences/:lid        @controllers.admin.Products.licenseView(id: Int, lid: String)
 
