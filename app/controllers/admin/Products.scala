@@ -80,18 +80,7 @@ class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo:
       case x => Some(x.toInt)
     }
 
-    import play.api.Play.current
-    DB.withConnection { implicit connection =>
-      import anorm._
-
-      SQL("MERGE INTO PingResponses(userId, licenseId, productId, response) KEY(userId, licenseId, productId) VALUES({user}, {license}, {product}, {resp})")
-        .on('user -> None)
-        .on('product -> productId)
-        .on('license -> license)
-        .on('resp -> response)
-        .executeUpdate()
-
-      Redirect(routes.Products.licenseView(productId, license))
-    }
+    pingRespRepo.upsertPingResponse(Some(productId), Some(license), None, response)
+    Redirect(routes.Products.licenseView(productId, license))
   }
 }
