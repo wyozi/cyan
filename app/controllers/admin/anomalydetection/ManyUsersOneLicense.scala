@@ -18,10 +18,13 @@ object ManyUsersOneLicense extends AnomalyDetector {
       import anorm.SqlParser._
 
       val dbEntries = SQL("""
-          |SELECT Products.name AS productName, Products.id AS productId, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
-          |LEFT JOIN Products ON Pings.product = Products.shortName
-          |GROUP BY product, licenseId
-          |HAVING distinctUserCount >= {threshold}
+          |SELECT *
+          |FROM (
+          |  SELECT Products.id AS productId, Products.name AS productName, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
+          |    LEFT JOIN Products ON Pings.product = Products.shortName
+          |  GROUP BY productId, licenseId
+          |) AS t
+          |WHERE distinctUserCount >= {threshold}
         """.stripMargin)
         .on('threshold -> USER_PER_LICENSE_THRESHOLD)
         .as(get[String]("productName")~get[Int]("productId")~get[String]("licenseId")~get[Int]("distinctUserCount")*)
