@@ -8,8 +8,8 @@ import controllers.admin.anomalydetection._
 object admin_anomaly_overview {
   def getSeverityBootstrapClass(severity: AnomalySeverity): String = severity match {
     case Low => "active"
-    case Medium => ""
     case Significant => "warning"
     case Critical => "danger"
+    case _ => ""
   }
 }

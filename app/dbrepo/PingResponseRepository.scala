@@ -2,13 +2,14 @@ package dbrepo
 
 import anorm._
 import anorm.SqlParser._
+import com.google.inject.Inject
 import model.Response
-import play.api.db.DB
+import play.api.db.{Database, DB}
 
 /**
   * Created by wyozi on 5.2.2016.
   */
-class PingResponseRepository {
+class PingResponseRepository @Inject() (db: Database) {
   import play.api.Play.current
 
   /**
@@ -25,7 +26,7 @@ class PingResponseRepository {
     * @return
     */
   def getBestPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Option[Int] = {
-    DB.withConnection { implicit connection =>
+    db.withConnection { implicit connection =>
       SQL(
         """
           |SELECT id FROM PingResponses WHERE response_id IS NOT NULL AND (product_id = {productId} AND license = {license}) AND user_name = {user}
@@ -55,14 +56,14 @@ class PingResponseRepository {
   def getExactPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Option[Int] = {
     val whereQuery = (productId, license, user) match {
       case (Some(p), Some(l), Some(u)) => "(product_id = {productId} AND license = {license}) AND user_name = {user}"
-      case (None, None, Some(u)) => "user_name = {user}"
+      case (None, None, Some(u)) => "(product_id IS NULL AND license IS NULL) AND user_name = {user}"
       case (Some(p), Some(l), None) => "(product_id = {productId} AND license = {license}) AND user_name IS NULL"
       case (Some(p), None, None) => "product_id = {productId} AND license IS NULL AND user_name IS NULL"
       case params => throw new RuntimeException(s"cannot search for exact ping response with this list of params: $params")
     }
     val fullQuery = s"SELECT id FROM PingResponses WHERE $whereQuery LIMIT 1"
 
-    DB.withConnection { implicit connection =>
+    db.withConnection { implicit connection =>
       SQL(fullQuery)
         .on('productId -> productId)
         .on('license -> license)
@@ -72,7 +73,7 @@ class PingResponseRepository {
   }
 
   private def getResponse(pingResponseId: Int): Option[Response] = {
-      DB.withConnection { implicit connection =>
+      db.withConnection { implicit connection =>
         SQL(
           """
             |SELECT *
@@ -93,7 +94,7 @@ class PingResponseRepository {
   }
 
   def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], response: Option[Int]): Unit = {
-    DB.withConnection { implicit connection =>
+    db.withConnection { implicit connection =>
       getExactPingResponseId(productId, license, user).fold(
         // empty
         SQL("INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES ({prod}, {license}, {user}, {resp})")

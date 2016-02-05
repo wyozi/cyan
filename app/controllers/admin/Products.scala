@@ -3,7 +3,6 @@ package controllers.admin
 import javax.inject.Inject
 
 import auth.Secured
-import controllers.routes
 import dbrepo.PingResponseRepository
 import model.Product
 import play.api.data.Form

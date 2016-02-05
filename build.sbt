@@ -10,7 +10,8 @@ libraryDependencies ++= Seq( jdbc , cache , ws, evolutions, specs2 % Test )
 
 libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4",
-  "com.typesafe.play" %% "anorm" % "2.5.0"
+  "com.typesafe.play" %% "anorm" % "2.5.0",
+  "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
 )
 
 libraryDependencies ++= Seq(
