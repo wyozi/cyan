@@ -1,5 +1,6 @@
 @import model.Product
-@(prod: Product)
+@import dbrepo.PingResponseRepository
+@(prod: Product)(implicit pingRespRepo: PingResponseRepository)
 
 @admin_main(s"Viewing product: ${prod.name}") {
     <div class="panel panel-default">
@@ -10,14 +11,9 @@
             <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
-                @block_responseselect(prod.defaultUnregResponse.getOrElse(-1))
-                <button type="submit" class="btn btn-primary btn-xs">Set</button>
-            </form>
-            <br>
-            <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
-                <input type="hidden" name="opt" value="reg_response">
-                <label for="" class="col-sm-4">Default response for registered licenses:</label>
-                @block_responseselect(prod.defaultRegResponse.getOrElse(-1))
+                @defining(pingRespRepo.getExactResponse(Some(prod.id), None, None)) { resp =>
+                    @block_responseselect(resp.map(_.id).getOrElse(-1))
+                }
                 <button type="submit" class="btn btn-primary btn-xs">Set</button>
             </form>
         </div>

@@ -17,7 +17,7 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
   def registerPing(product: String, license: String, user: String): Result = {
     import play.api.Play.current
     DB.withConnection { implicit connection =>
-      val productIdOpt = SQL("SELECT id FROM Products WHERE shortName = {shortName}")
+      val productIdOpt = SQL("SELECT id FROM Products WHERE short_name = {shortName}")
         .on('shortName -> product)
         .as(int("id").singleOpt)
 
@@ -34,7 +34,7 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
         import anorm.SqlParser._
 
         // Insert ping into db
-        SQL("INSERT INTO Pings(userId, licenseId, product, responseId) VALUES ({user}, {license}, {product}, {responseId})")
+        SQL("INSERT INTO Pings(product, license, user_name, response_id) VALUES ({product}, {license}, {user}, {responseId})")
           .on('user -> user)
           .on('license -> license)
           .on('product -> product)

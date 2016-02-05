@@ -6,7 +6,7 @@ import play.api.db.DB
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Product(id: Int, name: String, shortName: String, var defaultUnregResponse: Option[Int] = None, var defaultRegResponse: Option[Int] = None) {
+case class Product(id: Int, name: String, shortName: String) {
   import play.api.Play.current
 
   def getRecentPings: List[Ping] = {
@@ -26,23 +26,6 @@ case class Product(id: Int, name: String, shortName: String, var defaultUnregRes
   }
 
   def getLicense(license: String): ProductLicense = ProductLicense(this, license)
-
-  def updateDefaultUnregResponse(responseId: Option[Int]): Unit = {
-    DB.withConnection { implicit c =>
-      SQL("UPDATE Products SET defaultresp_unreg = {responseId} WHERE id = {id}")
-        .on('id -> id, 'responseId -> responseId)
-        .executeUpdate()
-    }
-    defaultUnregResponse = responseId
-  }
-  def updateDefaultRegResponse(responseId: Option[Int]): Unit = {
-    DB.withConnection { implicit c =>
-      SQL("UPDATE Products SET defaultresp_reg = {responseId} WHERE id = {id}")
-        .on('id -> id, 'responseId -> responseId)
-        .executeUpdate()
-    }
-    defaultRegResponse = responseId
-  }
 }
 object Product {
   import play.api.Play.current
@@ -52,12 +35,9 @@ object Product {
   val Parser = for {
     id <- int("id")
     name <- str("name")
-    shortName <- str("shortName")
-
-    defUnreg <- get[Option[Int]]("defaultresp_unreg")
-    defReg <- get[Option[Int]]("defaultresp_reg")
+    shortName <- str("short_name")
   } yield {
-    Product(id, name, shortName, defUnreg, defReg)
+    Product(id, name, shortName)
   }
 
   def getAll: List[Product] = {
@@ -73,7 +53,7 @@ object Product {
   }
   def insert(name: String, shortName: String) = {
     DB.withConnection { implicit c =>
-      SQL("INSERT INTO Products(name, shortName) VALUES({name}, {shortName})")
+      SQL("INSERT INTO Products(name, short_name) VALUES({name}, {shortName})")
         .on('name -> name, 'shortName -> shortName)
         .executeInsert()
     }

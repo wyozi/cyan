@@ -18,9 +18,9 @@ object Ping {
     for {
       id <- int("id")
       date <- get[DateTime]("date")
-      license <- str("licenseId")
-      user <- str("userId")
-      responseId <- get[Option[Int]]("responseId")
+      license <- str("license")
+      user <- str("user_name")
+      responseId <- get[Option[Int]]("response_id")
     } yield {
       Ping(id, date, _: Product, license, user, responseId)
     }

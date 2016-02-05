@@ -2,52 +2,49 @@
 
 # --- !Ups
 
-CREATE TABLE Responses(
-  id SERIAL UNIQUE,
+CREATE TABLE Responses (
+  id       SERIAL UNIQUE,
 
-  name VARCHAR(64) NOT NULL,
-  response TEXT NOT NULL,
-
-  PRIMARY KEY (id)
-);
-
-CREATE TABLE Products(
-  id SERIAL UNIQUE,
-  shortName VARCHAR(16) UNIQUE,
-
-  name VARCHAR(255),
-
-  defaultresp_unreg INT DEFAULT NULL REFERENCES Responses(id),
-  defaultresp_reg INT DEFAULT NULL REFERENCES Responses(id),
+  name     VARCHAR(64) NOT NULL,
+  response TEXT        NOT NULL,
 
   PRIMARY KEY (id)
 );
 
-CREATE TABLE Pings(
-  id SERIAL UNIQUE,
+CREATE TABLE Products (
+  id         SERIAL UNIQUE,
+  short_name VARCHAR(16) UNIQUE,
 
-  date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-  userId VARCHAR(64) NOT NULL,
-  licenseId VARCHAR(255) NOT NULL,
-  product VARCHAR(255) NOT NULL REFERENCES Products(shortName),
-
-  responseId INT DEFAULT NULL REFERENCES Responses(id),
+  name       VARCHAR(255),
 
   PRIMARY KEY (id)
 );
 
-CREATE TABLE PingResponses(
-  id SERIAL UNIQUE,
+CREATE TABLE Pings (
+  id          SERIAL UNIQUE,
 
-  userId VARCHAR(64),
-  licenseId VARCHAR(255),
-  productId INT,
+  product     VARCHAR(255) NOT NULL REFERENCES Products (short_name),
+  license     VARCHAR(255) NOT NULL,
+  user_name   VARCHAR(64)  NOT NULL,
+  date        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-  response INT REFERENCES Responses(id),
+  response_id INT       DEFAULT NULL REFERENCES Responses (id),
 
   PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX ping_userlicprod ON PingResponses (userId, licenseId, productId);
+
+CREATE TABLE PingResponses (
+  id          SERIAL UNIQUE,
+
+  product_id  INT,
+  license     VARCHAR(255),
+  user_name   VARCHAR(64),
+
+  response_id INT REFERENCES Responses (id),
+
+  PRIMARY KEY (id)
+);
+CREATE UNIQUE INDEX ping_userlicprod ON PingResponses (product_id, license, user_name);
 
 # --- !Downs
 

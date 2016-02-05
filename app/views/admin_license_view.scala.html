@@ -17,7 +17,7 @@
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for all users of this license:</label>
                 @defining(
-                    pingRespRepo.getResponse(
+                    pingRespRepo.getExactResponse(
                         Some(prodLicense.prod.id),
                         Some(prodLicense.license),
                         None)) { resp =>

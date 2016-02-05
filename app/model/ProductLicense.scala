@@ -24,8 +24,8 @@ case class ProductLicense(prod: Product, license: String) {
           |SELECT p1.*
           |FROM Pings p1
           |  LEFT JOIN Pings p2
-          |      ON p1.userId = p2.userId AND p1.product = p2.product AND p1.licenseId = p2.licenseId AND p1.id < p2.id
-          |WHERE p2.id is NULL AND p1.product = {shortName} AND p1.licenseId = {license}
+          |      ON p1.user_name = p2.user_name AND p1.product = p2.product AND p1.license = p2.license AND p1.id < p2.id
+          |WHERE p2.id is NULL AND p1.product = {shortName} AND p1.license = {license}
         """.stripMargin
       )
         .on('shortName -> prod.shortName)

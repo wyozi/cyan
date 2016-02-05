@@ -43,10 +43,11 @@ class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo:
 
     opt match {
       case "unreg_response" => {
-        prod.updateDefaultUnregResponse(fue.get("response").head match { case "null" => Option.empty; case x => Some(x.toInt) })
-      }
-      case "reg_response" => {
-        prod.updateDefaultRegResponse(fue.get("response").head match { case "null" => Option.empty; case x => Some(x.toInt) })
+        val response = fue.get("response").head match {
+          case "null" => Option.empty
+          case x => Some(x.toInt)
+        }
+        pingRespRepo.upsertExactPingResponse(Some(prodId), None, None, response)
       }
     }
 
@@ -80,7 +81,7 @@ class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo:
       case x => Some(x.toInt)
     }
 
-    pingRespRepo.upsertPingResponse(Some(productId), Some(license), None, response)
+    pingRespRepo.upsertExactPingResponse(Some(productId), Some(license), None, response)
     Redirect(routes.Products.licenseView(productId, license))
   }
 }
