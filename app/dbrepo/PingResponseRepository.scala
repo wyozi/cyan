@@ -19,9 +19,9 @@ class PingResponseRepository {
           |UNION ALL
           |SELECT id FROM PingResponses WHERE userId = {user}
           |UNION ALL
-          |SELECT id FROM PingResponses WHERE (productId = {productId} AND licenseId = {license})
+          |SELECT id FROM PingResponses WHERE (productId = {productId} AND licenseId = {license}) AND userId IS NULL
           |UNION ALL
-          |SELECT id FROM PingResponses WHERE productId = {productId}
+          |SELECT id FROM PingResponses WHERE productId = {productId} AND licenseId IS NULL AND userId IS NULL
           |LIMIT  1
         """.stripMargin)
         .on('productId -> productId.get)
