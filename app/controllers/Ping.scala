@@ -6,7 +6,7 @@ import anorm.SqlParser._
 import anorm._
 import controllers.Application._
 import play.api.db.DB
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Result, Action, Controller}
 import response.{ResponseFindParameters, ResponseFinder}
 
 /**
@@ -14,13 +14,7 @@ import response.{ResponseFindParameters, ResponseFinder}
   */
 class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
-  def ping = Action { req =>
-    val params = req.body.asFormUrlEncoded.get
-
-    val user = params.get("user").map(_.head.mkString)
-    val license = params.get("license").map(_.head.mkString)
-    val product = params.get("prod").map(_.head.mkString)
-
+  def registerPing(product: String, license: String, user: String): Result = {
     import play.api.Play.current
     DB.withConnection { implicit connection =>
       val productIdOpt = SQL("SELECT id FROM Products WHERE shortName = {shortName}")
@@ -34,7 +28,7 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
         val productId = productIdOpt.get
 
         // Get a response from responseFinder
-        val response = responseFinder.find(ResponseFindParameters(productIdOpt, license, user))
+        val response = responseFinder.find(ResponseFindParameters(productIdOpt, Some(license), Some(user)))
 
         import anorm._
         import anorm.SqlParser._
@@ -49,6 +43,20 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
         Ok(response.map(_.body).getOrElse(""))
       }
+    }
+  }
+
+  def ping = Action { req =>
+    val params = req.body.asFormUrlEncoded.get
+
+    val user = params.get("user").map(_.head.mkString)
+    val license = params.get("license").map(_.head.mkString)
+    val product = params.get("prod").map(_.head.mkString)
+
+    if (user.isEmpty || license.isEmpty || product.isEmpty) {
+      Ok("") // TODO log this somehow
+    } else {
+      registerPing(product.get, license.get, user.get)
     }
   }
 
