@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                           controllers.Application.index
-POST    /ping                       controllers.Ping.ping
+POST    /ping                                    @controllers.Ping.ping
 
 GET     /admin/products                          controllers.admin.Products.list
 POST    /admin/products                          controllers.admin.Products.create

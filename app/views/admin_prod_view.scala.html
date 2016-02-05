@@ -31,6 +31,7 @@
                 <td>User</td>
                 <td>License</td>
                 <td>Timestamp</td>
+                <td>Response</td>
             </tr>
         </thead>
         <tbody>
@@ -39,6 +40,16 @@
                     <td>@ping.user</td>
                     <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a></td>
                     <td>@ping.date</td>
+                    <td>
+                        @ping.response match {
+                            case Some(resp) => {
+                                <a href="@admin.routes.Responses.view(resp.id)" class="btn btn-info">@resp.name</a>
+                            }
+                            case None => {
+                                Empty
+                            }
+                        }
+                    </td>
                 </tr>
             }
         </tbody>

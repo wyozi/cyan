@@ -5,7 +5,7 @@ import play.api.db.DB
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Response(id: Int, name: String, response: String)
+case class Response(id: Int, name: String, body: String)
 object Response {
   import play.api.Play.current
   import anorm._
@@ -24,7 +24,7 @@ object Response {
       SQL("SELECT * FROM Responses").as(Parser.*)
     }
   }
-  def getId(id: Int): Option[Response] = {
+  def getById(id: Int): Option[Response] = {
     DB.withConnection { implicit c =>
       SQL("SELECT * FROM Responses WHERE id = {id}").on('id -> id).as(Parser.singleOpt)
     }

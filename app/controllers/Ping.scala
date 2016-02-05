@@ -1,22 +1,25 @@
 package controllers
 
+import javax.inject.Inject
+
 import anorm.SqlParser._
 import anorm._
 import controllers.Application._
 import play.api.db.DB
 import play.api.mvc.{Action, Controller}
+import response.{ResponseFindParameters, ResponseFinder}
 
 /**
   * Created by wyozi on 3.2.2016.
   */
-object Ping extends Controller {
+class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
   def ping = Action { req =>
     val params = req.body.asFormUrlEncoded.get
 
-    val userId = params.get("user").map(_.head.mkString).get
-    val licenseId = params.get("license").map(_.head.mkString).get
-    val product = params.get("prod").map(_.head.mkString).get
+    val user = params.get("user").map(_.head.mkString)
+    val license = params.get("license").map(_.head.mkString)
+    val product = params.get("prod").map(_.head.mkString)
 
     import play.api.Play.current
     DB.withConnection { implicit connection =>
@@ -25,41 +28,26 @@ object Ping extends Controller {
         .as(int("id").singleOpt)
 
       if (productIdOpt.isEmpty) {
-        Ok("NOT FOUND !!")
+        // product not found but we don't want to reveal that to pinger so return nil ok
+        Ok("")
       } else {
         val productId = productIdOpt.get
+
+        // Get a response from responseFinder
+        val response = responseFinder.find(ResponseFindParameters(productIdOpt, license, user))
 
         import anorm._
         import anorm.SqlParser._
 
-        SQL("INSERT INTO Pings(userId, licenseId, product) VALUES ({user}, {license}, {product})")
-          .on('user -> userId)
-          .on('license -> licenseId)
+        // Insert ping into db
+        SQL("INSERT INTO Pings(userId, licenseId, product, responseId) VALUES ({user}, {license}, {product}, {responseId})")
+          .on('user -> user)
+          .on('license -> license)
           .on('product -> product)
+          .on('responseId -> response.map(_.id))
           .executeInsert()
 
-        // First try to get specific response
-        val responseOpt = SQL("""
-              |SELECT Responses.response as response FROM PingResponses pr
-              |LEFT JOIN Responses ON pr.response = Responses.id
-              |WHERE pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
-            """.stripMargin)
-          .on('user -> userId)
-          .on('license -> licenseId)
-          .on('productId -> productId)
-          .as(str("response").singleOpt)
-        .orElse(
-          SQL("""
-                |SELECT Responses.response as response FROM Products
-                |LEFT JOIN Responses ON Products.defaultresp_unreg = Responses.id
-                |WHERE Products.id = {productId}
-              """.stripMargin)
-            .on('productId -> productId)
-            .as(get[Option[String]]("response").singleOpt)
-            .flatten
-        )
-
-        Ok(responseOpt.getOrElse(""))
+        Ok(response.map(_.body).getOrElse(""))
       }
     }
   }

@@ -10,20 +10,8 @@ import play.api.db.DB
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: String) {
-  import play.api.Play.current
-
-  def getResponseId: Option[Int] = {
-    DB.withConnection { implicit c =>
-      SQL("SELECT response FROM PingResponses " +
-          "WHERE response IS NOT NULL AND userId = {user} AND licenseId = {license} AND productId = {prod}")
-          .on('user -> user)
-          .on('license -> license)
-          .on('prod -> prod.id)
-          .as(int("response").singleOpt)
-    }
-  }
-  def getResponse: Option[Response] = getResponseId.flatMap(id => Response.getId(id))
+case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: String, responseId: Option[Int]) {
+  def response: Option[Response] = responseId.flatMap(id => Response.getById(id))
 }
 object Ping {
   val productlessParser = {
@@ -32,8 +20,9 @@ object Ping {
       date <- get[DateTime]("date")
       license <- str("licenseId")
       user <- str("userId")
+      responseId <- get[Option[Int]]("responseId")
     } yield {
-      Ping(id, date, _: Product, license, user)
+      Ping(id, date, _: Product, license, user, responseId)
     }
   }
 

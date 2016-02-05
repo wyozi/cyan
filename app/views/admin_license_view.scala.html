@@ -22,7 +22,7 @@
                         <form action="@admin.routes.Products.setProductLicenseResponse(prodLicense.prod.id)" method="POST">
                             <input type="hidden" name="user" value="@ping.user">
                             <input type="hidden" name="license" value="@ping.license">
-                            @block_responseselect(ping.getResponseId.getOrElse(-1))
+                            @block_responseselect(ping.responseId.getOrElse(-1))
                             <input type="submit" value="Set" />
                         </form>
                     </td>

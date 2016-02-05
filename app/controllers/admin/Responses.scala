@@ -26,7 +26,7 @@ object Responses extends Controller with Secured {
   }
 
   def view(respId: Int) = SecureAction {
-    val resp = Response.getId(respId).get
+    val resp = Response.getById(respId).get
     Ok(views.html.admin_resp_view(resp))
   }
 
