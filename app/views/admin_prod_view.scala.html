@@ -25,6 +25,7 @@
         <thead>
             <tr>
                 <td>User</td>
+                <td>IP</td>
                 <td>License</td>
                 <td>Timestamp</td>
                 <td>Response</td>
@@ -34,6 +35,7 @@
             @for(ping <- prod.getRecentPings) {
                 <tr>
                     <td>@ping.user</td>
+                    <td>@ping.ip</td>
                     <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a></td>
                     <td>@ping.date</td>
                     <td>

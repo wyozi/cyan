@@ -10,7 +10,7 @@ import play.api.db.DB
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: String, responseId: Option[Int]) {
+case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: String, ip: String, responseId: Option[Int]) {
   def response: Option[Response] = responseId.flatMap(id => Response.getById(id))
 }
 object Ping {
@@ -20,9 +20,10 @@ object Ping {
       date <- get[DateTime]("date")
       license <- str("license")
       user <- str("user_name")
+      ip <- str("ip")
       responseId <- get[Option[Int]]("response_id")
     } yield {
-      Ping(id, date, _: Product, license, user, responseId)
+      Ping(id, date, _: Product, license, user, ip, responseId)
     }
   }
 

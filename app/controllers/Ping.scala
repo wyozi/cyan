@@ -6,7 +6,7 @@ import anorm.SqlParser._
 import anorm._
 import controllers.Application._
 import play.api.db.DB
-import play.api.mvc.{Result, Action, Controller}
+import play.api.mvc._
 import response.{ResponseFindParameters, ResponseFinder}
 
 /**
@@ -14,7 +14,7 @@ import response.{ResponseFindParameters, ResponseFinder}
   */
 class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
-  def registerPing(product: String, license: String, user: String): Result = {
+  def registerPing(req: Request[AnyContent], product: String, license: String, user: String): Result = {
     import play.api.Play.current
     DB.withConnection { implicit connection =>
       val productIdOpt = SQL("SELECT id FROM Products WHERE short_name = {shortName}")
@@ -34,10 +34,11 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
         import anorm.SqlParser._
 
         // Insert ping into db
-        SQL("INSERT INTO Pings(product, license, user_name, response_id) VALUES ({product}, {license}, {user}, {responseId})")
-          .on('user -> user)
-          .on('license -> license)
+        SQL("INSERT INTO Pings(product, license, user_name, ip, response_id) VALUES ({product}, {license}, {user}, {ip}, {responseId})")
           .on('product -> product)
+          .on('license -> license)
+          .on('user -> user)
+          .on('ip -> req.remoteAddress)
           .on('responseId -> response.map(_.id))
           .executeInsert()
 
@@ -56,7 +57,7 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
     if (user.isEmpty || license.isEmpty || product.isEmpty) {
       Ok("") // TODO log this somehow
     } else {
-      registerPing(product.get, license.get, user.get)
+      registerPing(req, product.get, license.get, user.get)
     }
   }
 
