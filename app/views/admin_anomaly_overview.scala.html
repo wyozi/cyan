@@ -1,9 +1,38 @@
+@import controllers.admin.anomalydetection._
 @()
 
-@admin_main("Anomaly overview") {
-    @for(det <- controllers.admin.Anomalies.activeDetections) {
-        @for(a <- det.detectAnomalies()) {
-            <div>@a.name @a.severity</div>
-        }
+@getSeverityBootstrapClass(severity: AnomalySeverity) = {
+    @severity match {
+        case Low => { active }
+        case Significant => { warning }
+        case Critical => { danger }
+        case _ => {}
     }
+}
+
+@admin_main("Anomaly overview") {
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Level</td>
+                <td>Name</td>
+                <td>Related links</td>
+            </tr>
+        </thead>
+        <tbody>
+            @for(det <- controllers.admin.Anomalies.activeDetections) {
+                @for(a <- det.detectAnomalies()) {
+                    <tr class="@getSeverityBootstrapClass(a.severity)">
+                        <td>@a.severity</td>
+                        <td>@a.toShortString</td>
+                        <td>
+                            @for((name, targ) <- a.relatedLinks) {
+                                <a href="@targ" class="btn btn-info">@name</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
 }

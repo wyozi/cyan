@@ -5,7 +5,7 @@ package controllers.admin.anomalydetection
   */
 sealed class AnomalySeverity
 
-object Low extends AnomalySeverity
-object Medium extends AnomalySeverity
-object Significant extends AnomalySeverity
-object Critical extends AnomalySeverity
+case object Low extends AnomalySeverity
+case object Medium extends AnomalySeverity
+case object Significant extends AnomalySeverity
+case object Critical extends AnomalySeverity

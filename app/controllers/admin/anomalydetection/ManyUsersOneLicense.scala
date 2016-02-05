@@ -1,6 +1,7 @@
 package controllers.admin.anomalydetection
 
 import play.api.db.DB
+import play.api.mvc.Call
 
 /**
   * Created by wyozi on 3.2.2016.
@@ -16,19 +17,25 @@ object ManyUsersOneLicense extends AnomalyDetector {
       import anorm._
       import anorm.SqlParser._
 
-      // TODO test
-
       val dbEntries = SQL("""
-          |SELECT product, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
+          |SELECT Products.name AS productName, Products.id AS productId, licenseId, COUNT(DISTINCT userId) AS distinctUserCount FROM Pings
+          |LEFT JOIN Products ON Pings.product = Products.shortName
           |GROUP BY product, licenseId
+          |HAVING distinctUserCount >= {threshold}
         """.stripMargin)
-        .as(get[String]("product")~get[String]("licenseId")~get[Int]("distinctUserCount")*)
+        .on('threshold -> USER_PER_LICENSE_THRESHOLD)
+        .as(get[String]("productName")~get[Int]("productId")~get[String]("licenseId")~get[Int]("distinctUserCount")*)
 
-      dbEntries.map { case p~l~uc => Anomaly(s"$uc users on license $l in $p", Medium) }
+      dbEntries.map { case pnm~p~l~uc => new MUOLAnomaly(pnm, p, l, uc) }
     }
   }
 
-  class MUOLAnomaly(name: String, severity: AnomalySeverity) extends Anomaly(name, severity) {
-    override def toShortString: String = s"$name [${severity.getClass.getSimpleName}]"
+  class MUOLAnomaly(productName: String, productId: Int, license: String, distinctUserCount: Int) extends Anomaly(Medium) {
+    override def relatedLinks: List[(String, Call)] = List(
+      ("product", controllers.admin.routes.Products.view(productId)),
+      ("license", controllers.admin.routes.Products.licenseView(productId, license))
+    )
+
+    override def toShortString: String = s"$distinctUserCount distinct users on a single license of $productName"
   }
 }
