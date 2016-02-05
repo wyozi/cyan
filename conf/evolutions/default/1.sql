@@ -13,9 +13,9 @@ CREATE TABLE Responses(
 
 CREATE TABLE Products(
   id SERIAL UNIQUE,
+  shortName VARCHAR(16) UNIQUE,
 
   name VARCHAR(255),
-  shortName VARCHAR(16),
 
   defaultresp_unreg INT DEFAULT NULL REFERENCES Responses(id),
   defaultresp_reg INT DEFAULT NULL REFERENCES Responses(id),
