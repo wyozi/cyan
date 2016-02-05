@@ -1,5 +1,7 @@
 package controllers.admin
 
+import javax.inject.Inject
+
 import auth.Secured
 import controllers.routes
 import model.Product
@@ -9,11 +11,12 @@ import play.api.mvc.Controller
 
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import response.ResponseFinder
 
 /**
   * Created by wyozi on 4.2.2016.
   */
-object Products extends Controller with Secured {
+class Products @Inject() (implicit responseFinder: ResponseFinder) extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(
     tuple(

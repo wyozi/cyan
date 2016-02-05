@@ -21,7 +21,7 @@ class DatabaseResponseFinder extends ResponseFinder {
         """
           |SELECT * FROM PingResponses pr
           |LEFT JOIN Responses ON pr.response = Responses.id
-          |WHERE pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
+          |WHERE pr.response IS NOT NULL AND pr.userId = {user} AND pr.licenseId = {license} AND pr.productId = {productId}
         """.stripMargin)
         .on('user -> params.user.get)
         .on('license -> params.license.get)
@@ -31,7 +31,7 @@ class DatabaseResponseFinder extends ResponseFinder {
           SQL(
             """
                 |SELECT * FROM Products
-                |LEFT JOIN Responses ON Products.defaultresp_unreg = Responses.id
+                |JOIN Responses ON Products.defaultresp_unreg = Responses.id
                 |WHERE Products.id = {productId}
               """.stripMargin)
             .on('productId -> params.productId.get)
