@@ -43,6 +43,13 @@ object DbUtils {
       }.get.toInt
     }
 
+    def tableRowCount(table: String): Int = {
+      db.withConnection { implicit c =>
+        SQL("SELECT COUNT(*) as count FROM " + table)
+          .as(SqlParser.int("count").single)
+      }
+    }
+
     def truncate() = {
       db.withConnection { implicit c =>
         SQL"TRUNCATE TABLE PingResponses"
