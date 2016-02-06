@@ -21,7 +21,7 @@
                         Some(prodLicense.prod.id),
                         Some(prodLicense.license),
                         None)) { resp =>
-                    @block_responseselect(resp.map(_.id).getOrElse(-1))
+                    @snippet.responseselect(resp.map(_.id).getOrElse(-1))
                 }
                 <button type="submit" class="btn btn-primary btn-xs">Set</button>
             </form>

@@ -40,7 +40,7 @@
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
                 @defining(pingRespRepo.getExactResponse(Some(prod.id), None, None)) { resp =>
-                    @block_responseselect(resp.map(_.id).getOrElse(-1))
+                    @snippet.responseselect(resp.map(_.id).getOrElse(-1))
                 }
                 <button type="submit" class="btn btn-primary btn-xs">Set</button>
             </form>

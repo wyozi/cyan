@@ -1,7 +1,7 @@
 @import controllers.admin.anomalydetection._
 @()
 
-@getSeverityBootstrapClass(severity: AnomalySeverity) = {
+@severityBootstrapClass(severity: AnomalySeverity) = {
     @severity match {
         case Low => { active }
         case Significant => { warning }
@@ -22,7 +22,7 @@
         <tbody>
             @for(det <- controllers.admin.Anomalies.activeDetections) {
                 @for(a <- det.detectAnomalies()) {
-                    <tr class="@getSeverityBootstrapClass(a.severity)">
+                    <tr class="@severityBootstrapClass(a.severity)">
                         <td>@a.severity</td>
                         <td>@a.toShortString</td>
                         <td>
