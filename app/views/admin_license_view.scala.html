@@ -40,7 +40,7 @@
             @for(ping <- prodLicense.getLatestPingPerUser) {
                 <tr>
                     <td>@ping.user</td>
-                    <td>@ping.date</td>
+                    <td>@snippet.datetime(ping.date)</td>
                 </tr>
             }
         </tbody>
