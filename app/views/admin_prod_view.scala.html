@@ -1,6 +1,7 @@
 @import model.Product
 @import dbrepo.PingResponseRepository
-@(prod: Product)(implicit pingRespRepo: PingResponseRepository)
+@import cyan.backend.Backend
+@(prod: Product)(implicit backend: Backend, pingRespRepo: PingResponseRepository)
 
 @admin_main(s"Viewing product: ${prod.name}") {
     <div class="panel panel-default">
@@ -34,9 +35,9 @@
         <tbody>
             @for(ping <- prod.getRecentPings) {
                 <tr>
-                    <td>@ping.user</td>
+                    <td>@ping.user @backend @backend.createUserPopupHTML(ping.user)</td>
                     <td>@ping.ip</td>
-                    <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a></td>
+                    <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                     <td>@ping.date</td>
                     <td>
                         @ping.response match {

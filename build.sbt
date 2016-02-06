@@ -2,7 +2,11 @@ name := "Cyan"
 
 version := "1.0"
 
-lazy val `cyan` = (project in file(".")).enablePlugins(PlayScala)
+lazy val `backend-core` = project in file("backend-core")
+
+lazy val `cyan` = (project in file("."))
+  .enablePlugins(PlayScala)
+  .dependsOn(`backend-core`)
 
 scalaVersion := "2.11.7"
 
@@ -11,6 +15,7 @@ libraryDependencies ++= Seq( jdbc , cache , ws, evolutions, specs2 % Test )
 libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4",
   "com.typesafe.play" %% "anorm" % "2.5.0",
+  "com.google.inject.extensions" % "guice-multibindings" % "4.0",
   "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
 )
 
@@ -20,6 +25,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "jasny-bootstrap" % "3.1.3-2"
 )
+
+routesGenerator := InjectedRoutesGenerator
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
 

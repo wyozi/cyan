@@ -3,6 +3,7 @@ package controllers.admin
 import javax.inject.Inject
 
 import auth.Secured
+import cyan.backend.Backend
 import dbrepo.PingResponseRepository
 import model.Product
 import play.api.data.Form
@@ -16,7 +17,7 @@ import response.ResponseFinder
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Products @Inject() (implicit responseFinder: ResponseFinder, pingRespRepo: PingResponseRepository) extends Controller with Secured {
+class Products @Inject() (implicit backend: Backend, responseFinder: ResponseFinder, pingRespRepo: PingResponseRepository) extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(
     tuple(

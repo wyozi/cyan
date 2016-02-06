@@ -1,14 +1,16 @@
 package dbrepo
 
+import javax.inject.{Inject, Singleton}
+
 import anorm._
 import anorm.SqlParser._
-import com.google.inject.Inject
 import model.Response
 import play.api.db.{Database, DB}
 
 /**
   * Created by wyozi on 5.2.2016.
   */
+@Singleton
 class PingResponseRepository @Inject() (db: Database) {
   import play.api.Play.current
 

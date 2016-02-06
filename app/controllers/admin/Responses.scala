@@ -12,7 +12,7 @@ import play.api.i18n.Messages.Implicits._
 /**
   * Created by wyozi on 4.2.2016.
   */
-object Responses extends Controller with Secured {
+class Responses extends Controller with Secured {
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(

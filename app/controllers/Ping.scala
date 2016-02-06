@@ -4,7 +4,6 @@ import javax.inject.Inject
 
 import anorm.SqlParser._
 import anorm._
-import controllers.Application._
 import play.api.db.DB
 import play.api.mvc._
 import response.{ResponseFindParameters, ResponseFinder}

@@ -3,16 +3,16 @@
 # ~~~~
 
 # Home page
-GET     /                           controllers.Application.index
-POST    /ping                                    @controllers.Ping.ping
+GET     /                                        controllers.Application.index()
+POST    /ping                                    controllers.Ping.ping()
 
-GET     /admin/products                          @controllers.admin.Products.list
-POST    /admin/products                          @controllers.admin.Products.create
-GET     /admin/products/:id                      @controllers.admin.Products.view(id: Int)
-POST    /admin/products/:id                      @controllers.admin.Products.configure(id: Int)
-POST    /admin/products/:pid/:lid/response       @controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
+GET     /admin/products                          controllers.admin.Products.list()
+POST    /admin/products                          controllers.admin.Products.create()
+GET     /admin/products/:id                      controllers.admin.Products.view(id: Int)
+POST    /admin/products/:id                      controllers.admin.Products.configure(id: Int)
+POST    /admin/products/:pid/:lid/response       controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
 
-GET     /admin/products/:id/licences/:lid        @controllers.admin.Products.licenseView(id: Int, lid: String)
+GET     /admin/products/:id/licences/:lid        controllers.admin.Products.licenseView(id: Int, lid: String)
 
 GET     /admin/responses                         controllers.admin.Responses.list
 POST    /admin/responses                         controllers.admin.Responses.create
