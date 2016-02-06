@@ -1,17 +1,17 @@
 package model
 
-import java.sql.Date
-
-import anorm._
 import anorm.SqlParser._
+import anorm._
+import dbrepo.PingExtrasRepository
 import org.joda.time.DateTime
-import play.api.db.DB
 
 /**
   * Created by wyozi on 3.2.2016.
   */
 case class Ping(id: Int, date: DateTime, prod: Product, license: String, user: String, ip: String, responseId: Option[Int]) {
   def response: Option[Response] = responseId.flatMap(id => Response.getById(id))
+
+  def extras()(implicit pingExtrasRepo: PingExtrasRepository) = pingExtrasRepo.getExtrasFor(id)
 }
 object Ping {
   val productlessParser = {

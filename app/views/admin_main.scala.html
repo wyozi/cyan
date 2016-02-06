@@ -1,7 +1,7 @@
 @import model.Product
 @import model.Response
 @import controllers.admin.Anomalies
-@(subTitle: String)(content: Html)
+@(subTitle: String, scripts: Html = Html(""))(content: Html))
 
 @main("Admin: " + subTitle) {
 
@@ -44,4 +44,6 @@
 
         @content
     </div>
+} {
+    @scripts
 }

@@ -13,7 +13,7 @@ import response.{ResponseFindParameters, ResponseFinder}
   */
 class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
-  def registerPing(req: Request[AnyContent], product: String, license: String, user: String): Result = {
+  def registerPing(req: Request[AnyContent], product: String, license: String, user: String, extras: Map[String, String]): Result = {
     import play.api.Play.current
     DB.withConnection { implicit connection =>
       val productIdOpt = SQL("SELECT id FROM Products WHERE short_name = {shortName}")
@@ -30,16 +30,25 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
         val response = responseFinder.find(ResponseFindParameters(productIdOpt, Some(license), Some(user)))
 
         import anorm._
-        import anorm.SqlParser._
 
         // Insert ping into db
-        SQL("INSERT INTO Pings(product, license, user_name, ip, response_id) VALUES ({product}, {license}, {user}, {ip}, {responseId})")
+        val pingId = SQL("INSERT INTO Pings(product, license, user_name, ip, response_id) VALUES ({product}, {license}, {user}, {ip}, {responseId})")
           .on('product -> product)
           .on('license -> license)
           .on('user -> user)
           .on('ip -> req.remoteAddress)
           .on('responseId -> response.map(_.id))
           .executeInsert()
+          .get
+
+        val q = SQL("INSERT INTO PingExtras (ping_id, key, value) VALUES ({pingId}, {key}, {value})")
+            .on('pingId -> pingId)
+
+        for ((key, value) <- extras) {
+          q
+            .on('key -> key, 'value -> value)
+            .executeInsert()
+        }
 
         Ok(response.map(_.body).getOrElse(""))
       }
@@ -56,7 +65,10 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
     if (user.isEmpty || license.isEmpty || product.isEmpty) {
       Ok("") // TODO log this somehow
     } else {
-      registerPing(req, product.get, license.get, user.get)
+      val extras = params
+        .filterKeys(k => k.startsWith("x_"))
+        .map { case (key, values) => (key.substring(2), values.head.mkString) }
+      registerPing(req, product.get, license.get, user.get, extras)
     }
   }
 
