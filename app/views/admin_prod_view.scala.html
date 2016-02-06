@@ -35,7 +35,7 @@
         <tbody>
             @for(ping <- prod.getRecentPings) {
                 <tr>
-                    <td>@ping.user @backend @backend.createUserPopupHTML(ping.user)</td>
+                    <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
                     <td>@ping.ip</td>
                     <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                     <td>@ping.date</td>
