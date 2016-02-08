@@ -1,10 +1,9 @@
 @import model.Product
 @import model.Response
 @import model.ProductLicense
-@import response.ResponseFinder
-@import response.ResponseFindParameters
 @import dao.PingResponsesDAO
-@(prodLicense: ProductLicense)(implicit responseFinder: ResponseFinder, pingResponsesDAO: PingResponsesDAO)
+@import dao.ProductsDAO
+@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingResponsesDAO: PingResponsesDAO)
 
 @admin_main(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
 

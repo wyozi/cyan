@@ -1,5 +1,6 @@
 @import model.Response
-@(responses: Seq[Response], userForm: Form[(String, String)])(implicit messages: Messages)
+@import dao.ProductsDAO
+@(responses: Seq[Response], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO)
 
 @admin_main("Responses") {
     <h2>Create response</h2>

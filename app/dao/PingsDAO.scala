@@ -8,33 +8,25 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by wyozi on 8.2.2016.
   */
 class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
+
   import driver.api._
 
   private val Pings = TableQuery[PingsTable]
+
+  def insert(product: String, license: String, user: String, remoteAddress: String, responseId: Option[Int]): Future[Int] =
+    db.run((Pings.map(c => (c.product, c.license, c.userName, c.ip, c.responseId)) returning Pings.map(_.id)) += (product, license, user, remoteAddress, responseId))
 
   def findRecentForProduct(prod: Product): Future[Seq[Ping]] =
     db.run(Pings.filter(_.product === prod.shortName).sortBy(_.id.desc).result)
 
 
   private class PingsTable(tag: Tag) extends Table[Ping](tag, "PINGS") {
-    /*
-
-  id          SERIAL UNIQUE,
-
-  product     VARCHAR(255) NOT NULL REFERENCES Products (short_name),
-  license     VARCHAR(255) NOT NULL,
-  user_name   VARCHAR(64)  NOT NULL,
-  date        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-
-  response_id INT       DEFAULT NULL REFERENCES Responses (id),
-     */
     def id = column[Int]("ID", O.AutoInc)
 
     def product = column[String]("PRODUCT", O.SqlType("VARCHAR(255)"))

@@ -1,5 +1,6 @@
 @import model.Product
-@(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages)
+@import dao.ProductsDAO
+@(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO)
 
 @admin_main("Products") {
     <h2>Create product</h2>

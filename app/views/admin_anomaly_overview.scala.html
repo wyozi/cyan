@@ -1,5 +1,6 @@
 @import controllers.admin.anomalydetection._
-@()
+@import dao.ProductsDAO
+@()(implicit productsDAO: ProductsDAO)
 
 @severityBootstrapClass(severity: AnomalySeverity) = {
     @severity match {

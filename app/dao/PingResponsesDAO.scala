@@ -17,49 +17,6 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
 
   private val PingResponses = TableQuery[PingResponsesTable]
 
-  /*
-
-  import play.api.Play.current
-
-
-  private def getResponse(pingResponseId: Int): Option[Response] = {
-      db.withConnection { implicit connection =>
-        SQL(
-          """
-            |SELECT *
-            |FROM Responses
-            |WHERE id = (SELECT response_id FROM PingResponses WHERE id = {prid})
-            |LIMIT 1
-          """.stripMargin)
-          .on('prid -> pingResponseId)
-          .as(Response.Parser.singleOpt)
-      }
-  }
-
-  def getBestResponse(productId: Option[Int], license: Option[String], user: Option[String]): Option[Response] = {
-    getBestPingResponseId(productId, license, user).flatMap(getResponse)
-  }
-  def getExactResponse(productId: Option[Int], license: Option[String], user: Option[String]): Option[Response] = {
-    getExactPingResponseId(productId, license, user).flatMap(getResponse)
-  }
-
-  def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], response: Option[Int]): Unit = {
-    db.withConnection { implicit connection =>
-      getExactPingResponseId(productId, license, user).fold(
-        // empty
-        SQL("INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES ({prod}, {license}, {user}, {resp})")
-          .on('prod -> productId, 'license -> license, 'user -> user, 'resp -> response)
-          .execute()
-      ) { id =>
-        // found
-        SQL("UPDATE PingResponses SET response_id = {resp} WHERE id = {prid}")
-          .on('prid -> id, 'resp -> response)
-          .execute()
-      }
-    }
-  }
- */
-
   /**
     * Gets the ping response id that best matches given parameters.
     * Checks following in order:
@@ -106,16 +63,25 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     db.run(q.result.headOption)
   }
 
-  def getBestResponse(productId: Option[Int], license: Option[String], user: Option[String]): Option[Response] = {
-    ???
+  def getBestResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
+    getBestPingResponseId(productId, license, user).flatMap {
+      case Some(prid) => responsesDAO.findById(prid)
+      case None => Future.successful(None)
+    }
   }
   def getExactResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
     getExactPingResponseId(productId, license, user).flatMap {
       case Some(prid) => responsesDAO.findById(prid)
+      case None => Future.successful(None)
     }
   }
 
-  def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], response: Option[Int]): Unit = ???
+  def upsertExactPingResponse(pingResponse: PingResponse): Future[Unit] = {
+    getExactPingResponseId(pingResponse.productId, pingResponse.license, pingResponse.userName).map {
+      case Some(id) => db.run(sqlu"UPDATE PingResponses SET response_id = ${pingResponse.responseId} WHERE id = ${id}")
+      case None => db.run(sqlu"INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES (${pingResponse.productId}, ${pingResponse.license}, ${pingResponse.userName}, ${pingResponse.responseId})")
+    }
+  }
 
   private class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PINGRESPONSES") {
     def id = column[Int]("ID", O.AutoInc)

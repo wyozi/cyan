@@ -4,13 +4,12 @@ import javax.inject.Inject
 
 import auth.Secured
 import cyan.backend.Backend
-import dao.{PingResponsesDAO, PingsDAO, PingExtrasDAO, ProductsDAO}
-import model.{Product, ProductLicense}
+import dao._
+import model.{PingResponse, Product, ProductLicense}
 import play.api.Play.current
 import play.api.data.Form
 import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Controller
-import response.ResponseFinder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -18,7 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by wyozi on 4.2.2016.
   */
 class Products @Inject() (implicit backend: Backend,
-  responseFinder: ResponseFinder,
+  responsesDAO: ResponsesDAO,
   pingResponsesDAO: PingResponsesDAO,
   pingsDAO: PingsDAO,
   productsDAO: ProductsDAO,
@@ -47,19 +46,21 @@ class Products @Inject() (implicit backend: Backend,
     val fue = req.body.asFormUrlEncoded
 
     val opt = fue.get("opt").head
-    productsDAO.findById(prodId).map {
+    productsDAO.findById(prodId).flatMap {
       case Some(prod) =>
-        opt match {
+        val f = opt match {
           case "unreg_response" => {
             val response = fue.get("response").head match {
               case "null" => Option.empty
               case x => Some(x.toInt)
             }
-            pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
+            pingResponsesDAO.upsertExactPingResponse(PingResponse(0, Some(prodId), None, None, response))
           }
         }
-
-        Redirect(routes.Products.view(prodId))
+        f.map { r =>
+          println(r)
+          Redirect(routes.Products.view(prodId))
+        }
     }
   }
 
@@ -88,7 +89,7 @@ class Products @Inject() (implicit backend: Backend,
       case x => Some(x.toInt)
     }
 
-    pingResponsesDAO.upsertExactPingResponse(Some(productId), Some(license), None, response)
+    pingResponsesDAO.upsertExactPingResponse(PingResponse(0, Some(productId), Some(license), None, response))
     Redirect(routes.Products.licenseView(productId, license))
   }
 }

@@ -2,10 +2,9 @@ package controllers.admin
 
 import auth.Secured
 import com.google.inject.Inject
-import dao.ResponsesDAO
+import dao.{ProductsDAO, ResponsesDAO}
 import model.Response
 import play.api.data.Form
-import play.api.db.DB
 import play.api.mvc.Controller
 
 import play.api.Play.current
@@ -16,7 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Responses @Inject() (responsesDAO: ResponsesDAO) extends Controller with Secured {
+class Responses @Inject() (implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(

@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
+
   import driver.api._
 
   private val Products = TableQuery[ProductsTable]
@@ -26,6 +27,9 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
 
   def findById(id: Int): Future[Option[Product]] =
     db.run(Products.filter(_.id === id).result.headOption)
+
+  def findByShortName(shortName: String): Future[Option[Product]] =
+    db.run(Products.filter(_.shortName === shortName).result.headOption)
 
   private class ProductsTable(tag: Tag) extends Table[Product](tag, "PRODUCTS") {
     def id = column[Int]("ID", O.AutoInc)
