@@ -1,4 +1,3 @@
-import dbrepo.PingResponseRepository
 import model.Response
 import play.api.db.{Database, Databases}
 import play.api.db.evolutions.Evolutions

@@ -1,5 +1,5 @@
 @import model.Response
-@(userForm: Form[(String, String)])(implicit messages: Messages)
+@(responses: Seq[Response], userForm: Form[(String, String)])(implicit messages: Messages)
 
 @admin_main("Responses") {
     <h2>Create response</h2>
@@ -13,7 +13,7 @@
 
     <h2>Responses</h2>
 
-    @for(resp <- Response.getAll) {
+    @for(resp <- responses) {
         <a href="@admin.routes.Responses.view(resp.id)">@resp.name</a> <br>
     }
 }

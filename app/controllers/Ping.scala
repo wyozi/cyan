@@ -2,11 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import anorm.SqlParser._
-import anorm._
-import play.api.db.DB
 import play.api.mvc._
-import response.{ResponseFindParameters, ResponseFinder}
+import response.ResponseFinder
 
 /**
   * Created by wyozi on 3.2.2016.
@@ -14,6 +11,7 @@ import response.{ResponseFindParameters, ResponseFinder}
 class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
 
   def registerPing(req: Request[AnyContent], product: String, license: String, user: String, extras: Map[String, String]): Result = {
+    /*
     import play.api.Play.current
     DB.withConnection { implicit connection =>
       val productIdOpt = SQL("SELECT id FROM Products WHERE short_name = {shortName}")
@@ -53,6 +51,8 @@ class Ping @Inject() (responseFinder: ResponseFinder) extends Controller {
         Ok(response.map(_.body).getOrElse(""))
       }
     }
+    */
+    ???
   }
 
   def ping = Action { req =>

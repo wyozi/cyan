@@ -1,6 +1,8 @@
 package controllers.admin
 
 import auth.Secured
+import com.google.inject.Inject
+import dao.ResponsesDAO
 import model.Response
 import play.api.data.Form
 import play.api.db.DB
@@ -9,10 +11,12 @@ import play.api.mvc.Controller
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Responses extends Controller with Secured {
+class Responses @Inject() (responsesDAO: ResponsesDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(
@@ -21,28 +25,23 @@ class Responses extends Controller with Secured {
     )
   )
 
-  def list = SecureAction {
-    Ok(views.html.admin_resps(responseForm))
+  def list = SecureAction.async {
+    responsesDAO.getAll().map(resps => Ok(views.html.admin_resps(resps, responseForm)))
   }
 
-  def view(respId: Int) = SecureAction {
-    val resp = Response.getById(respId).get
-    Ok(views.html.admin_resp_view(resp))
+  def view(respId: Int) = SecureAction.async {
+    responsesDAO.findById(respId).map {
+      case Some(resp) =>
+        Ok(views.html.admin_resp_view(resp))
+    }
   }
 
   def create = SecureAction { implicit request =>
     responseForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin_resps(formWithErrors)),
-      prod => {
-        import play.api.Play.current
-        DB.withConnection { c =>
-          val s = c.prepareStatement("INSERT INTO Responses(name, response) VALUES (?, ?)")
-          s.setString(1, prod._1)
-          s.setString(2, prod._2)
-          s.execute()
-
-          Redirect(routes.Responses.list())
-        }
+      formWithErrors => BadRequest(views.html.admin_resps(Seq(), formWithErrors)),
+      resp => {
+        responsesDAO.insert(Response(0, resp._1, resp._2))
+        Redirect(routes.Responses.list())
       }
     )
   }

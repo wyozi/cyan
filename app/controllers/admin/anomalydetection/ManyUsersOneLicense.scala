@@ -1,6 +1,5 @@
 package controllers.admin.anomalydetection
 
-import play.api.db.DB
 import play.api.mvc.Call
 
 /**
@@ -12,6 +11,7 @@ object ManyUsersOneLicense extends AnomalyDetector {
   override def name: String = "Many users on license"
 
   override def detectAnomalies(): List[Anomaly] = {
+    /*
     import play.api.Play.current
     DB.withConnection { implicit connection =>
       import anorm._
@@ -31,6 +31,8 @@ object ManyUsersOneLicense extends AnomalyDetector {
 
       dbEntries.map { case pnm~p~l~uc => new MUOLAnomaly(pnm, p, l, uc) }
     }
+    */
+    ???
   }
 
   class MUOLAnomaly(productName: String, productId: Int, license: String, distinctUserCount: Int) extends Anomaly(Medium) {

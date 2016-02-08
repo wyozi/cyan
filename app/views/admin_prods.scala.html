@@ -1,5 +1,5 @@
 @import model.Product
-@(userForm: Form[(String, String)])(implicit messages: Messages)
+@(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages)
 
 @admin_main("Products") {
     <h2>Create product</h2>
@@ -21,10 +21,10 @@
             </tr>
         </thead>
         <tbody>
-            @for(prod <- Product.getAll) {
+            @for(prod <- products) {
                 <tr>
                     <td><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></td>
-                    <td>@prod.getPingCount</td>
+                    <td>idk</td>
                 </tr>
             }
         </tbody>

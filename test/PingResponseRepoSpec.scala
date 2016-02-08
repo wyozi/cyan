@@ -1,5 +1,4 @@
 import DbUtils.TestDatabase
-import dbrepo.PingResponseRepository
 import org.scalatestplus.play._
 
 /**

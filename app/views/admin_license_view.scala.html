@@ -3,8 +3,8 @@
 @import model.ProductLicense
 @import response.ResponseFinder
 @import response.ResponseFindParameters
-@import dbrepo.PingResponseRepository
-@(prodLicense: ProductLicense)(implicit responseFinder: ResponseFinder, pingRespRepo: PingResponseRepository)
+@import dao.PingResponsesDAO
+@(prodLicense: ProductLicense)(implicit responseFinder: ResponseFinder, pingResponsesDAO: PingResponsesDAO)
 
 @admin_main(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
 
@@ -16,13 +16,13 @@
             <form class="row" action="@admin.routes.Products.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for all users of this license:</label>
-                @defining(
-                    pingRespRepo.getExactResponse(
+                @* @defining(
+                    pingResponsesDAO.getExactResponse(
                         Some(prodLicense.prod.id),
                         Some(prodLicense.license),
                         None)) { resp =>
                     @snippet.responseselect(resp.map(_.id).getOrElse(-1))
-                }
+                } *@
                 <button type="submit" class="btn btn-primary btn-xs">Set</button>
             </form>
         </div>
@@ -37,12 +37,12 @@
             </tr>
         </thead>
         <tbody>
-            @for(ping <- prodLicense.getLatestPingPerUser) {
+            @* @for(ping <- prodLicense.getLatestPingPerUser) {
                 <tr>
                     <td>@ping.user</td>
                     <td>@snippet.datetime(ping.date)</td>
                 </tr>
-            }
+            }*@
         </tbody>
     </table>
 }
