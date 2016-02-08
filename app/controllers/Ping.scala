@@ -22,7 +22,7 @@ class Ping @Inject() (productsDAO: ProductsDAO,
     productsDAO
       .findByShortName(product)
       .flatMap {
-        case Some(prod) => responsesDAO.findById(prod.id).map(resp => (prod, resp))
+        case Some(prod) => pingResponsesDAO.getBestResponse(Some(prod.id), Some(license), Some(user)).map(resp => (prod, resp))
       }
       .flatMap {
         case (prod, resp) =>

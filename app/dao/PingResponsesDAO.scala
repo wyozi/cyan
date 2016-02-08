@@ -30,17 +30,17 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     * @param user
     * @return
     */
-  def getBestPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Int]] = {
+  def getBestPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
     db.run(
       (
-        PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName === user).map(_.id)
+        PingResponses.filter(pr => pr.responseId.isDefined && pr.productId === productId && pr.license === license && pr.userName === user)
         ++
-        PingResponses.filter(pr => pr.userName === user).map(_.id)
+        PingResponses.filter(pr => pr.responseId.isDefined && pr.userName === user)
         ++
-        PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName.isEmpty).map(_.id)
+        PingResponses.filter(pr => pr.responseId.isDefined && pr.productId === productId && pr.license === license && pr.userName.isEmpty)
         ++
-        PingResponses.filter(pr => pr.productId === productId && pr.license.isEmpty && pr.userName.isEmpty).map(_.id)
-      ).result.headOption
+        PingResponses.filter(pr => pr.responseId.isDefined && pr.productId === productId && pr.license.isEmpty && pr.userName.isEmpty)
+      ).take(1).result.headOption
     )
   }
 
@@ -52,33 +52,33 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     * @param user
     * @return
     */
-  def getExactPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Int]] = {
+  def getExactPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
     val q = (productId, license, user) match {
-      case (Some(p), Some(l), Some(u)) => PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName === user).map(_.id)
-      case (None, None, Some(u)) => PingResponses.filter(pr => pr.productId.isEmpty && pr.license.isEmpty && pr.userName === user).map(_.id)
-      case (Some(p), Some(l), None) =>PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName.isEmpty).map(_.id)
-      case (Some(p), None, None) => PingResponses.filter(pr => pr.productId === productId && pr.license.isEmpty && pr.userName.isEmpty).map(_.id)
+      case (Some(p), Some(l), Some(u)) => PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName === user)
+      case (None, None, Some(u)) => PingResponses.filter(pr => pr.productId.isEmpty && pr.license.isEmpty && pr.userName === user)
+      case (Some(p), Some(l), None) =>PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName.isEmpty)
+      case (Some(p), None, None) => PingResponses.filter(pr => pr.productId === productId && pr.license.isEmpty && pr.userName.isEmpty)
       case params => throw new RuntimeException(s"cannot search for exact ping response with this list of params: $params")
     }
-    db.run(q.result.headOption)
+    db.run(q.take(1).result.headOption)
   }
 
   def getBestResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
     getBestPingResponseId(productId, license, user).flatMap {
-      case Some(prid) => responsesDAO.findById(prid)
-      case None => Future.successful(None)
+      case Some(pr) if pr.responseId.isDefined => responsesDAO.findById(pr.responseId.get)
+      case _ => Future.successful(None)
     }
   }
   def getExactResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
     getExactPingResponseId(productId, license, user).flatMap {
-      case Some(prid) => responsesDAO.findById(prid)
-      case None => Future.successful(None)
+      case Some(pr) if pr.responseId.isDefined => responsesDAO.findById(pr.responseId.get)
+      case _ => Future.successful(None)
     }
   }
 
   def upsertExactPingResponse(pingResponse: PingResponse): Future[Unit] = {
     getExactPingResponseId(pingResponse.productId, pingResponse.license, pingResponse.userName).map {
-      case Some(id) => db.run(sqlu"UPDATE PingResponses SET response_id = ${pingResponse.responseId} WHERE id = ${id}")
+      case Some(pr) => db.run(sqlu"UPDATE PingResponses SET response_id = ${pingResponse.responseId} WHERE id = ${pr.id}")
       case None => db.run(sqlu"INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES (${pingResponse.productId}, ${pingResponse.license}, ${pingResponse.userName}, ${pingResponse.responseId})")
     }
   }

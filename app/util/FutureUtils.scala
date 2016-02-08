@@ -8,6 +8,6 @@ import scala.concurrent.duration._
   */
 object FutureUtils {
   implicit class FutureSync[T](future: Future[T]) {
-    def await() = Await.result(future, 2.seconds)
+    def await() = Await.result(future, 10.seconds)
   }
 }

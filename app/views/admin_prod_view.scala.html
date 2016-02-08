@@ -45,9 +45,12 @@
             <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
-                @defining(pingResponsesDAO.getExactResponse(Some(prod.id), None, None).await) { resp =>
-                    @snippet.responseselect(resp.map(_.id).getOrElse(-1))
-                }
+                @snippet.responseselect(
+                    pingResponsesDAO
+                            .getExactResponse(Some(prod.id), None, None)
+                            .await
+                            .map(_.id)
+                            .getOrElse(-1))
                 <button type="submit" class="btn btn-primary btn-xs">Set</button>
             </form>
         </div>
