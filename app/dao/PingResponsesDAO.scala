@@ -15,7 +15,7 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
   extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
-  private val PingResponses = TableQuery[PingResponsesTable]
+  private[dao] val PingResponses = TableQuery[PingResponsesTable]
 
   /**
     * Gets the ping response id that best matches given parameters.
@@ -83,7 +83,7 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     }
   }
 
-  private class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PINGRESPONSES") {
+  private[dao] class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PINGRESPONSES") {
     def id = column[Int]("ID", O.AutoInc)
 
     def productId = column[Option[Int]]("PRODUCT_ID")

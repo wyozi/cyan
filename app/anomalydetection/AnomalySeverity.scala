@@ -1,4 +1,4 @@
-package controllers.admin.anomalydetection
+package anomalydetection
 
 /**
   * Created by wyozi on 4.2.2016.

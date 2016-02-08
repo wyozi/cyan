@@ -17,7 +17,7 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
 
   import driver.api._
 
-  private val Products = TableQuery[ProductsTable]
+  private[dao] val Products = TableQuery[ProductsTable]
 
   def getAll(): Future[Seq[Product]] =
     db.run(Products.result)
@@ -31,7 +31,7 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
   def findByShortName(shortName: String): Future[Option[Product]] =
     db.run(Products.filter(_.shortName === shortName).result.headOption)
 
-  private class ProductsTable(tag: Tag) extends Table[Product](tag, "PRODUCTS") {
+  private[dao] class ProductsTable(tag: Tag) extends Table[Product](tag, "PRODUCTS") {
     def id = column[Int]("ID", O.AutoInc)
 
     def name = column[String]("NAME", O.SqlType("VARCHAR(255)"))

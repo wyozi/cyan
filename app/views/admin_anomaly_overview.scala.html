@@ -1,6 +1,7 @@
-@import controllers.admin.anomalydetection._
+@import anomalydetection._
 @import dao.ProductsDAO
-@()(implicit productsDAO: ProductsDAO)
+@import util.FutureUtils._
+@(detectors: java.util.Set[AnomalyDetector])(implicit productsDAO: ProductsDAO)
 
 @severityBootstrapClass(severity: AnomalySeverity) = {
     @severity match {
@@ -21,8 +22,8 @@
             </tr>
         </thead>
         <tbody>
-            @for(det <- controllers.admin.Anomalies.activeDetections) {
-                @for(a <- det.detectAnomalies()) {
+            @for(det <- detectors) {
+                @for(a <- det.detectAnomalies().await) {
                     <tr class="@severityBootstrapClass(a.severity)">
                         <td>@a.severity</td>
                         <td>@a.toShortString</td>

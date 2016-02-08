@@ -30,14 +30,6 @@
         </ul>
         <ul class="nav navmenu-nav">
             <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomaly overview</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Anomalies <b class="caret"></b></a>
-                <ul class="dropdown-menu navmenu-nav" role="menu">
-                    @for(anomaly <- Anomalies.activeDetections) {
-                        <li><a href="#">@anomaly.name</a></li>
-                    }
-                </ul>
-            </li>
         </ul>
     </div>
 

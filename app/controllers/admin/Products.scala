@@ -21,6 +21,7 @@ class Products @Inject() (implicit backend: Backend,
   pingResponsesDAO: PingResponsesDAO,
   pingsDAO: PingsDAO,
   productsDAO: ProductsDAO,
+  plpDAP: ProdLicensePingDAO,
   pingExtrasDAO: PingExtrasDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(

@@ -1,8 +1,8 @@
 package model
 
-import java.sql.Date
+import java.sql.Timestamp
 
 /**
   * Created by wyozi on 3.2.2016.
   */
-case class Ping(id: Int, date: Date, product: String, license: String, user: String, ip: String, responseId: Option[Int])
+case class Ping(id: Int, date: Timestamp, product: String, license: String, user: String, ip: String, responseId: Option[Int])

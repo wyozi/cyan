@@ -15,7 +15,7 @@ class ResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProv
   extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
-  private val Responses = TableQuery[ResponsesTable]
+  private[dao] val Responses = TableQuery[ResponsesTable]
 
   def getAll(): Future[Seq[Response]] =
     db.run(Responses.result)
@@ -26,7 +26,7 @@ class ResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProv
   def findById(id: Int): Future[Option[Response]] =
     db.run(Responses.filter(_.id === id).result.headOption)
 
-  private class ResponsesTable(tag: Tag) extends Table[Response](tag, "RESPONSES") {
+  private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "RESPONSES") {
     def id = column[Int]("ID", O.AutoInc)
 
     def name = column[String]("NAME", O.SqlType("VARCHAR(64)"))

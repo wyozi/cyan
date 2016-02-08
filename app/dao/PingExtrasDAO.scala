@@ -18,7 +18,7 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
 
   import driver.api._
 
-  private val PingExtras = TableQuery[PingExtrasTable]
+  private[dao] val PingExtras = TableQuery[PingExtrasTable]
 
   def insert(extra: PingExtra): Future[Unit] =
     db.run(PingExtras += extra).map(_ => ())
@@ -29,7 +29,7 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def findValue(pingId: Int, key: String): Future[Option[String]] =
     db.run(PingExtras.filter(r => r.pingId === pingId && r.key === key).map(_.value).result.headOption)
 
-  private class PingExtrasTable(tag: Tag) extends Table[PingExtra](tag, "PINGEXTRAS") {
+  private[dao] class PingExtrasTable(tag: Tag) extends Table[PingExtra](tag, "PINGEXTRAS") {
     def pingId = column[Int]("PING_ID")
     def key = column[String]("KEY", O.SqlType("VARCHAR(16)"))
     def value = column[String]("VALUE")
