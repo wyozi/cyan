@@ -1,5 +1,6 @@
 @import model.Response
-@(resp: Response)
+@import dao.ProductsDAO
+@(resp: Response)(implicit productsDAO: ProductsDAO)
 
 @admin_main(s"Viewing response: ${resp.name}") {
     <pre>

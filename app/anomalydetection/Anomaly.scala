@@ -1,4 +1,4 @@
-package controllers.admin.anomalydetection
+package anomalydetection
 
 import play.api.mvc.Call
 

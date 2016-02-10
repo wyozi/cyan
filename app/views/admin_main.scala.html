@@ -1,7 +1,9 @@
 @import model.Product
 @import model.Response
 @import controllers.admin.Anomalies
-@(subTitle: String, scripts: Html = Html(""))(content: Html))
+@import dao.ProductsDAO
+@import util.FutureUtils._
+@(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
 @main("Admin: " + subTitle) {
 
@@ -17,7 +19,7 @@
             <li class="dropdown">
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">Products <b class="caret"></b></a>
                 <ul class="dropdown-menu navmenu-nav" role="menu">
-                @for(prod <- Product.getAll) {
+                @for(prod <- productsDAO.getAll().await) {
                     <li><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></li>
                 }
                 </ul>
@@ -28,14 +30,6 @@
         </ul>
         <ul class="nav navmenu-nav">
             <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomaly overview</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Anomalies <b class="caret"></b></a>
-                <ul class="dropdown-menu navmenu-nav" role="menu">
-                    @for(anomaly <- Anomalies.activeDetections) {
-                        <li><a href="#">@anomaly.name</a></li>
-                    }
-                </ul>
-            </li>
         </ul>
     </div>
 

@@ -1,14 +1,13 @@
 package controllers.admin
 
 import auth.Secured
-import controllers.admin.anomalydetection.ManyUsersOneLicense
+import com.google.inject.Inject
+import anomalydetection.AnomalyDetector
+import dao.ProductsDAO
 import play.api.mvc.Controller
 
-class Anomalies extends Controller with Secured {
+class Anomalies @Inject() (val detections: java.util.Set[AnomalyDetector])(implicit productsDAO: ProductsDAO) extends Controller with Secured {
   def overview = SecureAction {
-    Ok(views.html.admin_anomaly_overview())
+    Ok(views.html.admin_anomaly_overview(detections))
   }
-}
-object Anomalies {
-  val activeDetections = List(ManyUsersOneLicense)
 }

@@ -4,23 +4,25 @@ import javax.inject.Inject
 
 import auth.Secured
 import cyan.backend.Backend
-import dbrepo.{PingExtrasRepository, PingResponseRepository}
-import model.Product
+import dao._
+import model.{PingResponse, Product, ProductLicense}
+import play.api.Play.current
 import play.api.data.Form
-import play.api.db.DB
+import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Controller
 
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import response.ResponseFinder
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by wyozi on 4.2.2016.
   */
 class Products @Inject() (implicit backend: Backend,
-  responseFinder: ResponseFinder,
-  pingRespRepo: PingResponseRepository,
-  pingExtrasRepo: PingExtrasRepository) extends Controller with Secured {
+  responsesDAO: ResponsesDAO,
+  pingResponsesDAO: PingResponsesDAO,
+  pingsDAO: PingsDAO,
+  productsDAO: ProductsDAO,
+  plpDAP: ProdLicensePingDAO,
+  pingExtrasDAO: PingExtrasDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(
     tuple(
@@ -29,51 +31,55 @@ class Products @Inject() (implicit backend: Backend,
     )
   )
 
-  def list = SecureAction {
-    Ok(views.html.admin_prods(productForm))
+  def list = SecureAction.async {
+    productsDAO.getAll().map(prods => Ok(views.html.admin_prods(prods, productForm)))
   }
 
-  def view(prodId: Int) = SecureAction {
-    val prod = Product.getId(prodId).get
-    Ok(views.html.admin_prod_view(prod))
+  def view(prodId: Int) = SecureAction.async {
+    val futureProd = productsDAO.findById(prodId)
+    for {
+      prodOpt <- productsDAO.findById(prodId)
+      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get)
+    } yield Ok(views.html.admin_prod_view(prodOpt.get, recentPings))
   }
 
-  def configure(prodId: Int) = SecureAction { req =>
+  def configure(prodId: Int) = SecureAction.async { req =>
     val fue = req.body.asFormUrlEncoded
 
     val opt = fue.get("opt").head
-    val prod = Product.getId(prodId).get
-
-    opt match {
-      case "unreg_response" => {
-        val response = fue.get("response").head match {
-          case "null" => Option.empty
-          case x => Some(x.toInt)
+    productsDAO.findById(prodId).flatMap {
+      case Some(prod) =>
+        val f = opt match {
+          case "unreg_response" => {
+            val response = fue.get("response").head match {
+              case "null" => Option.empty
+              case x => Some(x.toInt)
+            }
+            pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
+          }
         }
-        pingRespRepo.upsertExactPingResponse(Some(prodId), None, None, response)
-      }
+        f.map { r =>
+          println(r)
+          Redirect(routes.Products.view(prodId))
+        }
     }
-
-    Redirect(routes.Products.view(prodId))
   }
 
   def create = SecureAction { implicit request =>
     productForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin_prods(formWithErrors)),
+      formWithErrors => BadRequest(views.html.admin_prods(Seq(), formWithErrors)),
       prod => {
-        import play.api.Play.current
-        DB.withConnection { c =>
-          Product.insert(prod._1, prod._2)
-
-          Redirect(routes.Products.list())
-        }
+        productsDAO.insert(prod._1, prod._2)
+        Redirect(routes.Products.list())
       }
     )
   }
 
-  def licenseView(prodId: Int, licenseId: String) = SecureAction {
-    val prod = Product.getId(prodId).get
-    Ok(views.html.admin_license_view(prod.getLicense(licenseId)))
+  def licenseView(prodId: Int, licenseId: String) = SecureAction.async {
+    productsDAO.findById(prodId).map {
+      case Some(prod) =>
+        Ok(views.html.admin_license_view(ProductLicense(prod, licenseId)))
+    }
   }
 
   def setProductLicenseResponse(productId: Int, license: String) = SecureAction { req =>
@@ -84,7 +90,7 @@ class Products @Inject() (implicit backend: Backend,
       case x => Some(x.toInt)
     }
 
-    pingRespRepo.upsertExactPingResponse(Some(productId), Some(license), None, response)
+    pingResponsesDAO.upsertExactPingResponse(Some(productId), Some(license), None, response)
     Redirect(routes.Products.licenseView(productId, license))
   }
 }
