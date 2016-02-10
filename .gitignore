@@ -9,6 +9,7 @@ dist
 *.iml
 /out
 /lib
+extensions/*.jar
 /.idea_modules
 /.classpath
 /.project

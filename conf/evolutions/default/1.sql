@@ -28,6 +28,7 @@ CREATE TABLE "Pings" (
   date        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
   response_id INT       DEFAULT NULL REFERENCES "Responses" (id),
+  ip VARCHAR(16) DEFAULT '0.0.0.0',
 
   PRIMARY KEY (id)
 );
@@ -45,9 +46,19 @@ CREATE TABLE "PingResponses" (
 );
 CREATE UNIQUE INDEX ping_userlicprod ON "PingResponses" (product_id, license, user_name);
 
+CREATE TABLE "PingExtras" (
+  ping_id INT REFERENCES "Pings"(id) ON DELETE CASCADE,
+  key     VARCHAR(16) NOT NULL,
+  value   TEXT NOT NULL,
+
+  PRIMARY KEY(ping_id, key)
+);
+CREATE INDEX pingextra_id ON "PingExtras"(ping_id);
+
 # --- !Downs
 
 DROP TABLE "Products";
 DROP TABLE "Pings";
 DROP TABLE "Responses";
 DROP TABLE "PingResponses";
+DROP TABLE "PingExtras";
