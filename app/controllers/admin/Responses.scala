@@ -39,7 +39,7 @@ class Responses @Inject() (implicit productsDAO: ProductsDAO, responsesDAO: Resp
     responseForm.bindFromRequest().fold(
       formWithErrors => BadRequest(views.html.admin_resps(Seq(), formWithErrors)),
       resp => {
-        responsesDAO.insert(Response(0, resp._1, resp._2))
+        responsesDAO.insert(resp._1, resp._2)
         Redirect(routes.Responses.list())
       }
     )

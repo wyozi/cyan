@@ -5,13 +5,12 @@ import model.Response
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
   * Created by wyozi on 8.2.2016.
   */
-class ResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
+class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
 
@@ -20,8 +19,8 @@ class ResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProv
   def getAll(): Future[Seq[Response]] =
     db.run(Responses.result)
 
-  def insert(prod: Response): Future[Unit] =
-    db.run(Responses += prod).map(_ => ())
+  def insert(name: String, body: String): Future[Int] =
+    db.run((Responses.map(c => (c.name, c.body)) returning Responses.map(_.id)) += (name, body))
 
   def findById(id: Int): Future[Option[Response]] =
     db.run(Responses.filter(_.id === id).result.headOption)

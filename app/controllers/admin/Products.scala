@@ -55,7 +55,7 @@ class Products @Inject() (implicit backend: Backend,
               case "null" => Option.empty
               case x => Some(x.toInt)
             }
-            pingResponsesDAO.upsertExactPingResponse(PingResponse(0, Some(prodId), None, None, response))
+            pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
           }
         }
         f.map { r =>
@@ -69,7 +69,7 @@ class Products @Inject() (implicit backend: Backend,
     productForm.bindFromRequest().fold(
       formWithErrors => BadRequest(views.html.admin_prods(Seq(), formWithErrors)),
       prod => {
-        productsDAO.insert(Product(-1, prod._1, prod._2))
+        productsDAO.insert(prod._1, prod._2)
         Redirect(routes.Products.list())
       }
     )
@@ -90,7 +90,7 @@ class Products @Inject() (implicit backend: Backend,
       case x => Some(x.toInt)
     }
 
-    pingResponsesDAO.upsertExactPingResponse(PingResponse(0, Some(productId), Some(license), None, response))
+    pingResponsesDAO.upsertExactPingResponse(Some(productId), Some(license), None, response)
     Redirect(routes.Products.licenseView(productId, license))
   }
 }

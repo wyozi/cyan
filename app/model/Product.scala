@@ -1,8 +1,5 @@
 package model
 
-import anorm._
-import play.api.db.DB
-
 /**
   * Created by wyozi on 3.2.2016.
   */

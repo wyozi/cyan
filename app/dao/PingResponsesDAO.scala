@@ -11,11 +11,14 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by wyozi on 8.2.2016.
   */
-class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, responsesDAO: ResponsesDAO)
+class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
+
   import driver.api._
 
   private[dao] val PingResponses = TableQuery[PingResponsesTable]
+
+  def pingResponseCount: Future[Int] = db.run(PingResponses.length.result)
 
   /**
     * Gets the ping response id that best matches given parameters.
@@ -30,7 +33,7 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     * @param user
     * @return
     */
-  def getBestPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
+  def getBestPingResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
     db.run(
       (
         PingResponses.filter(pr => pr.responseId.isDefined && pr.productId === productId && pr.license === license && pr.userName === user)
@@ -52,7 +55,7 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     * @param user
     * @return
     */
-  def getExactPingResponseId(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
+  def getExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[PingResponse]] = {
     val q = (productId, license, user) match {
       case (Some(p), Some(l), Some(u)) => PingResponses.filter(pr => pr.productId === productId && pr.license === license && pr.userName === user)
       case (None, None, Some(u)) => PingResponses.filter(pr => pr.productId.isEmpty && pr.license.isEmpty && pr.userName === user)
@@ -64,22 +67,22 @@ class PingResponsesDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
   }
 
   def getBestResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
-    getBestPingResponseId(productId, license, user).flatMap {
+    getBestPingResponse(productId, license, user).flatMap {
       case Some(pr) if pr.responseId.isDefined => responsesDAO.findById(pr.responseId.get)
       case _ => Future.successful(None)
     }
   }
   def getExactResponse(productId: Option[Int], license: Option[String], user: Option[String]): Future[Option[Response]] = {
-    getExactPingResponseId(productId, license, user).flatMap {
+    getExactPingResponse(productId, license, user).flatMap {
       case Some(pr) if pr.responseId.isDefined => responsesDAO.findById(pr.responseId.get)
       case _ => Future.successful(None)
     }
   }
 
-  def upsertExactPingResponse(pingResponse: PingResponse): Future[Unit] = {
-    getExactPingResponseId(pingResponse.productId, pingResponse.license, pingResponse.userName).map {
-      case Some(pr) => db.run(sqlu"UPDATE PingResponses SET response_id = ${pingResponse.responseId} WHERE id = ${pr.id}")
-      case None => db.run(sqlu"INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES (${pingResponse.productId}, ${pingResponse.license}, ${pingResponse.userName}, ${pingResponse.responseId})")
+  def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], responseId: Option[Int]): Future[Unit] = {
+    getExactPingResponse(productId, license, user).map {
+      case Some(pr) => db.run(sqlu"UPDATE PingResponses SET response_id = ${responseId} WHERE id = ${pr.id}")
+      case None => db.run(sqlu"INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES (${productId}, ${license}, ${user}, ${responseId})")
     }
   }
 

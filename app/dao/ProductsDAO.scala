@@ -22,8 +22,8 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
   def getAll(): Future[Seq[Product]] =
     db.run(Products.result)
 
-  def insert(prod: Product): Future[Unit] =
-    db.run(Products += prod).map(_ => ())
+  def insert(name: String, shortName: String): Future[Unit] =
+    db.run(Products.map(c => (c.name, c.shortName)) += (name, shortName)).map(_ => ())
 
   def findById(id: Int): Future[Option[Product]] =
     db.run(Products.filter(_.id === id).result.headOption)
