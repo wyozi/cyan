@@ -1,5 +1,6 @@
-package cyan
+package cyan.dao
 
+import cyan.DBApplication
 import dao.{PingResponsesDAO, ResponsesDAO}
 import org.scalatestplus.play.PlaySpec
 import util.FutureUtils._
@@ -7,7 +8,7 @@ import util.FutureUtils._
 /**
   * Created by wyozi on 5.2.2016.
   */
-class PingResponseRepoSpec extends PlaySpec {
+class PingResponseDAOSpec extends PlaySpec {
   "PingResponseRepository" should {
     "upsert ping response" in new DBApplication{
 
