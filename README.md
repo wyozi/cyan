@@ -8,6 +8,16 @@ In addition to managing licences, Cyan will come with tools to detect anomalies 
 Future versions of Cyan might include small-scale error reporting server (something like [Sentry](https://getsentry.com))
 , statistic collection (with Graphite support?) and some utilities for A/B testing.
 
+### Installation/Usage (assuming Linux server)
+
+1. Install activator from https://www.typesafe.com/activator/download.
+2. Clone Cyan repository to somewhere (here assumed to be in same folder where the activator folder is)
+3. Compile/create startup scripts with ```../activator-dist-1.3.6/activator -mem 300 clean compile stage```
+4. Run Cyan with  ```target/universal/stage/bin/cyan -DapplyEvolutions.default=true```
+5. Access admin panel in ```http://localhost:9000/admin/products``` using `admin/admin` for user/passwd (assuming port 9000)
+
+__NOTE: Cyan is currently under development and not secure by default! Anyone can login with the admin password. More secure sign-in methods will come soon.__
+
 ### Terminology briefly
 
 __Ping__ = a HTTP request sent from the application to Cyan server which usually contains license id, user id and the product id.
