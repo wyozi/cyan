@@ -6,21 +6,21 @@
 GET     /                                        controllers.Application.index()
 POST    /ping                                    controllers.PingReceiver.ping()
 
-GET     /cyan.admin/products                          controllers.admin.Products.list()
-POST    /cyan.admin/products                          controllers.admin.Products.create()
-GET     /cyan.admin/products/:id                      controllers.admin.Products.view(id: Int)
-POST    /cyan.admin/products/:id                      controllers.admin.Products.configure(id: Int)
-POST    /cyan.admin/products/:pid/:lid/response       controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
+GET     /admin/products                          controllers.admin.Products.list()
+POST    /admin/products                          controllers.admin.Products.create()
+GET     /admin/products/:id                      controllers.admin.Products.view(id: Int)
+POST    /admin/products/:id                      controllers.admin.Products.configure(id: Int)
+POST    /admin/products/:pid/:lid/response       controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
 
-GET     /cyan.admin/products/:id/licences/:lid        controllers.admin.Products.licenseView(id: Int, lid: String)
+GET     /admin/products/:id/licences/:lid        controllers.admin.Products.licenseView(id: Int, lid: String)
 
-GET     /cyan.admin/pings/:id/:key                    controllers.admin.Pings.showPingExtra(id: Int, key: String)
+GET     /admin/pings/:id/:key                    controllers.admin.Pings.showPingExtra(id: Int, key: String)
 
-GET     /cyan.admin/responses                         controllers.admin.Responses.list
-POST    /cyan.admin/responses                         controllers.admin.Responses.create
-GET     /cyan.admin/responses/:id                     controllers.admin.Responses.view(id: Int)
+GET     /admin/responses                         controllers.admin.Responses.list
+POST    /admin/responses                         controllers.admin.Responses.create
+GET     /admin/responses/:id                     controllers.admin.Responses.view(id: Int)
 
-GET     /cyan.admin/anomalies                         controllers.admin.Anomalies.overview
+GET     /admin/anomalies                         controllers.admin.Anomalies.overview
 
 # WebJar assets
 GET     /webjars/*file                           controllers.WebJarAssets.at(file)
