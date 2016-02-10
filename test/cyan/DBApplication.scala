@@ -22,6 +22,7 @@ class DBApplication extends WithApplication(FakeApplication(additionalConfigurat
     try {
       super.around(t)
     } finally {
+      db.shutdown()
       //Evolutions.cleanupEvolutions(db)
     }
   }

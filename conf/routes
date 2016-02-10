@@ -4,7 +4,7 @@
 
 # Home page
 GET     /                                        controllers.Application.index()
-POST    /ping                                    controllers.Ping.ping()
+POST    /ping                                    controllers.PingReceiver.ping()
 
 GET     /cyan.admin/products                          controllers.admin.Products.list()
 POST    /cyan.admin/products                          controllers.admin.Products.create()

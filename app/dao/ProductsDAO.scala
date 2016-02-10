@@ -6,7 +6,6 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
 import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by wyozi on 8.2.2016.
@@ -22,8 +21,8 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
   def getAll(): Future[Seq[Product]] =
     db.run(Products.result)
 
-  def insert(name: String, shortName: String): Future[Unit] =
-    db.run(Products.map(c => (c.name, c.shortName)) += (name, shortName)).map(_ => ())
+  def insert(name: String, shortName: String): Future[Int] =
+    db.run(Products.map(c => (c.name, c.shortName)) returning Products.map(_.id) += (name, shortName))
 
   def findById(id: Int): Future[Option[Product]] =
     db.run(Products.filter(_.id === id).result.headOption)
