@@ -22,8 +22,8 @@ class MUOLAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPr
     db.run(sql"""
         SELECT *
         FROM (
-          SELECT Products.id AS product_id, Products.name AS product_name, license, COUNT(DISTINCT user_name) AS distinctUserCount FROM Pings
-            LEFT JOIN Products ON Pings.product = Products.short_name
+          SELECT products.id AS product_id, products.name AS product_name, license, COUNT(DISTINCT user_name) AS distinctUserCount FROM pings
+            LEFT JOIN products ON pings.product = products.short_name
           GROUP BY product_id, license
         ) AS t
         WHERE distinctUserCount >= ${threshold}

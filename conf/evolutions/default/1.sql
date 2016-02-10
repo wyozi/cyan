@@ -1,7 +1,7 @@
 # Initial
 
 # --- !Ups
-CREATE TABLE "Responses" (
+CREATE TABLE responses (
   id       SERIAL UNIQUE,
 
   name     VARCHAR(64) NOT NULL,
@@ -10,7 +10,7 @@ CREATE TABLE "Responses" (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE "Products" (
+CREATE TABLE products (
   id         SERIAL UNIQUE,
   short_name VARCHAR(16) UNIQUE,
 
@@ -19,46 +19,46 @@ CREATE TABLE "Products" (
   PRIMARY KEY (id)
 );
 
-CREATE TABLE "Pings" (
+CREATE TABLE pings (
   id          SERIAL UNIQUE,
 
-  product     VARCHAR(255) NOT NULL REFERENCES "Products" (short_name),
+  product     VARCHAR(255) NOT NULL REFERENCES products (short_name),
   license     VARCHAR(255) NOT NULL,
   user_name   VARCHAR(64)  NOT NULL,
   date        TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 
-  response_id INT       DEFAULT NULL REFERENCES "Responses" (id),
+  response_id INT       DEFAULT NULL REFERENCES responses (id),
   ip VARCHAR(16) DEFAULT '0.0.0.0',
 
   PRIMARY KEY (id)
 );
 
-CREATE TABLE "PingResponses" (
+CREATE TABLE pingresponses (
   id          SERIAL UNIQUE,
 
   product_id  INT,
   license     VARCHAR(255),
   user_name   VARCHAR(64),
 
-  response_id INT REFERENCES "Responses" (id),
+  response_id INT REFERENCES responses (id),
 
   PRIMARY KEY (id)
 );
-CREATE UNIQUE INDEX ping_userlicprod ON "PingResponses" (product_id, license, user_name);
+CREATE UNIQUE INDEX ping_userlicprod ON pingresponses (product_id, license, user_name);
 
-CREATE TABLE "PingExtras" (
-  ping_id INT REFERENCES "Pings"(id) ON DELETE CASCADE,
+CREATE TABLE pingextras (
+  ping_id INT REFERENCES pings(id) ON DELETE CASCADE,
   key     VARCHAR(16) NOT NULL,
   value   TEXT NOT NULL,
 
   PRIMARY KEY(ping_id, key)
 );
-CREATE INDEX pingextra_id ON "PingExtras"(ping_id);
+CREATE INDEX pingextra_id ON pingextras(ping_id);
 
 # --- !Downs
 
-DROP TABLE "Products";
-DROP TABLE "Pings";
-DROP TABLE "Responses";
-DROP TABLE "PingResponses";
-DROP TABLE "PingExtras";
+DROP TABLE products;
+DROP TABLE pings;
+DROP TABLE responses;
+DROP TABLE pingresponses;
+DROP TABLE pingextras;

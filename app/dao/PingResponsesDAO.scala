@@ -81,19 +81,19 @@ class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit
 
   def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], responseId: Option[Int]): Future[Unit] = {
     getExactPingResponse(productId, license, user).map {
-      case Some(pr) => db.run(sqlu"UPDATE PingResponses SET response_id = ${responseId} WHERE id = ${pr.id}")
-      case None => db.run(sqlu"INSERT INTO PingResponses(product_id, license, user_name, response_id) VALUES (${productId}, ${license}, ${user}, ${responseId})")
+      case Some(pr) => db.run(sqlu"UPDATE pingresponses SET response_id = ${responseId} WHERE id = ${pr.id}")
+      case None => db.run(sqlu"INSERT INTO pingresponses(product_id, license, user_name, response_id) VALUES (${productId}, ${license}, ${user}, ${responseId})")
     }
   }
 
-  private[dao] class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PingResponses") {
-    def id = column[Int]("ID", O.AutoInc)
+  private[dao] class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "pingresponses") {
+    def id = column[Int]("id", O.AutoInc)
 
-    def productId = column[Option[Int]]("PRODUCT_ID")
-    def license = column[Option[String]]("LICENSE")
-    def userName = column[Option[String]]("USER_NAME")
+    def productId = column[Option[Int]]("product_id")
+    def license = column[Option[String]]("license")
+    def userName = column[Option[String]]("user_name")
 
-    def responseId = column[Option[Int]]("RESPONSE_ID")
+    def responseId = column[Option[Int]]("response_id")
 
     override def * = (id, productId, license, userName, responseId) <> (PingResponse.tupled, PingResponse.unapply)
   }

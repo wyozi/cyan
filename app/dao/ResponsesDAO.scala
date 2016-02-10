@@ -25,11 +25,11 @@ class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: Databas
   def findById(id: Int): Future[Option[Response]] =
     db.run(Responses.filter(_.id === id).result.headOption)
 
-  private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "Responses") {
-    def id = column[Int]("ID", O.AutoInc)
+  private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "responses") {
+    def id = column[Int]("id", O.AutoInc)
 
-    def name = column[String]("NAME", O.SqlType("VARCHAR(64)"))
-    def body = column[String]("RESPONSE")
+    def name = column[String]("name", O.SqlType("VARCHAR(64)"))
+    def body = column[String]("response")
 
     override def * = (id, name, body) <> (Response.tupled, Response.unapply)
   }

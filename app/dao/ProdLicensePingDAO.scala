@@ -24,8 +24,8 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     db.run(
       sql"""
          SELECT p1.*
-         FROM Pings p1
-           LEFT JOIN Pings p2
+         FROM pings p1
+           LEFT JOIN pings p2
                ON p1.user_name = p2.user_name AND p1.product = p2.product AND p1.license = p2.license AND p1.id < p2.id
          WHERE p2.id is NULL AND p1.product = ${prodLicense.prod.shortName} AND p1.license = ${prodLicense.license}
       """.as[Ping]

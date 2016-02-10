@@ -26,16 +26,16 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run(Pings.filter(_.product === prod.shortName).sortBy(_.id.desc).result)
 
 
-  private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "Pings") {
-    def id = column[Int]("ID", O.AutoInc)
+  private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
+    def id = column[Int]("id", O.AutoInc)
 
-    def product = column[String]("PRODUCT", O.SqlType("VARCHAR(255)"))
-    def license = column[String]("LICENSE", O.SqlType("VARCHAR(255)"))
-    def userName = column[String]("USER_NAME", O.SqlType("VARCHAR(64)"))
-    def date = column[Timestamp]("DATE")
-    def responseId = column[Option[Int]]("RESPONSE_ID")
+    def product = column[String]("product", O.SqlType("VARCHAR(255)"))
+    def license = column[String]("license", O.SqlType("VARCHAR(255)"))
+    def userName = column[String]("user_name", O.SqlType("VARCHAR(64)"))
+    def date = column[Timestamp]("date")
+    def responseId = column[Option[Int]]("response_id")
 
-    def ip = column[String]("IP", O.SqlType("VARCHAR(16)"))
+    def ip = column[String]("ip", O.SqlType("VARCHAR(16)"))
 
     override def * = (id, date, product, license, userName, ip, responseId) <> (Ping.tupled, Ping.unapply _)
     //def response = foreignKey("RESPONSE_FK", responseId, )
