@@ -86,7 +86,7 @@ class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit
     }
   }
 
-  private[dao] class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PINGRESPONSES") {
+  private[dao] class PingResponsesTable(tag: Tag) extends Table[PingResponse](tag, "PingResponses") {
     def id = column[Int]("ID", O.AutoInc)
 
     def productId = column[Option[Int]]("PRODUCT_ID")

@@ -26,7 +26,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run(Pings.filter(_.product === prod.shortName).sortBy(_.id.desc).result)
 
 
-  private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "PINGS") {
+  private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "Pings") {
     def id = column[Int]("ID", O.AutoInc)
 
     def product = column[String]("PRODUCT", O.SqlType("VARCHAR(255)"))

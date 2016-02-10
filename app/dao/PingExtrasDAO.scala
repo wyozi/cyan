@@ -29,7 +29,7 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def findValue(pingId: Int, key: String): Future[Option[String]] =
     db.run(PingExtras.filter(r => r.pingId === pingId && r.key === key).map(_.value).result.headOption)
 
-  private[dao] class PingExtrasTable(tag: Tag) extends Table[PingExtra](tag, "PINGEXTRAS") {
+  private[dao] class PingExtrasTable(tag: Tag) extends Table[PingExtra](tag, "PingExtras") {
     def pingId = column[Int]("PING_ID")
     def key = column[String]("KEY", O.SqlType("VARCHAR(16)"))
     def value = column[String]("VALUE")

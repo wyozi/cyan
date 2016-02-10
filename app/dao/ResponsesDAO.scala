@@ -25,7 +25,7 @@ class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: Databas
   def findById(id: Int): Future[Option[Response]] =
     db.run(Responses.filter(_.id === id).result.headOption)
 
-  private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "RESPONSES") {
+  private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "Responses") {
     def id = column[Int]("ID", O.AutoInc)
 
     def name = column[String]("NAME", O.SqlType("VARCHAR(64)"))
