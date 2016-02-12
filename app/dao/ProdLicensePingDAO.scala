@@ -19,17 +19,24 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   import driver.api._
 
   implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, product = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
+
+  /**
+    * Returns a list of pings with license in product. Ordered by latest ping timestamp descendingly. One per user.
+    */
   def findUserPings(prodLicense: ProductLicense): Future[Seq[Ping]] =
     db.run(
-      sql"""
-         SELECT p1.*
-         FROM pings p1
-           LEFT JOIN pings p2
-               ON p1.user_name = p2.user_name AND p1.product = p2.product AND p1.license = p2.license AND p1.id < p2.id
-         WHERE p2.id is NULL AND p1.product = ${prodLicense.prod.shortName} AND p1.license = ${prodLicense.license}
-      """.as[Ping]
+      (
+        for {
+          p <- pingsDAO.Pings.filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+          maxTimestamp <- pingsDAO.Pings.groupBy(_.userName).map { case (user, pings) => pings.map(_.date).max }
+          if p.date === maxTimestamp
+        } yield p
+      ).sortBy(_.date.desc).result
     )
 
+  /**
+    * Returns a list of pings in product. Ordered by first (oldest) ping timestamp descendingly. One per license.
+    */
   def findRecentNewLicenses(prod: Product, limit: Int): Future[Seq[Ping]] = {
     val q = (
       for {
