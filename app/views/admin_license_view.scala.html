@@ -35,7 +35,7 @@
             </tr>
         </thead>
         <tbody>
-            @for(ping <- plpDAO.findUserPings(prodLicense).await) {
+            @for(ping <- plpDAO.findRecentUserPings(prodLicense).await) {
                 <tr>
                     <td>@ping.user</td>
                     <td>@snippet.datetime(ping.date)</td>
