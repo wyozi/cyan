@@ -5,7 +5,7 @@ import javax.inject.Inject
 import auth.Secured
 import cyan.backend.Backend
 import dao._
-import model.{PingResponse, Product, ProductLicense}
+import model.ProductLicense
 import play.api.Play.current
 import play.api.data.Form
 import play.api.i18n.Messages.Implicits._
@@ -21,7 +21,7 @@ class Products @Inject() (implicit backend: Backend,
   pingResponsesDAO: PingResponsesDAO,
   pingsDAO: PingsDAO,
   productsDAO: ProductsDAO,
-  plpDAP: ProdLicensePingDAO,
+  plpDAO: ProdLicensePingDAO,
   pingExtrasDAO: PingExtrasDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val productForm = Form(
@@ -39,8 +39,9 @@ class Products @Inject() (implicit backend: Backend,
     val futureProd = productsDAO.findById(prodId)
     for {
       prodOpt <- productsDAO.findById(prodId)
-      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get)
-    } yield Ok(views.html.admin_prod_view(prodOpt.get, recentPings))
+      recentNewLicenses <- plpDAO.findRecentNewLicenses(prodOpt.get, 15)
+      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get, 15)
+    } yield Ok(views.html.admin_prod_view(prodOpt.get, recentNewLicenses, recentPings))
   }
 
   def configure(prodId: Int) = SecureAction.async { req =>
