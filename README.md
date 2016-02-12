@@ -16,6 +16,10 @@ Future versions of Cyan might include small-scale error reporting server (someth
 4. Run Cyan with  ```target/universal/stage/bin/cyan -DapplyEvolutions.default=true```
 5. Access admin panel in ```http://localhost:9000/admin/products``` using `admin/admin` for user/passwd (assuming port 9000)
 
+If you'd like to use postgres instead, add this after the "Run Cyan" line:
+```-Dslick.dbs.default.driver=slick.driver.PostgresDriver$ -Dslick.dbs.default.db.driver=org.postgresql.Driver -Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan -Dslick.dbs.default.db.user=cyanuser -Dslick.dbs.default.db.password=cyanpass```
+where `cyan` is database name, `cyanuser` is database user and `cyanpass` is database password
+
 __NOTE: Cyan is currently under development and not secure by default! Anyone can login with the admin password. More secure sign-in methods will come soon.__
 
 ### Terminology briefly
