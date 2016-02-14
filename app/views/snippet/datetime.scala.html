@@ -1,4 +1,22 @@
 @import java.sql.Timestamp
-@(datetime: Timestamp)
+@import org.joda.time.format.{PeriodFormatter, PeriodFormatterBuilder}
+@import org.joda.time.DateTime
+@import org.joda.time.Period
+@import org.joda.time.Instant
+@(timestamp: Timestamp,
+        formatter: PeriodFormatter = new PeriodFormatterBuilder()
+        .appendDays()
+        .appendSuffix(" day", " days")
+        .appendSeparator(" and ")
+        .printZeroAlways()
+        .minimumPrintedDigits(2)
+        .appendHours()
+        .appendSuffix(":")
+        .appendMinutes()
+        .appendSuffix(":")
+        .appendSeconds()
+        .toFormatter)
 
-@datetime
+@defining(new DateTime(timestamp.getTime)) { datetime =>
+    <span title="@datetime">@formatter.print(new Period(datetime.toInstant, Instant.now())) ago</span>
+}
