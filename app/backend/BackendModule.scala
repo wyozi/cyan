@@ -1,5 +1,8 @@
 package backend
 
+import java.io.File
+import java.net.URLClassLoader
+
 import com.google.inject.AbstractModule
 import cyan.backend.Backend
 import cyan.backend.impl.DefaultBackend
@@ -12,10 +15,13 @@ class BackendModule(environment: Environment, configuration: Configuration) exte
   override def configure(): Unit = {
     val be = configuration.getString("cyan.backend")
 
+
     val backendClass = be match {
       case Some(cls) =>
-        environment.classLoader.loadClass(cls)
-          .asSubclass(classOf[Backend])
+        val jarUrls = new File("extensions/").listFiles.filter(_.getName.endsWith(".jar")).map(_.toURI.toURL)
+        val jarCl = new URLClassLoader(jarUrls, environment.classLoader)
+
+        jarCl.loadClass(cls).asSubclass(classOf[Backend])
       case _ => classOf[DefaultBackend]
     }
 
