@@ -28,6 +28,13 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jasny-bootstrap" % "3.1.3-2"
 )
 
+resolvers += "Atlassian Releases" at "https://maven.atlassian.com/public/"
+
+libraryDependencies ++= Seq(
+  "com.mohiva" %% "play-silhouette" % "3.0.4",
+  "com.mohiva" %% "play-silhouette-testkit" % "3.0.4" % "test"
+)
+
 routesGenerator := InjectedRoutesGenerator
 
 unmanagedResourceDirectories in Test <+=  baseDirectory ( _ /"target/web/public/test" )  
