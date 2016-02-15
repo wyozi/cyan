@@ -1,6 +1,6 @@
 package dao
 
-import com.google.inject.Inject
+import com.google.inject.{Singleton, Inject}
 import model.{Ping, Product, ProductLicense}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
@@ -13,6 +13,7 @@ import scala.concurrent.Future
   *
   * Created by wyozi on 8.2.2016.
   */
+@Singleton
 class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
   pingsDAO: PingsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {

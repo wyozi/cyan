@@ -1,6 +1,6 @@
 package dao
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.jdbc.GetResult
@@ -10,6 +10,7 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 8.2.2016.
   */
+@Singleton
 class MUOLAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 

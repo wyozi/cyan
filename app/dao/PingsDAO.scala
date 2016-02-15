@@ -2,7 +2,7 @@ package dao
 
 import java.sql.Timestamp
 
-import com.google.inject.Inject
+import com.google.inject.{Singleton, Inject}
 import model.{Ping, Product}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
@@ -12,6 +12,7 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 8.2.2016.
   */
+@Singleton
 class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 

@@ -1,6 +1,6 @@
 package dao
 
-import com.google.inject.Inject
+import com.google.inject.{Singleton, Inject}
 import model.{PingResponse, Response}
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
 import slick.driver.JdbcProfile
@@ -11,6 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by wyozi on 8.2.2016.
   */
+@Singleton
 class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
