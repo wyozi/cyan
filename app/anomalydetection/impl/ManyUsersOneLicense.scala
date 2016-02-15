@@ -24,8 +24,8 @@ class ManyUsersOneLicense @Inject() (muolLAnomalyDAO: MUOLAnomalyDAO) extends An
 
   class MUOLAnomaly(productName: String, productId: Int, license: String, distinctUserCount: Int) extends Anomaly(Medium) {
     override def relatedLinks: List[(String, Call)] = List(
-      ("product", controllers.admin.routes.Products.view(productId)),
-      ("license", controllers.admin.routes.Products.licenseView(productId, license))
+      ("product", controllers.admin.prod.routes.Products.view(productId)),
+      ("license", controllers.admin.prod.routes.ProductLicenses.licenseView(productId, license))
     )
 
     override def toShortString: String = s"$distinctUserCount distinct users on a single license of $productName"

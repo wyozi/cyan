@@ -3,29 +3,29 @@
 # ~~~~
 
 # Home page
-GET     /                                        controllers.Application.index()
-POST    /ping                                    controllers.PingReceiver.ping()
+GET         /                                                  controllers.Application.index()
+POST        /ping                                              controllers.PingReceiver.ping()
 
-GET     /admin/products                          controllers.admin.Products.list()
-POST    /admin/products                          controllers.admin.Products.create()
-GET     /admin/products/:id                      controllers.admin.Products.view(id: Int)
-POST    /admin/products/:id                      controllers.admin.Products.configure(id: Int)
-POST    /admin/products/:pid/:lid/response       controllers.admin.Products.setProductLicenseResponse(pid: Int, lid: String)
+GET         /admin/products                                    controllers.admin.prod.Products.list()
+POST        /admin/products                                    controllers.admin.prod.Products.create()
+GET         /admin/products/:id                                controllers.admin.prod.Products.view(id: Int)
+POST        /admin/products/:id                                controllers.admin.prod.Products.configure(id: Int)
 
-GET     /admin/products/:id/licences/:lid        controllers.admin.Products.licenseView(id: Int, lid: String)
+GET         /admin/products/:id/licences/:lid                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
+POST        /admin/products/:pid/licenses/:lid/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
 
-GET     /admin/pings/:id/:key                    controllers.admin.Pings.showPingExtra(id: Int, key: String)
+GET         /admin/pings/:id/:key                              controllers.admin.Pings.showPingExtra(id: Int, key: String)
 
-GET     /admin/responses                         controllers.admin.Responses.list
-POST    /admin/responses                         controllers.admin.Responses.create
-GET     /admin/responses/:id                     controllers.admin.Responses.view(id: Int)
+GET         /admin/responses                                   controllers.admin.Responses.list
+POST        /admin/responses                                   controllers.admin.Responses.create
+GET         /admin/responses/:id                               controllers.admin.Responses.view(id: Int)
 
-GET     /admin/anomalies                         controllers.admin.Anomalies.overview
+GET         /admin/anomalies                                   controllers.admin.Anomalies.overview
 
 # WebJar assets
-GET     /webjars/*file                           controllers.WebJarAssets.at(file)
+GET         /webjars/*file                                     controllers.WebJarAssets.at(file)
 
 # Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file                            controllers.Assets.at(path="/public", file)
+GET         /assets/*file                                      controllers.Assets.at(path="/public", file)
 
     

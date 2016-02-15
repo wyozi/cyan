@@ -1,11 +1,10 @@
-package controllers.admin
+package controllers.admin.prod
 
 import javax.inject.Inject
 
 import auth.Secured
 import cyan.backend.Backend
 import dao._
-import model.ProductLicense
 import play.api.Play.current
 import play.api.data.Form
 import play.api.i18n.Messages.Implicits._
@@ -74,24 +73,5 @@ class Products @Inject() (implicit backend: Backend,
         Redirect(routes.Products.list())
       }
     )
-  }
-
-  def licenseView(prodId: Int, licenseId: String) = SecureAction.async {
-    productsDAO.findById(prodId).map {
-      case Some(prod) =>
-        Ok(views.html.admin_license_view(ProductLicense(prod, licenseId)))
-    }
-  }
-
-  def setProductLicenseResponse(productId: Int, license: String) = SecureAction { req =>
-    val params = req.body.asFormUrlEncoded.get
-
-    val response = params.get("response").map(_.head.mkString).get match {
-      case "null" => Option.empty
-      case x => Some(x.toInt)
-    }
-
-    pingResponsesDAO.upsertExactPingResponse(Some(productId), Some(license), None, response)
-    Redirect(routes.Products.licenseView(productId, license))
   }
 }

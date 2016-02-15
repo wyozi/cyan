@@ -14,7 +14,7 @@
             <h3 class="panel-title">Configuration</h3>
         </div>
         <div class="panel-body">
-            <form class="row" action="@admin.routes.Products.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
+            <form class="row" action="@admin.prod.routes.ProductLicenses.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
                 <input type="hidden" name="opt" value="unreg_response">
                 <label for="" class="col-sm-4">Default response for all users of this license:</label>
                 @defining(pingResponsesDAO.getExactResponse(Some(prodLicense.prod.id), Some(prodLicense.license), None).await) { resp =>

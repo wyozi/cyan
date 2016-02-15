@@ -37,6 +37,15 @@
 }
 
 @layout_admin(prod.name, scripts) {
+    <div class="col-sm-3 col-md-2 sidebar">
+        <ul class="nav nav-sidebar">
+            <li><a href="@admin.prod.routes.Products.view(prod.id)">Overview</a></li>
+        </ul>
+        <ul class="nav nav-sidebar">
+            <li><a href="">Ping extras</a></li>
+        </ul>
+    </div>
+
     <div class="col-sm-12 main">
         <h1>Viewing product: @prod.name</h1>
 
@@ -45,7 +54,7 @@
                 <h3 class="panel-title">Configuration</h3>
             </div>
             <div class="panel-body">
-                <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
+                <form class="row" action="@admin.prod.routes.Products.configure(prod.id)" method="post">
                     <input type="hidden" name="opt" value="unreg_response">
                     <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
                     @snippet.responseselect(
@@ -71,7 +80,7 @@
             <tbody>
                 @for(ping <- recentNewLicenses) {
                     <tr>
-                        <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
+                        <td><a href="@admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                         <td>@snippet.datetime(ping.date)</td>
                     </tr>
                 }
@@ -96,7 +105,7 @@
                 <tr>
                     <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
                     <td>@ping.ip</td>
-                    <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
+                    <td><a href="@admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                     <td>@snippet.datetime(ping.date)</td>
                     <td>
                     @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
