@@ -5,7 +5,7 @@
 @import util.FutureUtils._
 @(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@main("Admin: " + subTitle) {
+@layout("Admin: " + subTitle) {
     <nav class="navbar navbar-inverse navbar-fixed-top">
         <div class="container-fluid">
             <div class="navbar-header">
@@ -20,7 +20,17 @@
             <div id="navbar" class="navbar-collapse collapse">
                 <ul class="nav navbar-nav navbar-right">
                     <li><a href="#">Dashboard</a></li>
-                    <li><a href="@admin.routes.Products.list()">Products</a></li>
+
+                    <li class="dropdown">
+                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Products <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="@admin.routes.Products.list()">Overview</a></li>
+                            <li role="separator" class="divider"></li>
+                            @for(prod <- productsDAO.getAll().await) {
+                                <li><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></li>
+                            }
+                        </ul>
+                    </li>
                     <li><a href="@admin.routes.Responses.list()">Responses</a></li>
                     <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomalies</a></li>
                 </ul>
@@ -29,13 +39,9 @@
     </nav>
 
 
-    <div class="container-fluid">
+    <div class="container">
         <div class="row">
-            <div class="col-sm-12 main">
-                <h1 class="page-header">@subTitle</h1>
-
-                @content
-            </div>
+            @content
         </div>
     </div>
 } {

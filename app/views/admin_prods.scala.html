@@ -4,7 +4,7 @@
 @import util.FutureUtils._
 @(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO)
 
-@admin_main("Products") {
+@layout_admin_simple("Products") {
     <h2>Create product</h2>
 
     @helper.form(action = admin.routes.Products.create()) {
@@ -25,20 +25,20 @@
             </tr>
         </thead>
         <tbody>
-            @for(prod <- products) {
-                <tr>
-                    <td><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></td>
-                    <td>@plpDAO.findPingCount(prod).await</td>
-                    <td>
-                        @plpDAO.findRecentPings(prod, 1).await.headOption match {
-                            case Some(ping) => {
-                                @snippet.datetime(ping.date)
-                            }
-                            case None => {}
-                        }
-                    </td>
-                </tr>
-            }
+        @for(prod <- products) {
+            <tr>
+                <td><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></td>
+                <td>@plpDAO.findPingCount(prod).await</td>
+                <td>
+                @plpDAO.findRecentPings(prod, 1).await.headOption match {
+                    case Some(ping) => {
+                        @snippet.datetime(ping.date)
+                    }
+                    case None => {}
+                }
+                </td>
+            </tr>
+        }
         </tbody>
     </table>
 }

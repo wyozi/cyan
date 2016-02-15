@@ -8,8 +8,7 @@
 @import dao.ProdLicensePingDAO
 @(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
 
-@admin_main(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
-
+@layout_admin_simple(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Configuration</h3>

@@ -2,8 +2,6 @@
 @import dao.ProductsDAO
 @(resp: Response)(implicit productsDAO: ProductsDAO)
 
-@admin_main(s"Viewing response: ${resp.name}") {
-    <pre>
-        @resp.body
-    </pre>
+@layout_admin_simple(s"Viewing response: ${resp.name}") {
+    <pre>@resp.body</pre>
 }

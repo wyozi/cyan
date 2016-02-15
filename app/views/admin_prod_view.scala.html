@@ -36,84 +36,88 @@
     </script>
 }
 
-@admin_main(s"Viewing product: ${prod.name}", scripts) {
-    <div class="panel panel-default">
-        <div class="panel-heading">
-            <h3 class="panel-title">Configuration</h3>
-        </div>
-        <div class="panel-body">
-            <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
-                <input type="hidden" name="opt" value="unreg_response">
-                <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
-                @snippet.responseselect(
-                    pingResponsesDAO
-                            .getExactResponse(Some(prod.id), None, None)
-                            .await
-                            .map(_.id)
-                            .getOrElse(-1))
-                <button type="submit" class="btn btn-primary btn-xs">Set</button>
-            </form>
-        </div>
-    </div>
+@layout_admin(prod.name, scripts) {
+    <div class="col-sm-12 main">
+        <h1>Viewing product: @prod.name</h1>
 
-    <h3>Recent new licenses</h3>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Configuration</h3>
+            </div>
+            <div class="panel-body">
+                <form class="row" action="@admin.routes.Products.configure(prod.id)" method="post">
+                    <input type="hidden" name="opt" value="unreg_response">
+                    <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
+                    @snippet.responseselect(
+                        pingResponsesDAO
+                                .getExactResponse(Some(prod.id), None, None)
+                                .await
+                                .map(_.id)
+                                .getOrElse(-1))
+                    <button type="submit" class="btn btn-primary btn-xs">Set</button>
+                </form>
+            </div>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <td>License</td>
-                <td>First timestamp</td>
-            </tr>
-        </thead>
-        <tbody>
-            @for(ping <- recentNewLicenses) {
+        <h3>Recent new licenses</h3>
+
+        <table class="table">
+            <thead>
                 <tr>
+                    <td>License</td>
+                    <td>First timestamp</td>
+                </tr>
+            </thead>
+            <tbody>
+                @for(ping <- recentNewLicenses) {
+                    <tr>
+                        <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
+                        <td>@snippet.datetime(ping.date)</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+        <h3>Recent pings</h3>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>User</td>
+                    <td>IP</td>
+                    <td>License</td>
+                    <td>Timestamp</td>
+                    <td>Extra keys</td>
+                    <td>Response</td>
+                </tr>
+            </thead>
+            <tbody>
+            @for(ping <- recentPings) {
+                <tr>
+                    <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
+                    <td>@ping.ip</td>
                     <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                     <td>@snippet.datetime(ping.date)</td>
+                    <td>
+                    @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
+                        <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" href="@admin.routes.Pings.showPingExtra(ping.id, pe.key)">
+                        @pe.key
+                        </a>
+                    }
+                    </td>
+                    <td>
+                    @ping.responseId match {
+                        case Some(respId) => {
+                            @defining(responsesDAO.findById(respId).await.get) { resp =>
+                                <a href="@admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
+                            }
+                        }
+                        case _ => { Empty }
+                    }
+                    </td>
                 </tr>
             }
-        </tbody>
-    </table>
-
-    <h3>Recent pings</h3>
-
-    <table class="table">
-        <thead>
-            <tr>
-                <td>User</td>
-                <td>IP</td>
-                <td>License</td>
-                <td>Timestamp</td>
-                <td>Extra keys</td>
-                <td>Response</td>
-            </tr>
-        </thead>
-        <tbody>
-        @for(ping <- recentPings) {
-            <tr>
-                <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
-                <td>@ping.ip</td>
-                <td><a href="@admin.routes.Products.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
-                <td>@snippet.datetime(ping.date)</td>
-                <td>
-                @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
-                    <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" href="@admin.routes.Pings.showPingExtra(ping.id, pe.key)">
-                    @pe.key
-                    </a>
-                }
-                </td>
-                <td>
-                @ping.responseId match {
-                    case Some(respId) => {
-                        @defining(responsesDAO.findById(respId).await.get) { resp =>
-                            <a href="@admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
-                        }
-                    }
-                    case _ => { Empty }
-                }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 }

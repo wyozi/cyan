@@ -1,0 +1,10 @@
+@import dao.ProductsDAO
+@(subTitle: String)(content: Html)(implicit productsDAO: ProductsDAO)
+
+@layout_admin(subTitle) {
+    <div class="col-sm-12 main">
+        <h1>@subTitle</h1>
+
+        @content
+    </div>
+}
