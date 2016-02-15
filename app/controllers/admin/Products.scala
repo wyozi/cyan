@@ -27,7 +27,7 @@ class Products @Inject() (implicit backend: Backend,
   val productForm = Form(
     tuple(
       "name" -> text,
-      "charId" -> text
+      "shortName" -> text
     )
   )
 
