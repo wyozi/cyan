@@ -20,6 +20,7 @@
         <thead>
             <tr>
                 <td>Name</td>
+                <td>License count</td>
                 <td>Ping count</td>
                 <td>Latest ping</td>
             </tr>
@@ -28,6 +29,7 @@
         @for(prod <- products) {
             <tr>
                 <td><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></td>
+                <td>@plpDAO.findLicenseCount(prod).await</td>
                 <td>@plpDAO.findPingCount(prod).await</td>
                 <td>
                 @plpDAO.findRecentPings(prod, 1).await.headOption match {

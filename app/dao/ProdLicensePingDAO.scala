@@ -20,6 +20,9 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
 
   implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, product = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
 
+  def findLicenseCount(prod: Product): Future[Int] =
+    db.run(pingsDAO.Pings.filter(_.product === prod.shortName).map(_.license).countDistinct.result)
+
   def findPingCount(prod: Product): Future[Int] =
     db.run(pingsDAO.Pings.filter(_.product === prod.shortName).length.result)
 
