@@ -1,0 +1,30 @@
+@import scala.concurrent.ExecutionContext
+@import dao.ProductsDAO
+@import dao.PingExtrasDAO
+@import model.Product
+@import util.FutureUtils._
+@(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
+
+@layout_admin_simple("Ping extra") {
+    <table class="table">
+        <thead>
+            <tr>
+                <td>Value</td>
+                <td>Count</td>
+            </tr>
+        </thead>
+        <tbody>
+        @for((value, count) <- pingExtrasDAO.findProductExtraDistinctValueCounts(prod.shortName, pingExtraKey).await) {
+            <tr>
+                <td>
+                    @value match {
+                        case Some(x) => { @x }
+                        case None => { <i>no ping extra</i> }
+                    }
+                </td>
+                <td>@count</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}

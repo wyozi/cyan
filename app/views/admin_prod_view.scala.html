@@ -28,10 +28,8 @@
             placement: 'bottom',
             content: function() {
                 var divId =  "tmp-id-" + $.now();
-                return fetchContents($(this).attr('href'), divId);
+                return fetchContents($(this).data('valueurl'), divId);
             }
-        }).click(function(e) {
-            e.preventDefault();
         });
     </script>
 }
@@ -109,7 +107,7 @@
                     <td>@snippet.datetime(ping.date)</td>
                     <td>
                     @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
-                        <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" href="@admin.routes.Pings.showPingExtra(ping.id, pe.key)">
+                        <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" data-valueurl="@admin.routes.Pings.showPingExtra(ping.id, pe.key)" href="@admin.prod.routes.ProductPingExtras.view(prod.id, pe.key)">
                         @pe.key
                         </a>
                     }

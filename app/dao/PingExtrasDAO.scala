@@ -13,9 +13,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by wyozi on 8.2.2016.
   */
 @Singleton
-class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
+class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, pingsDAO: PingsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {
-
 
   import driver.api._
 
@@ -24,8 +23,18 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def insert(extra: PingExtra): Future[Unit] =
     db.run(PingExtras += extra).map(_ => ())
 
-  def findExtras(id: Int): Future[Seq[PingExtra]] =
-    db.run(PingExtras.filter(_.pingId === id).result)
+  def findProductExtraDistinctValueCounts(product: String, key: String): Future[Seq[(Option[String], Int)]] = {
+    val q = for {
+      (p, e) <- pingsDAO.Pings.filter(_.product === product) joinLeft PingExtras.filter(_.key === key) on (_.id === _.pingId)
+    } yield (e.map(_.value))
+
+    db.run(
+      q.groupBy(x => x).map { case (value, values) => (value, values.length) }.result
+    )
+  }
+
+  def findExtras(pingId: Int): Future[Seq[PingExtra]] =
+    db.run(PingExtras.filter(_.pingId === pingId).result)
 
   def findValue(pingId: Int, key: String): Future[Option[String]] =
     db.run(PingExtras.filter(r => r.pingId === pingId && r.key === key).map(_.value).result.headOption)
