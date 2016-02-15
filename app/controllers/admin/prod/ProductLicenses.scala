@@ -20,7 +20,7 @@ class ProductLicenses @Inject() ()
   def licenseView(prodId: Int, licenseId: String) = SecureAction.async {
     productsDAO.findById(prodId).map {
       case Some(prod) =>
-        Ok(views.html.admin_license_view(ProductLicense(prod, licenseId)))
+        Ok(views.html.admin_prod_license_view(ProductLicense(prod, licenseId)))
     }
   }
 
