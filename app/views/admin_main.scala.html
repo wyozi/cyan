@@ -6,36 +6,37 @@
 @(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
 @main("Admin: " + subTitle) {
-
-    <div class="navmenu navmenu-default navmenu-fixed-left offcanvas-sm" role="navigation">
-        <a class="navmenu-brand" href="#">Cyan</a>
-
-        <ul class="nav navmenu-nav">
-            <li class="active"><a href="#">Overview</a></li>
-        </ul>
-        <ul class="nav navmenu-nav">
-            <li><a href="@admin.routes.Products.list()">Product overview</a></li>
-            <li class="dropdown">
-                <a href="#" class="dropdown-toggle" data-toggle="dropdown">Products <b class="caret"></b></a>
-                <ul class="dropdown-menu navmenu-nav" role="menu">
-                @for(prod <- productsDAO.getAll().await) {
-                    <li><a href="@admin.routes.Products.view(prod.id)">@prod.name</a></li>
-                }
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand" href="#">Cyan</a>
+            </div>
+            <div id="navbar" class="navbar-collapse collapse">
+                <ul class="nav navbar-nav navbar-right">
+                    <li><a href="#">Dashboard</a></li>
+                    <li><a href="@admin.routes.Products.list()">Products</a></li>
+                    <li><a href="@admin.routes.Responses.list()">Responses</a></li>
+                    <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomalies</a></li>
                 </ul>
-            </li>
-        </ul>
-        <ul class="nav navmenu-nav">
-            <li><a href="@admin.routes.Responses.list()">Response overview</a></li>
-        </ul>
-        <ul class="nav navmenu-nav">
-            <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomaly overview</a></li>
-        </ul>
-    </div>
+            </div>
+        </div>
+    </nav>
 
-    <div class="container">
-        <h1 class="page-header">@subTitle</h1>
 
-        @content
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12 main">
+                <h1 class="page-header">@subTitle</h1>
+
+                @content
+            </div>
+        </div>
     </div>
 } {
     @scripts
