@@ -6,14 +6,15 @@
     <head>
         <title>@title</title>
         <link rel='stylesheet' href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
-        <link rel='stylesheet' href="@routes.WebJarAssets.at(WebJarAssets.locate("css/jasny-bootstrap.min.css"))">
         <link rel='stylesheet' href="@routes.Assets.at("stylesheets/dashboard.css")">
 <body>
     @content
 
     <script src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))"></script>
     <script src="@routes.WebJarAssets.at(WebJarAssets.locate("js/bootstrap.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("js/jasny-bootstrap.min.js"))"></script>
+
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("min/moment.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("Chart.min.js"))"></script>
 
     @scripts
 </body>

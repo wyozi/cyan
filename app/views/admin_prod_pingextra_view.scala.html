@@ -3,28 +3,71 @@
 @import dao.PingExtrasDAO
 @import model.Product
 @import util.FutureUtils._
+@import org.joda.time.LocalDate
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
 
-@layout_admin_simple("Ping extra") {
-    <table class="table">
-        <thead>
-            <tr>
-                <td>Value</td>
-                <td>Count</td>
-            </tr>
-        </thead>
-        <tbody>
-        @for((value, count) <- pingExtrasDAO.findProductExtraDistinctValueCounts(prod.shortName, pingExtraKey).await) {
-            <tr>
-                <td>
-                    @value match {
-                        case Some(x) => { @x }
-                        case None => { <i>no ping extra</i> }
-                    }
-                </td>
-                <td>@count</td>
-            </tr>
+@scripts = {
+
+    <script type="application/javascript">
+        function getRandomColor() {
+            return "rgba(" + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + ",0.4)";
         }
-        </tbody>
-    </table>
+
+        var valueDistWeekCtx = document.getElementById("chart_valueDistWeek").getContext("2d");
+        var valueDistWeekChart = new Chart(valueDistWeekCtx, {
+            type: "line",
+            data: {
+                labels: ["Day -6", "Day -5", "Day -4", "Day -3", "Day -2", "Day -1", "Day 0"],
+                datasets: [
+                    @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await) {
+                        {
+                            label: "@value match {
+                                case Some(x) => {@x}
+                                case None => {no value}
+                            }",
+                            backgroundColor: getRandomColor(),
+                            data: [
+                                @for(i <- 6 to 0 by -1) {
+                                    @daycounts.find(_._1 == LocalDate.now().minusDays(i)).getOrElse(0) ,
+                                }
+                            ]
+                        },
+                    }
+                ]
+            }
+        });
+    </script>
+}
+
+@layout_admin_simple("Ping extra", scripts) {
+    <div class="row">
+        <div class="col-xs-12 col-md-6">
+            <h3>Value distribution in past 24 hours</h3>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Value</td>
+                        <td>Count</td>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1)).await) {
+                    <tr>
+                        <td>
+                        @value match {
+                            case Some(x) => { @x }
+                            case None => { <i>no value</i> }
+                        }
+                        </td>
+                        <td>@daycounts.head._2</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+        <div class="col-xs-12 col-md-6">
+            <h3>Value distribution in past 7 days</h3>
+            <canvas id="chart_valueDistWeek" width="400" height="300"></canvas>
+        </div>
+    </div>
 }

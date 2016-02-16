@@ -1,7 +1,7 @@
 @import dao.ProductsDAO
-@(subTitle: String)(content: Html)(implicit productsDAO: ProductsDAO)
+@(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@layout_admin(subTitle) {
+@layout_admin(subTitle, scripts) {
     <div class="col-sm-12 main">
         <h1>@subTitle</h1>
 

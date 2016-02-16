@@ -1,13 +1,15 @@
 package dao
 
-import com.google.inject.{Singleton, Inject}
+import java.sql.Timestamp
+
+import com.google.inject.{Inject, Singleton}
 import model.PingExtra
+import org.joda.time.LocalDate
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
-import scala.concurrent.Future
-
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by wyozi on 8.2.2016.
@@ -23,14 +25,19 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def insert(extra: PingExtra): Future[Unit] =
     db.run(PingExtras += extra).map(_ => ())
 
-  def findProductExtraDistinctValueCounts(product: String, key: String): Future[Seq[(Option[String], Int)]] = {
-    val q = for {
-      (p, e) <- pingsDAO.Pings.filter(_.product === product) joinLeft PingExtras.filter(_.key === key) on (_.id === _.pingId)
-    } yield (e.map(_.value))
-
+  def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
     db.run(
-      q.groupBy(x => x).map { case (value, values) => (value, values.length) }.result
-    )
+      sql"""
+         SELECT pi."date"::date AS "date", pe."value" AS "value", COUNT(pe."value") AS count
+         FROM "pings" pi
+           LEFT JOIN "pingextras" pe
+             ON pi.id = pe.ping_id AND pe.key = ${key}
+         WHERE pi."product" = ${product} AND pi."date" >= ${new Timestamp(since.toDate.getTime)}
+         GROUP BY pi."date"::date, pe."value"
+         HAVING COUNT(pe."value") > 0
+      """
+        .as[(Timestamp, Option[String], Int)]
+    ).map(_.groupBy(_._2).mapValues(_.map { case (t, v, c) => (new LocalDate(t), c) }.sortBy(_._1.toDateTimeAtStartOfDay.getMillis)).toSeq)
   }
 
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =

@@ -25,7 +25,8 @@ libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.4.0-1",
   "org.webjars" % "jquery" % "2.2.0",
   "org.webjars" % "bootstrap" % "3.3.6",
-  "org.webjars" % "jasny-bootstrap" % "3.1.3-2"
+  "org.webjars" % "momentjs" % "2.11.1",
+  "org.webjars.bower" % "Chart.js" % "2.0.0-beta2"
 )
 
 routesGenerator := InjectedRoutesGenerator
