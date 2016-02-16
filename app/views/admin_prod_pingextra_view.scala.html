@@ -17,7 +17,11 @@
         var valueDistWeekChart = new Chart(valueDistWeekCtx, {
             type: "line",
             data: {
-                labels: ["Day -6", "Day -5", "Day -4", "Day -3", "Day -2", "Day -1", "Day 0"],
+                labels: [
+                    @for(i <- 6 to 0 by -1) {
+                        "@LocalDate.now().minusDays(i)",
+                    }
+                ],
                 datasets: [
                     @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await) {
                         {
@@ -59,7 +63,7 @@
                             case None => { <i>no value</i> }
                         }
                         </td>
-                        <td>@daycounts.head._2</td>
+                        <td>@daycounts.map(_._2).sum</td>
                     </tr>
                 }
                 </tbody>
