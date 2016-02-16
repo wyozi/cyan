@@ -28,7 +28,7 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
     db.run(
       sql"""
-         SELECT pi."date"::date AS "date", pe."value" AS "value", COUNT(pe."value") AS count
+         SELECT pi."date"::date AS "date", pe."value" AS "value", COUNT(DISTINCT pi."user_name") AS count
          FROM "pings" pi
            LEFT JOIN "pingextras" pe
              ON pi.id = pe.ping_id AND pe.key = ${key}
