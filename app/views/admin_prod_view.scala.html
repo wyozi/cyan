@@ -8,7 +8,8 @@
 @import util.FutureUtils._
 @import dao.ResponsesDAO
 @import dao.ProductsDAO
-@(prod: Product, recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
+@import dao.ProductConfigDAO
+@(prod: Product, recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
     <script type="text/javascript">
@@ -52,8 +53,7 @@
                 <h3 class="panel-title">Configuration</h3>
             </div>
             <div class="panel-body">
-                <form class="row" action="@admin.prod.routes.Products.configure(prod.id)" method="post">
-                    <input type="hidden" name="opt" value="unreg_response">
+                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, "unreg_response")" method="post">
                     <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
                     @snippet.responseselect(
                         pingResponsesDAO
@@ -61,6 +61,11 @@
                                 .await
                                 .map(_.id)
                                 .getOrElse(-1))
+                    <button type="submit" class="btn btn-primary btn-xs">Set</button>
+                </form>
+                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, "devlicense")" method="post">
+                    <label for="devlicense" class="col-sm-4">Developer license (if set, hidden in some stats/lists):</label>
+                    <input name="devlicense" value="@productConfigDAO.getValue(prod.id, "devlicense").await.getOrElse("")" type="text" />
                     <button type="submit" class="btn btn-primary btn-xs">Set</button>
                 </form>
             </div>

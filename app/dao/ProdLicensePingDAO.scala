@@ -15,6 +15,7 @@ import scala.concurrent.Future
   */
 @Singleton
 class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
+  productConfigDAO: ProductConfigDAO,
   pingsDAO: PingsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {
   import driver.api._
@@ -37,7 +38,8 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     db.run(
       (
         for {
-          p <- pingsDAO.Pings.filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+          p <- pingsDAO.Pings
+            .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
           maxTimestamp <- pingsDAO.Pings.groupBy(_.userName).map { case (user, pings) => pings.map(_.date).max }
           if p.date === maxTimestamp
         } yield p
@@ -47,11 +49,13 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   /**
     * Returns a list of pings in product. Ordered by first (oldest) ping timestamp descendingly. One per license.
     */
-  def findRecentNewLicenses(prod: Product, limit: Int): Future[Seq[Ping]] = {
+  def findRecentNewLicenses(prod: Product, limit: Int, ignoredLicense: Option[String]): Future[Seq[Ping]] = {
     val q = (
       for {
         p <- pingsDAO.Pings
-        maxTimestamp <- pingsDAO.Pings.filter(_.product === prod.shortName)
+        maxTimestamp <- pingsDAO.Pings
+          .filter(_.product === prod.shortName)
+          .filterNot(_.license === ignoredLicense)
           .groupBy(_.license)
           .map { case(user, pings) => pings.map(_.date).min }
         if p.date === maxTimestamp

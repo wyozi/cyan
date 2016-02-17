@@ -20,6 +20,7 @@ class Products @Inject() (implicit backend: Backend,
   pingResponsesDAO: PingResponsesDAO,
   pingsDAO: PingsDAO,
   productsDAO: ProductsDAO,
+  productConfigDAO: ProductConfigDAO,
   plpDAO: ProdLicensePingDAO,
   pingExtrasDAO: PingExtrasDAO) extends Controller with Secured {
   import play.api.data.Forms._
@@ -36,20 +37,21 @@ class Products @Inject() (implicit backend: Backend,
 
   def view(prodId: Int) = SecureAction.async {
     val futureProd = productsDAO.findById(prodId)
+
     for {
       prodOpt <- productsDAO.findById(prodId)
-      recentNewLicenses <- plpDAO.findRecentNewLicenses(prodOpt.get, 15)
-      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get, 15)
+      devLicense <- productConfigDAO.getValue(prodId, "devlicense")
+      recentNewLicenses <- plpDAO.findRecentNewLicenses(prodOpt.get, 15, devLicense)
+      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get, 15, devLicense)
     } yield Ok(views.html.admin_prod_view(prodOpt.get, recentNewLicenses, recentPings))
   }
 
-  def configure(prodId: Int) = SecureAction.async { req =>
+  def configure(prodId: Int, configKey: String) = SecureAction.async { req =>
     val fue = req.body.asFormUrlEncoded
 
-    val opt = fue.get("opt").head
     productsDAO.findById(prodId).flatMap {
       case Some(prod) =>
-        val f = opt match {
+        val f = configKey match {
           case "unreg_response" => {
             val response = fue.get("response").head match {
               case "null" => Option.empty
@@ -57,9 +59,12 @@ class Products @Inject() (implicit backend: Backend,
             }
             pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
           }
+          case "devlicense" => {
+            productConfigDAO.upsertValue(prodId, configKey, fue.get("devlicense").head)
+          }
         }
+
         f.map { r =>
-          println(r)
           Redirect(routes.Products.view(prodId))
         }
     }

@@ -9,7 +9,7 @@ POST        /ping                                              controllers.PingR
 GET         /admin/products                                    controllers.admin.prod.Products.list()
 POST        /admin/products                                    controllers.admin.prod.Products.create()
 GET         /admin/products/:id                                controllers.admin.prod.Products.view(id: Int)
-POST        /admin/products/:id                                controllers.admin.prod.Products.configure(id: Int)
+POST        /admin/products/:id/:cfgkey                        controllers.admin.prod.Products.configure(id: Int, cfgkey)
 
 GET         /admin/products/:id/licences/:lid                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
 POST        /admin/products/:pid/licenses/:lid/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
