@@ -24,7 +24,14 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run((Pings.map(c => (c.product, c.license, c.userName, c.ip, c.responseId)) returning Pings.map(_.id)) += (product, license, user, remoteAddress, responseId))
 
   def findRecentForProduct(prod: Product, limit: Int = 1000, ignoredLicense: Option[String] = None): Future[Seq[Ping]] =
-    db.run(Pings.filter(_.product === prod.shortName).filterNot(_.license === ignoredLicense).sortBy(_.id.desc).take(limit).result)
+    db.run(
+      Pings
+        .filter(_.product === prod.shortName)
+        .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
+        .sortBy(_.id.desc)
+        .take(limit)
+        .result
+    )
 
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)

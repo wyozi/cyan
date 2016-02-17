@@ -55,7 +55,7 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
         p <- pingsDAO.Pings
         maxTimestamp <- pingsDAO.Pings
           .filter(_.product === prod.shortName)
-          .filterNot(_.license === ignoredLicense)
+          .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
           .groupBy(_.license)
           .map { case(user, pings) => pings.map(_.date).min }
         if p.date === maxTimestamp
