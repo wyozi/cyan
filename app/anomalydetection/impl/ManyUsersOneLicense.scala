@@ -18,7 +18,7 @@ class ManyUsersOneLicense @Inject() (muolLAnomalyDAO: MUOLAnomalyDAO) extends An
 
   override def detectAnomalies(): Future[List[Anomaly]] = {
     muolLAnomalyDAO.findDistinctUserGroups(USER_PER_LICENSE_THRESHOLD).map(mars => mars.map {
-      mar => new MUOLAnomaly(mar.productName, mar.productId, mar.license, mar.distinctUserCount)
+      case (prod, license, userCount) => new MUOLAnomaly(prod.name, prod.id, license, userCount)
     }.toList)
   }
 
