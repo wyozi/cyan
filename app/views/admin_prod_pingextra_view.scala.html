@@ -4,15 +4,12 @@
 @import model.Product
 @import util.FutureUtils._
 @import org.joda.time.{LocalDate, LocalTime}
+@import java.awt.Color
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @scripts = {
 
     <script type="application/javascript">
-        function getRandomColor() {
-            return "rgba(" + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + "," + Math.floor(Math.random() * 256) + ",0.4)";
-        }
-
         var valueDistWeekCtx = document.getElementById("chart_valueDistWeek").getContext("2d");
         var valueDistWeekChart = new Chart(valueDistWeekCtx, {
             type: "line",
@@ -24,13 +21,15 @@
                     "@LocalDate.now() *"
                 ],
                 datasets: [
-                    @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await) {
+                    @for(((value, daycounts), index) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await.zipWithIndex) {
                         {
                             label: "@value match {
                                 case Some(x) => {@x}
                                 case None => {no value}
                             }",
-                            backgroundColor: getRandomColor(),
+                            backgroundColor: @defining(Color.getHSBColor(index * 0.618033988749895f, 0.8f, 0.85f)) { clr =>
+                                'rgba(@clr.getRed, @clr.getGreen, @clr.getBlue, 0.4)'
+                            },
                             data: [
                                 @for(i <- 6 to 1 by -1) {
                                     @daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2).getOrElse(0) ,
