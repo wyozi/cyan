@@ -13,28 +13,30 @@
 }
 
 @layout_admin_simple("Anomaly overview") {
-    <table class="table">
-        <thead>
-            <tr>
-                <td>Level</td>
-                <td>Name</td>
-                <td>Related links</td>
-            </tr>
-        </thead>
-        <tbody>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Level</td>
+                    <td>Name</td>
+                    <td>Related links</td>
+                </tr>
+            </thead>
+            <tbody>
             @for(det <- detectors) {
                 @for(a <- det.detectAnomalies().await) {
                     <tr class="@severityBootstrapClass(a.severity)">
                         <td>@a.severity</td>
                         <td>@a.toShortString</td>
                         <td>
-                            @for((name, targ) <- a.relatedLinks) {
-                                <a href="@targ" class="btn btn-info">@name</a>
-                            }
+                        @for((name, targ) <- a.relatedLinks) {
+                            <a href="@targ" class="btn btn-info">@name</a>
+                        }
                         </td>
                     </tr>
                 }
             }
-        </tbody>
-    </table>
+            </tbody>
+        </table>
+    </div>
 }

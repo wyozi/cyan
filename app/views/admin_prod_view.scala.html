@@ -49,7 +49,7 @@
         </ul>
     </div>
 
-    <div class="col-sm-12 main">
+    <div class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
         <h1>Viewing product: @prod.name</h1>
 
         <div class="panel panel-default">
@@ -77,37 +77,40 @@
 
         <h3>Recent new licenses</h3>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <td>License</td>
-                    <td>First timestamp</td>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>License</td>
+                        <td>First timestamp</td>
+                    </tr>
+                </thead>
+                <tbody>
                 @for(ping <- recentNewLicenses) {
                     <tr>
                         <td><a href="@admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                         <td>@snippet.datetime(ping.date)</td>
                     </tr>
                 }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
 
         <h3>Recent pings</h3>
 
-        <table class="table">
-            <thead>
-                <tr>
-                    <td>User</td>
-                    <td>IP</td>
-                    <td>License</td>
-                    <td>Timestamp</td>
-                    <td>Extra keys</td>
-                    <td>Response</td>
-                </tr>
-            </thead>
-            <tbody>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>User</td>
+                        <td>IP</td>
+                        <td>License</td>
+                        <td>Timestamp</td>
+                        <td>Extra keys</td>
+                        <td>Response</td>
+                    </tr>
+                </thead>
+                <tbody>
                 @for(ping :: extras :: response :: HNil <- recentPings.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: p.queryResponse() :: HNil)) awaitAll) {
                     <tr>
                         <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
@@ -131,7 +134,8 @@
                         </td>
                     </tr>
                 }
-            </tbody>
-        </table>
+                </tbody>
+            </table>
+        </div>
     </div>
 }

@@ -19,31 +19,33 @@
 
     <h2>Products</h2>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <td>Name</td>
-                <td>License count</td>
-                <td>Ping count</td>
-                <td>Latest ping</td>
-            </tr>
-        </thead>
-        <tbody>
-        @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: p.queryLicenseCount() ::  p.queryPingCount() :: p.queryRecentPings(1) :: HNil)) awaitAll) {
-            <tr>
-                <td><a href="@admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
-                <td>@licenseCount</td>
-                <td>@pingCount</td>
-                <td>
-                @recentPings.headOption match {
-                    case Some(ping) => {
-                        @snippet.datetime(ping.date)
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Name</td>
+                    <td>License count</td>
+                    <td>Ping count</td>
+                    <td>Latest ping</td>
+                </tr>
+            </thead>
+            <tbody>
+            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: p.queryLicenseCount() ::  p.queryPingCount() :: p.queryRecentPings(1) :: HNil)) awaitAll) {
+                <tr>
+                    <td><a href="@admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
+                    <td>@licenseCount</td>
+                    <td>@pingCount</td>
+                    <td>
+                    @recentPings.headOption match {
+                        case Some(ping) => {
+                            @snippet.datetime(ping.date)
+                        }
+                        case None => {}
                     }
-                    case None => {}
-                }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
 }
