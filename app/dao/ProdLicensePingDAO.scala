@@ -37,13 +37,17 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   def findRecentUserPings(prodLicense: ProductLicense): Future[Seq[Ping]] =
     db.run(
       (
-        for {
-          p <- pingsDAO.Pings
-            .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
-          maxTimestamp <- pingsDAO.Pings.groupBy(_.userName).map { case (user, pings) => pings.map(_.date).max }
-          if p.date === maxTimestamp
-        } yield p
-      ).sortBy(_.date.desc).result
+        pingsDAO.Pings
+          .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+          .groupBy(_.userName)
+          .map { case (user, pings) => pings.map(_.id).max }
+      )
+        join
+      pingsDAO.Pings
+        on (_ === _.id)
+      map { case (id, ping) => ping }
+      sortBy(_.date.desc)
+      result
     )
 
   /**
