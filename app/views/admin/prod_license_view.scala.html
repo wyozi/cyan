@@ -49,40 +49,6 @@
     </table>
 
     <h3>Recent pings on this license:</h3>
-    <table class="table">
-        <thead>
-            <tr>
-                <td>User</td>
-                <td>IP</td>
-                <td>Timestamp</td>
-                <td>Extra keys</td>
-                <td>Response</td>
-            </tr>
-        </thead>
-        <tbody>
-        @for(ping :: extras :: response :: HNil <- plpDAO.findRecentPings(prodLicense, 15).await.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: p.queryResponse() :: HNil)) awaitAll) {
-            <tr>
-                <td>@ping.user</td>
-                <td>@ping.ip</td>
-                <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prodLicense.prod.id, ping.license)">@ping.license</a></td>
-                <td>@snippet.datetime(ping.date)</td>
-                <td>
-                @for(pe <- extras) {
-                    <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" data-valueurl="@controllers.admin.routes.Pings.showPingExtra(ping.id, pe.key)" href="@controllers.admin.prod.routes.ProductPingExtras.view(prodLicense.prod.id, pe.key)">
-                    @pe.key
-                    </a>
-                }
-                </td>
-                <td>
-                @response match {
-                    case Some(resp) => {
-                        <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
-                    }
-                    case _ => { Empty }
-                }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
+
+    @snippet.ping_table(plpDAO.findRecentPings(prodLicense, 15).await, showLicense = false)
 }
