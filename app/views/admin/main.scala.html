@@ -5,7 +5,7 @@
 @import util.FutureUtils._
 @()(implicit productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
 
-@layout_admin_simple("Cyan") {
+@layout_admin_simple() {
     <h3>Recent pings</h3>
 
     @snippet.ping_table(pingsDAO.findRecent().await, showProducts = true)

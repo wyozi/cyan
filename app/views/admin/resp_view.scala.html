@@ -2,6 +2,6 @@
 @import dao.ProductsDAO
 @(resp: Response)(implicit productsDAO: ProductsDAO)
 
-@layout_admin_simple(s"Viewing response: ${resp.name}") {
+@layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
     <pre>@resp.body</pre>
 }

@@ -1,9 +1,9 @@
 @import dao.ProductsDAO
-@(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
+@(nav: Seq[Any] = Seq(), scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@layout_admin(subTitle, scripts) {
+@layout_admin(nav.mkString(">"), scripts) {
     <div class="col-sm-12 main">
-        <h1>@subTitle</h1>
+        @snippet.breadcrumb(nav)
 
         @content
     </div>

@@ -48,7 +48,7 @@
     </script>
 }
 
-@layout_admin_simple("Ping extra", scripts) {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Ping extras", pingExtraKey), scripts) {
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <h3>Value distribution in past 24 hours (per user)</h3>

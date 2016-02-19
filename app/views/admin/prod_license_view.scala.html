@@ -13,7 +13,7 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
 
-@layout_admin_simple(s"Viewing license ${prodLicense.license} for product ${prodLicense.prod.name}") {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, prodLicense.license)) {
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Configuration</h3>

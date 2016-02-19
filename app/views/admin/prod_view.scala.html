@@ -55,7 +55,7 @@
     </div>
 
     <div class="col-sm-10 main">
-        <h1>Viewing product: @prod.name</h1>
+        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod))
 
         <div class="panel panel-default">
             <div class="panel-heading">

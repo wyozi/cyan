@@ -1,0 +1,37 @@
+@(rnav: Seq[Any])
+
+@bcpart(content: Html, active: Boolean = false) = {
+    @if(active) { <li class="active"> } else { <li> }
+    @content
+    </li>
+}
+
+@pageobj(obj: Any, active: Boolean = false) = @{
+    obj match {
+        case prod: model.Product => (prod.name, Some(controllers.admin.prod.routes.Products.view(prod.id)))
+        case resp: model.Response => (resp.name, Some(controllers.admin.routes.Responses.view(resp.id)))
+        case (name: String, path: Call) => (name, Some(path))
+        case 'root => ("Cyan", Some(controllers.admin.routes.Main.index()))
+        case x => (x.toString, None)
+    }
+}
+@tolink(p: (String, Option[Call])) = {
+    @p match {
+        case (name, Some(link)) => { <a href="@link">@name</a> }
+        case (name, None) => { @name }
+    }
+}
+
+<ol class="breadcrumb">
+    @defining(Seq('root) ++ rnav) { nav =>
+        @for(el <- nav.dropRight(1)) {
+            @bcpart(tolink(pageobj(el)))
+        }
+        @nav.lastOption match {
+            case Some(x) => {
+                @bcpart(Html(pageobj(x)._1), active = true)
+            }
+            case _ => {}
+        }
+    }
+</ol>

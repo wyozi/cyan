@@ -7,7 +7,7 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO)
 
-@layout_admin_simple("Products") {
+@layout_admin_simple(Seq("Products")) {
     <h2>Create product</h2>
 
     @helper.form(action = controllers.admin.prod.routes.Products.create()) {

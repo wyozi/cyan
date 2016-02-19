@@ -2,7 +2,7 @@
 @import dao.ProductsDAO
 @(responses: Seq[Response], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO)
 
-@layout_admin_simple("Responses") {
+@layout_admin_simple(Seq("Responses")) {
     <h2>Create response</h2>
 
     @helper.form(action = controllers.admin.routes.Responses.create()) {
