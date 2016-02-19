@@ -57,21 +57,42 @@
                 <h3 class="panel-title">Configuration</h3>
             </div>
             <div class="panel-body">
-                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, "unreg_response")" method="post">
-                    <label for="" class="col-sm-4">Default response for unregistered licenses:</label>
-                    @snippet.responseselect(
-                        pingResponsesDAO
-                                .getExactResponse(Some(prod.id), None, None)
-                                .await
-                                .map(_.id)
-                                .getOrElse(-1))
-                    <button type="submit" class="btn btn-primary btn-xs">Set</button>
-                </form>
-                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, ProductConfig.Keys.DevLicense)" method="post">
-                    <label for="devlicense" class="col-sm-4">Developer license (if set, hidden in some stats/lists):</label>
-                    <input name="devlicense" value="@devlicense.getOrElse("")" type="text" />
-                    <button type="submit" class="btn btn-primary btn-xs">Set</button>
-                </form>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="control-label">Default response for unregistered licenses:</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <form action="@admin.prod.routes.Products.configure(prod.id, "unreg_response")" method="post">
+                            <div class="input-group">
+                                @snippet.responseselect(
+                                    pingResponsesDAO
+                                            .getExactResponse(Some(prod.id), None, None)
+                                            .await
+                                            .map(_.id)
+                                            .getOrElse(-1))
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">Set</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-4">
+                        <label class="control-label">Developer license (if set, hidden in some stats/lists):</label>
+                    </div>
+                    <div class="col-sm-8">
+                        <form action="@admin.prod.routes.Products.configure(prod.id, ProductConfig.Keys.DevLicense)" method="post">
+                            <div class="input-group">
+                                <input class="form-control" name="devlicense" value="@devlicense.getOrElse("")" type="text" />
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">Set</button>
+                                </span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
 

@@ -3,7 +3,7 @@
 @import dao.ResponsesDAO
 @(selected: Int = -1)(implicit responsesDAO: ResponsesDAO)
 
-<select name="response">
+<select name="response" class="form-control">
     <option value="null"
     @if(selected == -1) {
         selected="selected"
