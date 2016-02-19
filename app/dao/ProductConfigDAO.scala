@@ -21,11 +21,10 @@ class ProductConfigDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     db.run(ProductConfigs.filter(pc => pc.prodId === productId && pc.key === key).map(_.value).result.headOption)
 
   def upsertValue(productId: Int, key: String, value: String): Future[Unit] = {
-    val q = ProductConfigs
-      .insertOrUpdate(ProductConfig(productId, key, value))
-    println(q.statements.head)
     db.run(
-      q.map(_ => ())
+      ProductConfigs
+        .insertOrUpdate(ProductConfig(productId, key, value))
+        .map(_ => ())
     )
   }
 
