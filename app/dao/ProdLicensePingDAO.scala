@@ -36,15 +36,13 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     */
   def findRecentUserPings(prodLicense: ProductLicense): Future[Seq[Ping]] =
     db.run(
-      (
         pingsDAO.Pings
           .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
           .groupBy(_.userName)
           .map { case (user, pings) => pings.map(_.id).max }
-      )
-        join
-      pingsDAO.Pings
-        on (_ === _.id)
+      join
+        pingsDAO.Pings
+      on (_ === _.id)
       map { case (id, ping) => ping }
       sortBy(_.date.desc)
       result
@@ -54,17 +52,19 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     * Returns a list of pings in product. Ordered by first (oldest) ping timestamp descendingly. One per license.
     */
   def findRecentNewLicenses(prod: Product, limit: Int, ignoredLicense: Option[String]): Future[Seq[Ping]] = {
-    val q = (
-      for {
-        p <- pingsDAO.Pings
-        maxTimestamp <- pingsDAO.Pings
-          .filter(_.product === prod.shortName)
+    db.run(
+        pingsDAO.Pings
+          .filter(p => p.product === prod.shortName)
           .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
           .groupBy(_.license)
-          .map { case(user, pings) => pings.map(_.date).min }
-        if p.date === maxTimestamp
-      } yield p
-    ).take(limit).sortBy(_.date.desc)
-    db.run(q.result)
+          .map { case (license, pings) => pings.map(_.id).min }
+      join
+        pingsDAO.Pings
+      on (_ === _.id)
+      map { case (id, ping) => ping }
+      sortBy(_.date.desc)
+      take(limit)
+      result
+    )
   }
 }
