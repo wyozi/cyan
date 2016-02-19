@@ -121,9 +121,9 @@
             <table class="table">
                 <thead>
                     <tr>
+                        <td>License</td>
                         <td>User</td>
                         <td>IP</td>
-                        <td>License</td>
                         <td>Timestamp</td>
                         <td>Extra keys</td>
                         <td>Response</td>
@@ -132,9 +132,9 @@
                 <tbody>
                 @for(ping :: extras :: response :: HNil <- recentPings.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: p.queryResponse() :: HNil)) awaitAll) {
                     <tr>
+                        <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                         <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
                         <td>@ping.ip</td>
-                        <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
                         <td>@snippet.datetime(ping.date)</td>
                         <td>
                         @for(pe <- extras) {

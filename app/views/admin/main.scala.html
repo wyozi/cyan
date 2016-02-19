@@ -16,9 +16,9 @@
             <thead>
                 <tr>
                     <td>Product</td>
+                    <td>License</td>
                     <td>User</td>
                     <td>IP</td>
-                    <td>License</td>
                     <td>Timestamp</td>
                     <td>Response</td>
                 </tr>
@@ -27,9 +27,9 @@
             @for(ping :: product :: extras :: response :: HNil <- pingsDAO.findRecent().await.map(p => hsequence(Future.successful(p) :: p.queryProduct() :: p.queryExtras() :: p.queryResponse() :: HNil)) awaitAll) {
                 <tr>
                     <td>@product.name</td>
+                    <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a></td>
                     <td>@ping.user</td>
                     <td>@ping.ip</td>
-                    <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     <td>
                     @response match {
