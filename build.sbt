@@ -18,6 +18,7 @@ libraryDependencies ++= Seq(
   "com.h2database" % "h2" % "1.4.191", // for development
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4", // for prod
   "com.google.inject.extensions" % "guice-multibindings" % "4.0",
+  "com.chuusai" %% "shapeless" % "2.2.5", // THERE IS NO COMING BACK
   "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
 )
 

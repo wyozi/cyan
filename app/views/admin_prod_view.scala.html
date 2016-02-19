@@ -6,10 +6,13 @@
 @import dao.PingResponsesDAO
 @import scala.concurrent.ExecutionContext
 @import util.FutureUtils._
+@import shapeless._
 @import dao.ResponsesDAO
 @import dao.ProductsDAO
 @import dao.ProductConfigDAO
 @import model.ProductConfig
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext.Implicits.global
 @(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
@@ -105,31 +108,29 @@
                 </tr>
             </thead>
             <tbody>
-            @for(ping <- recentPings) {
-                <tr>
-                    <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
-                    <td>@ping.ip</td>
-                    <td><a href="@admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
-                    <td>@snippet.datetime(ping.date)</td>
-                    <td>
-                    @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
-                        <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" data-valueurl="@admin.routes.Pings.showPingExtra(ping.id, pe.key)" href="@admin.prod.routes.ProductPingExtras.view(prod.id, pe.key)">
-                        @pe.key
-                        </a>
-                    }
-                    </td>
-                    <td>
-                    @ping.responseId match {
-                        case Some(respId) => {
-                            @defining(responsesDAO.findById(respId).await.get) { resp =>
+                @for(ping :: extras :: response :: HNil <- recentPings.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: p.queryResponse() :: HNil)) awaitAll) {
+                    <tr>
+                        <td>@ping.user @backend.createUserPopupHTML(ping.user)</td>
+                        <td>@ping.ip</td>
+                        <td><a href="@admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>  @backend.createLicensePopupHTML(ping.license)</td>
+                        <td>@snippet.datetime(ping.date)</td>
+                        <td>
+                        @for(pe <- extras) {
+                            <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key" data-valueurl="@admin.routes.Pings.showPingExtra(ping.id, pe.key)" href="@admin.prod.routes.ProductPingExtras.view(prod.id, pe.key)">
+                            @pe.key
+                            </a>
+                        }
+                        </td>
+                        <td>
+                        @response match {
+                            case Some(resp) => {
                                 <a href="@admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
                             }
+                            case _ => { Empty }
                         }
-                        case _ => { Empty }
-                    }
-                    </td>
-                </tr>
-            }
+                        </td>
+                    </tr>
+                }
             </tbody>
         </table>
     </div>

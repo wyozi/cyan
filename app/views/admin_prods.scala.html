@@ -2,6 +2,9 @@
 @import dao.ProductsDAO
 @import dao.ProdLicensePingDAO
 @import util.FutureUtils._
+@import shapeless._
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext.Implicits.global
 @(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO)
 
 @layout_admin_simple("Products") {
@@ -26,13 +29,13 @@
             </tr>
         </thead>
         <tbody>
-        @for(prod <- products) {
+        @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: p.queryLicenseCount() ::  p.queryPingCount() :: p.queryRecentPings(1) :: HNil)) awaitAll) {
             <tr>
                 <td><a href="@admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
-                <td>@plpDAO.findLicenseCount(prod).await</td>
-                <td>@plpDAO.findPingCount(prod).await</td>
+                <td>@licenseCount</td>
+                <td>@pingCount</td>
                 <td>
-                @plpDAO.findRecentPings(prod, 1).await.headOption match {
+                @recentPings.headOption match {
                     case Some(ping) => {
                         @snippet.datetime(ping.date)
                     }
