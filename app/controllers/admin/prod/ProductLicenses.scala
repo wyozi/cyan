@@ -2,7 +2,7 @@ package controllers.admin.prod
 
 import auth.Secured
 import com.google.inject.Inject
-import dao.{ProdLicensePingDAO, PingResponsesDAO, ProductsDAO, ResponsesDAO}
+import dao._
 import model.ProductLicense
 import play.api.mvc.Controller
 
@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ProductLicenses @Inject() ()
   (implicit pingResponsesDAO: PingResponsesDAO,
     responsesDAO: ResponsesDAO,
+    pingExtrasDAO: PingExtrasDAO,
     plpDAO: ProdLicensePingDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
