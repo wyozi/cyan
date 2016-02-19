@@ -34,6 +34,6 @@ class ProductConfigDAO @Inject() (protected val dbConfigProvider: DatabaseConfig
     def key = column[String]("key", O.SqlType("VARCHAR(16)"), O.PrimaryKey)
     def value = column[String]("value")
 
-    override def * = (prodId, key, value) <> (ProductConfig.tupled, ProductConfig.unapply)
+    override def * = (prodId, key, value) <> ((ProductConfig.apply _).tupled, ProductConfig.unapply)
   }
 }

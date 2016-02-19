@@ -5,6 +5,7 @@ import javax.inject.Inject
 import auth.Secured
 import cyan.backend.Backend
 import dao._
+import model.ProductConfig
 import play.api.Play.current
 import play.api.data.Form
 import play.api.i18n.Messages.Implicits._
@@ -39,11 +40,11 @@ class Products @Inject() (implicit backend: Backend,
     val futureProd = productsDAO.findById(prodId)
 
     for {
-      prodOpt <- productsDAO.findById(prodId)
-      devLicense <- productConfigDAO.getValue(prodId, "devlicense")
-      recentNewLicenses <- plpDAO.findRecentNewLicenses(prodOpt.get, 15, devLicense)
-      recentPings <- pingsDAO.findRecentForProduct(prodOpt.get, 15, devLicense)
-    } yield Ok(views.html.admin_prod_view(prodOpt.get, recentNewLicenses, recentPings))
+      prod <- productsDAO.findById(prodId).map(_.get)
+      devLicense <- prod.queryDevLicense()
+      recentNewLicenses <- plpDAO.findRecentNewLicenses(prod, 15, devLicense)
+      recentPings <- pingsDAO.findRecentForProduct(prod, 15, devLicense)
+    } yield Ok(views.html.admin_prod_view(prod, devLicense, recentNewLicenses, recentPings))
   }
 
   def configure(prodId: Int, configKey: String) = SecureAction.async { req =>
@@ -60,7 +61,7 @@ class Products @Inject() (implicit backend: Backend,
             pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
           }
           case "devlicense" => {
-            productConfigDAO.upsertValue(prodId, configKey, fue.get("devlicense").head)
+            productConfigDAO.upsertValue(prodId, configKey, fue.get(ProductConfig.Keys.DevLicense).head)
           }
         }
 

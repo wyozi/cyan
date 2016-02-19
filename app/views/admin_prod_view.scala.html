@@ -9,7 +9,8 @@
 @import dao.ResponsesDAO
 @import dao.ProductsDAO
 @import dao.ProductConfigDAO
-@(prod: Product, recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@import model.ProductConfig
+@(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
     <script type="text/javascript">
@@ -63,9 +64,9 @@
                                 .getOrElse(-1))
                     <button type="submit" class="btn btn-primary btn-xs">Set</button>
                 </form>
-                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, "devlicense")" method="post">
+                <form class="row" action="@admin.prod.routes.Products.configure(prod.id, ProductConfig.Keys.DevLicense)" method="post">
                     <label for="devlicense" class="col-sm-4">Developer license (if set, hidden in some stats/lists):</label>
-                    <input name="devlicense" value="@productConfigDAO.getValue(prod.id, "devlicense").await.getOrElse("")" type="text" />
+                    <input name="devlicense" value="@devlicense.getOrElse("")" type="text" />
                     <button type="submit" class="btn btn-primary btn-xs">Set</button>
                 </form>
             </div>
