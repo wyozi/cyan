@@ -6,6 +6,7 @@
 @import org.joda.time.DateTimeZone
 @import java.time.ZoneId
 @import java.time.ZoneOffset
+@import org.joda.time.PeriodType
 @(timestamp: Timestamp,
         formatter: PeriodFormatter = new PeriodFormatterBuilder()
         .appendDays()
@@ -22,5 +23,5 @@
 
 @* This disgusting piece of code (using both Javatime and Joda time) converts timestamp to UTC based DateTime *@
 @defining(new DateTime(timestamp.toLocalDateTime.atOffset(ZoneOffset.UTC).toInstant.toEpochMilli)) { datetime =>
-    <span title="@datetime">@formatter.print(new Period(datetime.toInstant, Instant.now())) ago</span>
+    <span title="@datetime">@formatter.print(new Period(datetime.toInstant, Instant.now(), PeriodType.dayTime())) ago</span>
 }
