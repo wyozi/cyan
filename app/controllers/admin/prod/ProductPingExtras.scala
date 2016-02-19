@@ -14,6 +14,7 @@ class ProductPingExtras @Inject() ()
   (implicit pingResponsesDAO: PingResponsesDAO,
     responsesDAO: ResponsesDAO,
     plpDAO: ProdLicensePingDAO,
+    productConfigDAO: ProductConfigDAO,
     pingExtrasDAO: PingExtrasDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {
 

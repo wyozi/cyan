@@ -5,7 +5,8 @@
 @import util.FutureUtils._
 @import org.joda.time.{LocalDate, LocalTime}
 @import java.awt.Color
-@(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
+@import dao.ProductConfigDAO
+@(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
 
@@ -21,7 +22,7 @@
                     "@LocalDate.now() *"
                 ],
                 datasets: [
-                    @for(((value, daycounts), index) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await.zipWithIndex) {
+                    @for(((value, daycounts), index) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7), prod.queryDevLicense().await).await.zipWithIndex) {
                         {
                             label: "@value match {
                                 case Some(x) => {@x}
@@ -59,7 +60,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1)).await) {
+                @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await) {
                     <tr>
                         <td>
                         @value match {

@@ -25,19 +25,33 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def insert(extra: PingExtra): Future[Unit] =
     db.run(PingExtras += extra).map(_ => ())
 
-  def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
+  private def timestamp2date = SimpleExpression.unary[Timestamp, String] { (date, qb) =>
+    qb.sqlBuilder += "DATE( "
+    qb.expr(date)
+    qb.sqlBuilder += ")"
+  }
+
+  def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate, ignoredLicense: Option[String]): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
     db.run(
-      sql"""
-         SELECT pi."date"::date AS "date", pe."value" AS "value", COUNT(DISTINCT pi."user_name") AS count
-         FROM "pings" pi
-           LEFT JOIN "pingextras" pe
-             ON pi.id = pe.ping_id AND pe.key = ${key}
-         WHERE pi."product" = ${product} AND pi."date" >= ${new Timestamp(since.toDate.getTime)}
-         GROUP BY pi."date"::date, pe."value"
-         HAVING COUNT(pe."value") > 0
-      """
-        .as[(Timestamp, Option[String], Int)]
-    ).map(_.groupBy(_._2).mapValues(_.map { case (t, v, c) => (new LocalDate(t), c) }.sortBy(_._1.toDateTimeAtStartOfDay.getMillis)).toSeq)
+      (
+          pingsDAO.Pings
+            .filter(pi => pi.product === product && pi.date >= new Timestamp(since.toDate.getTime))
+            .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
+        joinLeft
+          PingExtras
+            .filter(_.key === key)
+        on (_.id === _.pingId)
+      )
+        .groupBy { case(pi, ex) => (timestamp2date(pi.date), ex.map(_.value)) }
+        .map { case ((date, value), rows) => (date, value, rows.map(_._1.userName).countDistinct) }
+        .result
+    )
+      .map(_.groupBy(_._2)
+      .mapValues(
+        _.map { case (t, v, c) => (new LocalDate(t), c) }
+          .sortBy(_._1.toDateTimeAtStartOfDay.getMillis))
+          .toSeq
+      )
   }
 
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =
