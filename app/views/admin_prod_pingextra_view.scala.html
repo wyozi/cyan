@@ -3,7 +3,7 @@
 @import dao.PingExtrasDAO
 @import model.Product
 @import util.FutureUtils._
-@import org.joda.time.LocalDate
+@import org.joda.time.{LocalDate, LocalTime}
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @scripts = {
@@ -18,9 +18,10 @@
             type: "line",
             data: {
                 labels: [
-                    @for(i <- 6 to 0 by -1) {
+                    @for(i <- 6 to 1 by -1) {
                         "@LocalDate.now().minusDays(i)",
                     }
+                    "@LocalDate.now() *"
                 ],
                 datasets: [
                     @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7)).await) {
@@ -31,8 +32,12 @@
                             }",
                             backgroundColor: getRandomColor(),
                             data: [
-                                @for(i <- 6 to 0 by -1) {
-                                    @daycounts.find(_._1 == LocalDate.now().minusDays(i)).getOrElse(0) ,
+                                @for(i <- 6 to 1 by -1) {
+                                    @daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2).getOrElse(0) ,
+                                }
+                                @* today's value needs to be extrapolated, calculate multiplier in defining *@
+                                @defining(1.0 / (LocalTime.now().getMillisOfDay.toDouble / (1000 * 60 * 60 * 24))) { frac =>
+                                    @daycounts.find(_._1 == LocalDate.now()).map(v => (v._2 * frac).floor).getOrElse(0)
                                 }
                             ]
                         },
