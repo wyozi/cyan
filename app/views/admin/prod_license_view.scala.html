@@ -19,14 +19,23 @@
             <h3 class="panel-title">Configuration</h3>
         </div>
         <div class="panel-body">
-            <form class="row" action="@controllers.admin.prod.routes.ProductLicenses.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
-                <input type="hidden" name="opt" value="unreg_response">
-                <label for="" class="col-sm-4">Default response for all users of this license:</label>
-                @defining(pingResponsesDAO.getExactResponse(Some(prodLicense.prod.id), Some(prodLicense.license), None).await) { resp =>
-                    @snippet.responseselect(resp.map(_.id).getOrElse(-1))
-                }
-                <button type="submit" class="btn btn-primary btn-xs">Set</button>
-            </form>
+            <div class="row">
+                <div class="col-sm-4">
+                    <label class="control-label">Default response for all users of this license:</label>
+                </div>
+                <div class="col-sm-8">
+                    <form action="@controllers.admin.prod.routes.ProductLicenses.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
+                        <div class="input-group">
+                            @defining(pingResponsesDAO.getExactResponse(Some(prodLicense.prod.id), Some(prodLicense.license), None).await) { resp =>
+                                @snippet.responseselect(resp.map(_.id).getOrElse(-1))
+                            }
+                            <span class="input-group-btn">
+                                <button type="submit" class="btn btn-primary">Set</button>
+                            </span>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
