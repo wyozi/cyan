@@ -20,7 +20,7 @@ class ProductPingExtras @Inject() ()
 
   def view(prodId: Int, pingExtra: String) = SecureAction.async {
     productsDAO.findById(prodId).map {
-      case Some(prod) => Ok(views.html.admin_prod_pingextra_view(prod, pingExtra))
+      case Some(prod) => Ok(views.html.admin.prod_pingextra_view(prod, pingExtra))
     }
   }
 

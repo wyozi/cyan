@@ -1,0 +1,47 @@
+@import dao.ProductsDAO
+@import dao.PingsDAO
+@import util.FutureUtils._
+@import shapeless._
+@import scala.concurrent.ExecutionContext.Implicits.global
+@import scala.concurrent.Future
+@import dao.PingExtrasDAO
+@import dao.ResponsesDAO
+@()(implicit productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+
+@layout_admin_simple("Cyan") {
+    <h3>Recent pings</h3>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Product</td>
+                    <td>User</td>
+                    <td>IP</td>
+                    <td>License</td>
+                    <td>Timestamp</td>
+                    <td>Response</td>
+                </tr>
+            </thead>
+            <tbody>
+            @for(ping :: product :: extras :: response :: HNil <- pingsDAO.findRecent().await.map(p => hsequence(Future.successful(p) :: p.queryProduct() :: p.queryExtras() :: p.queryResponse() :: HNil)) awaitAll) {
+                <tr>
+                    <td>@product.name</td>
+                    <td>@ping.user</td>
+                    <td>@ping.ip</td>
+                    <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a></td>
+                    <td>@snippet.datetime(ping.date)</td>
+                    <td>
+                    @response match {
+                        case Some(resp) => {
+                            <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
+                        }
+                        case _ => { Empty }
+                    }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}

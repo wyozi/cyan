@@ -8,6 +8,6 @@ import play.api.mvc.Controller
 
 class Anomalies @Inject() (val detections: java.util.Set[AnomalyDetector])(implicit productsDAO: ProductsDAO) extends Controller with Secured {
   def overview = SecureAction {
-    Ok(views.html.admin_anomaly_overview(detections))
+    Ok(views.html.admin.anomaly_overview(detections))
   }
 }

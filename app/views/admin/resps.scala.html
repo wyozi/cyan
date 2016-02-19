@@ -5,7 +5,7 @@
 @layout_admin_simple("Responses") {
     <h2>Create response</h2>
 
-    @helper.form(action = admin.routes.Responses.create()) {
+    @helper.form(action = controllers.admin.routes.Responses.create()) {
         @helper.inputText(userForm("name"))
         @helper.textarea(userForm("response"))
 
@@ -15,6 +15,6 @@
     <h2>Responses</h2>
 
     @for(resp <- responses) {
-        <a href="@admin.routes.Responses.view(resp.id)">@resp.name</a> <br>
+        <a href="@controllers.admin.routes.Responses.view(resp.id)">@resp.name</a> <br>
     }
 }

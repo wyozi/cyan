@@ -10,7 +10,7 @@
 @layout_admin_simple("Products") {
     <h2>Create product</h2>
 
-    @helper.form(action = admin.prod.routes.Products.create()) {
+    @helper.form(action = controllers.admin.prod.routes.Products.create()) {
         @helper.inputText(userForm("name"))
         @helper.inputText(userForm("shortName"))
 
@@ -32,7 +32,7 @@
             <tbody>
             @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: p.queryLicenseCount() ::  p.queryPingCount() :: p.queryRecentPings(1) :: HNil)) awaitAll) {
                 <tr>
-                    <td><a href="@admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
+                    <td><a href="@controllers.admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
                     <td>@licenseCount</td>
                     <td>@pingCount</td>
                     <td>

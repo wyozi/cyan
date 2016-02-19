@@ -6,6 +6,8 @@
 GET         /                                                  controllers.Application.index()
 POST        /ping                                              controllers.PingReceiver.ping()
 
+GET         /admin                                             controllers.admin.Main.index()
+
 GET         /admin/products                                    controllers.admin.prod.Products.list()
 POST        /admin/products                                    controllers.admin.prod.Products.create()
 GET         /admin/products/:id                                controllers.admin.prod.Products.view(id: Int)

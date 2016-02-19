@@ -23,6 +23,9 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   def insert(product: String, license: String, user: String, remoteAddress: String, responseId: Option[Int]): Future[Int] =
     db.run((Pings.map(c => (c.product, c.license, c.userName, c.ip, c.responseId)) returning Pings.map(_.id)) += (product, license, user, remoteAddress, responseId))
 
+  def findRecent(limit: Int = 15): Future[Seq[Ping]] =
+    db.run(Pings.sortBy(_.id.desc).take(limit).result)
+
   def findRecentForProduct(prod: Product, limit: Int = 1000, ignoredLicense: Option[String] = None): Future[Seq[Ping]] =
     db.run(
       Pings

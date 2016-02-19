@@ -33,7 +33,7 @@ class Products @Inject() (implicit backend: Backend,
   )
 
   def list = SecureAction.async {
-    productsDAO.getAll().map(prods => Ok(views.html.admin_prods(prods, productForm)))
+    productsDAO.getAll().map(prods => Ok(views.html.admin.prods(prods, productForm)))
   }
 
   def view(prodId: Int) = SecureAction.async {
@@ -45,7 +45,7 @@ class Products @Inject() (implicit backend: Backend,
       prod <- productsDAO.findById(prodId).map(_.get)
       devLicense <- prod.queryDevLicense()
       recentNewLicenses :: recentPings :: HNil <- util.FutureUtils.hsequence(plpDAO.findRecentNewLicenses(prod, 15, devLicense) :: pingsDAO.findRecentForProduct(prod, 15, devLicense) :: HNil)
-    } yield Ok(views.html.admin_prod_view(prod, devLicense, recentNewLicenses, recentPings))
+    } yield Ok(views.html.admin.prod_view(prod, devLicense, recentNewLicenses, recentPings))
   }
 
   def configure(prodId: Int, configKey: String) = SecureAction.async { req =>
@@ -74,7 +74,7 @@ class Products @Inject() (implicit backend: Backend,
 
   def create = SecureAction { implicit request =>
     productForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin_prods(Seq(), formWithErrors)),
+      formWithErrors => BadRequest(views.html.admin.prods(Seq(), formWithErrors)),
       prod => {
         productsDAO.insert(prod._1, prod._2)
         Redirect(routes.Products.list())
