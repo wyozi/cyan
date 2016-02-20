@@ -8,14 +8,15 @@
 
 @pageobj(obj: Any, active: Boolean = false) = @{
     obj match {
-        case prod: model.Product => (prod.name, Some(controllers.admin.prod.routes.Products.view(prod.id)))
-        case resp: model.Response => (resp.name, Some(controllers.admin.routes.Responses.view(resp.id)))
-        case (name: String, path: Call) => (name, Some(path))
-        case 'root => ("Cyan", Some(controllers.admin.routes.Main.index()))
-        case x => (x.toString, None)
+        case prod: model.Product => (Html(prod.name), Some(controllers.admin.prod.routes.Products.view(prod.id)))
+        case resp: model.Response => (Html(resp.name), Some(controllers.admin.routes.Responses.view(resp.id)))
+        case (name: String, path: Call) => (Html(name), Some(path))
+        case 'root => (Html("Cyan"), Some(controllers.admin.routes.Main.index()))
+        case h: Html => (h, None)
+        case x => (Html(x.toString), None)
     }
 }
-@tolink(p: (String, Option[Call])) = {
+@tolink(p: (Html, Option[Call])) = {
     @p match {
         case (name, Some(link)) => { <a href="@link">@name</a> }
         case (name, None) => { @name }
@@ -29,7 +30,7 @@
         }
         @nav.lastOption match {
             case Some(x) => {
-                @bcpart(Html(pageobj(x)._1), active = true)
+                @bcpart(pageobj(x)._1, active = true)
             }
             case _ => {}
         }

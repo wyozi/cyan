@@ -11,9 +11,10 @@
 @import dao.PingExtrasDAO
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
+@import util.TwirlUtils._
 @(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
 
-@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, prodLicense.license)) {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, html"License <code>${prodLicense.license}</code>")) {
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">Configuration</h3>

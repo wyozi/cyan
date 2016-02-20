@@ -6,6 +6,7 @@
 @import org.joda.time.{LocalDate, LocalTime}
 @import java.awt.Color
 @import dao.ProductConfigDAO
+@import util.TwirlUtils._
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
@@ -48,7 +49,7 @@
     </script>
 }
 
-@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Ping extras", pingExtraKey), scripts) {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Ping extras", html"Key <code>${pingExtraKey}</code>"), scripts) {
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <h3>Value distribution in past 24 hours (per user)</h3>
