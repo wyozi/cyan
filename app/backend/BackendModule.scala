@@ -18,7 +18,10 @@ class BackendModule(environment: Environment, configuration: Configuration) exte
     val beClassDir = configuration.getString("cyan.backend.classpath")
     val dirUrls = beClassDir.map(s => Seq(new File(s).toURI.toURL)).getOrElse(Seq())
 
-    new URLClassLoader(jarUrls ++ dirUrls, environment.classLoader)
+    val lookUrls = jarUrls ++ dirUrls
+    Logger.info("Backend classpath URLs: " + lookUrls.mkString(","))
+
+    new URLClassLoader(lookUrls, environment.classLoader)
   }
 
   override def configure(): Unit = {
