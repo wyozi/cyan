@@ -5,7 +5,6 @@ import javax.inject.Inject
 import auth.Secured
 import cyan.backend.Backend
 import dao._
-import model.ProductConfig
 import play.api.Play.current
 import play.api.data.Form
 import play.api.i18n.Messages.Implicits._
@@ -61,8 +60,10 @@ class Products @Inject() (implicit backend: Backend,
             }
             pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
           }
-          case "devlicense" => {
-            productConfigDAO.upsertValue(prodId, configKey, fue.get(ProductConfig.Keys.DevLicense).head)
+
+          // assume it's a product config
+          case key => {
+            productConfigDAO.upsertValue(prodId, configKey, fue.get("value").head)
           }
         }
 

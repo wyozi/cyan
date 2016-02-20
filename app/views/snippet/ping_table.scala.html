@@ -6,7 +6,8 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 
 @import model.Ping
-@(pings: Seq[Ping], showProducts: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true)(implicit productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO)
+@import cyan.backend.Backend
+@(pings: Seq[Ping], showProducts: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true)(implicit productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, backend: Backend = null)
 
 <div class="table-responsive">
     <table class="table">
@@ -24,8 +25,16 @@
         <tbody>
             @for(ping :: product :: extras :: response :: HNil <- pings.map(p => hsequence(Future.successful(p) :: p.queryProduct() :: p.queryExtras() :: p.queryResponse() :: HNil)) awaitAll) {
                 <tr>
-                    @if(showProducts) { <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td> }
-                    @if(showLicense) { <td><a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a></td> }
+                    @if(showProducts) {
+                        <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td>
+                    }
+                    @if(showLicense) {
+                        <td>
+                            @Option(backend).map(be => be.transformLicenseHtml(ping.license)(_: Html)).getOrElse((x: Html) => x) {
+                                <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a>
+                            }
+                        </td>
+                    }
                     <td>@ping.user</td>
                     <td>@ping.ip</td>
                     <td>@snippet.datetime(ping.date)</td>

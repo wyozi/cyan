@@ -1,4 +1,4 @@
-name := "Cyan backend core"
+name := "Cyan Backend API"
 
 version := "1.0"
 

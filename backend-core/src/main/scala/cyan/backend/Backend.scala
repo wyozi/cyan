@@ -5,26 +5,37 @@ import play.twirl.api.Html
 /**
   * Created by wyozi on 6.2.2016.
   */
-trait Backend {
+abstract class Backend {
   /**
-    *  Returns additional user-specific html content that is shown in a pop-up upon clicking a button next to
-    *  the user element.
+    *  Allows modifying the html used for user cell in eg. ping tables. Return `content` if you do not
+    *  wish to modify the html.
     *
     *  NOTE: Make sure you don't introduce XSS- bugs if you include `user` in the returned HTML.
     *
-    * @param user
+    * @param user the user name/id
+    * @param original original html
     * @return
     */
-  def createUserPopupHTML(user: String): Option[Html]
+  def transformUserHtml(user: String)(original: Html): Html = original
 
   /**
-    *  Returns additional license-specific html content that is shown in a pop-up upon clicking a button next to
-    *  the license element.
+    *  Allows modifying the html used for license cell in eg. ping tables. Return `content` if you do not
+    *  wish to modify the html.
     *
-    *  NOTE: Make sure you don't introduce XSS- bugs if you include `user` in the returned HTML.
+    *  NOTE: Make sure you don't introduce XSS- bugs if you include `license` in the returned HTML.
     *
-    * @param license
+    * @param license the license
+    * @param original original html
     * @return
     */
-  def createLicensePopupHTML(license: String): Option[Html]
+  def transformLicenseHtml(license: String)(original: Html): Html = original
+
+  /**
+    * Returns list of custom project configurations. They are basically configuration options
+    * that the user can set in each project. This could be for example an API key to query
+    * some other backend license server for license validity.
+    *
+    * @return
+    */
+  def getCustomProjectConfigs: Seq[CustomProjectConfig] = Nil
 }
