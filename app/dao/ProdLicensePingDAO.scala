@@ -18,6 +18,7 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   productConfigDAO: ProductConfigDAO,
   pingsDAO: PingsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {
+
   import driver.api._
 
   implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, product = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
@@ -30,6 +31,23 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
 
   def findRecentPings(prod: Product, limit: Int): Future[Seq[Ping]] =
     db.run(pingsDAO.Pings.filter(_.product === prod.shortName).sortBy(_.date.desc).take(limit).result)
+
+  def findRecentPings(license: model.License, limit: Int): Future[Seq[Ping]] =
+    db.run(
+      pingsDAO.Pings.filter(_.license === license)
+      sortBy(_.date.desc)
+      take(limit)
+      result
+    )
+
+  def findRecentPings(prodLicense: ProductLicense, limit: Int): Future[Seq[Ping]] =
+    db.run(
+      pingsDAO.Pings
+        .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+        sortBy(_.date.desc)
+        take(limit)
+        result
+    )
 
   /**
     * Returns a list of pings with license in product. Ordered by latest ping timestamp descendingly. One per user.
@@ -45,15 +63,6 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
       on (_ === _.id)
       map { case (id, ping) => ping }
       sortBy(_.date.desc)
-      result
-    )
-
-  def findRecentPings(prodLicense: ProductLicense, limit: Int): Future[Seq[Ping]] =
-    db.run(
-      pingsDAO.Pings
-        .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
-      sortBy(_.date.desc)
-      take(limit)
       result
     )
 
