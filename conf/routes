@@ -7,6 +7,7 @@ GET         /                                                  controllers.Appli
 POST        /ping                                              controllers.PingReceiver.ping()
 
 GET         /admin                                             controllers.admin.Main.index()
+GET         /javascriptRoutes                                  controllers.admin.Main.javascriptRoutes
 
 POST        /admin/search                                      controllers.admin.Search.search()
 

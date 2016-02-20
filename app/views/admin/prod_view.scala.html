@@ -14,31 +14,7 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
-@scripts = {
-    <script type="text/javascript">
-        function fetchContents(link, divId) {
-            $.ajax({
-                url: link,
-                success: function(response) {
-                    $('#' + divId).text(response);
-                }
-            });
-            return '<div id="'+ divId +'">Loading...</div>';
-        }
-        
-        $('a[data-pingextra-key]').popover({
-            html: true,
-            trigger: 'hover',
-            placement: 'bottom',
-            content: function() {
-                var divId =  "tmp-id-" + $.now();
-                return fetchContents($(this).data('valueurl'), divId);
-            }
-        });
-    </script>
-}
-
-@layout_admin(prod.name, scripts) {
+@layout_admin(prod.name) {
     <div class="col-sm-2 sidebar">
         <h4>Product</h4>
         <ul class="nav nav-sidebar">
