@@ -74,6 +74,7 @@
                         </form>
                     </div>
                 </div>
+                <br>
                 @for(cfg <- backend.getCustomProjectConfigs) {
                     <div class="row">
                         <div class="col-sm-4">
@@ -90,6 +91,7 @@
                             </form>
                         </div>
                     </div>
+                    <br>
                 }
             </div>
         </div>
@@ -108,7 +110,7 @@
                 @for(ping <- recentNewLicenses) {
                     <tr>
                         <td>
-                            @backend.transformLicenseHtml(ping.license) {
+                            @backend.transformLicenseHtml(model.backendLicense(prod, ping.license)) {
                                 <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>
                             }
                         </td>

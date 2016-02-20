@@ -14,6 +14,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class ProductLicenses @Inject() ()
   (implicit pingResponsesDAO: PingResponsesDAO,
     responsesDAO: ResponsesDAO,
+    productConfigDAO: ProductConfigDAO,
     pingExtrasDAO: PingExtrasDAO,
     plpDAO: ProdLicensePingDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {

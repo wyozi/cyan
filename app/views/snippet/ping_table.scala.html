@@ -7,7 +7,7 @@
 
 @import model.Ping
 @import cyan.backend.Backend
-@(pings: Seq[Ping], showProducts: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true)(implicit productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, backend: Backend = null)
+@(pings: Seq[Ping], showProducts: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true)(implicit productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, backend: Backend = null)
 
 <div class="table-responsive">
     <table class="table">
@@ -30,7 +30,7 @@
                     }
                     @if(showLicense) {
                         <td>
-                            @Option(backend).map(be => be.transformLicenseHtml(ping.license)(_: Html)).getOrElse((x: Html) => x) {
+                            @Option(backend).map(be => be.transformLicenseHtml(model.backendLicense(product, ping.license))(_: Html)).getOrElse((x: Html) => x) {
                                 <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a>
                             }
                         </td>
@@ -74,15 +74,31 @@
     }
 
     $(document).ready(function() {
+        function extraContent() {
+            var divId =  "tmp-id-" + $.now();
+            var valueRoute = jsAdminRoutes.controllers.admin.Pings.showPingExtra($(this).data("ping-id"), $(this).data("pingextra-key"));
+            return fetchContents(valueRoute.url, divId);
+        }
+        function backendContent() {
+            var divId =  "tmp-id-" + $.now();
+            var query = $(this).data("backend-query");
+            var productId = $(this).data("backend-productid");
+            var license = $(this).data("backend-license");
+            var queryRoute = jsAdminRoutes.controllers.admin.BackendController.view(query, productId, license);
+            return fetchContents(queryRoute.url, divId);
+        }
+
         $('a[data-pingextra-key]').popover({
             html: true,
             trigger: 'hover',
             placement: 'bottom',
-            content: function() {
-                var divId =  "tmp-id-" + $.now();
-                var valueRoute = jsAdminRoutes.controllers.admin.Pings.showPingExtra($(this).data("ping-id"), $(this).data("pingextra-key"));
-                return fetchContents(valueRoute.url, divId);
-            }
+            content: extraContent
+        });
+        $('a[data-backend-query]').popover({
+            html: true,
+            trigger: 'hover',
+            placement: 'bottom',
+            content: backendContent
         });
     });
 </script>

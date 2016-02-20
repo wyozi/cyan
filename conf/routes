@@ -9,6 +9,8 @@ POST        /ping                                              controllers.PingR
 GET         /admin                                             controllers.admin.Main.index()
 GET         /javascriptRoutes                                  controllers.admin.Main.javascriptRoutes
 
+GET         /admin/backend                                     controllers.admin.BackendController.view(query, productId: Option[Int], license: Option[String])
+
 POST        /admin/search                                      controllers.admin.Search.search()
 
 GET         /admin/products                                    controllers.admin.prod.Products.list()

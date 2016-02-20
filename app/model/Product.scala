@@ -1,5 +1,6 @@
 package model
 
+import cyan.backend.model.{BackendProduct}
 import dao.{ProdLicensePingDAO, ProductConfigDAO}
 
 import scala.concurrent.Future
@@ -14,4 +15,10 @@ case class Product(id: Int, name: String, shortName: String) {
 
   def queryDevLicense()(implicit productConfigDAO: ProductConfigDAO): Future[Option[String]] =
     productConfigDAO.getValue(id, ProductConfig.Keys.DevLicense)
+
+  def backend()(implicit productConfigDAO: ProductConfigDAO) = new BackendProduct {
+    override def name: String = Product.this.name
+    override def id: Int = Product.this.id
+    override def queryConfig(key: String): Future[Option[String]] = productConfigDAO.getValue(id, key)
+  }
 }
