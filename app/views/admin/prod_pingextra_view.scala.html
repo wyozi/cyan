@@ -1,17 +1,48 @@
-@import scala.concurrent.ExecutionContext
-@import dao.ProductsDAO
-@import dao.PingExtrasDAO
-@import model.Product
-@import util.FutureUtils._
-@import org.joda.time.{LocalDate, LocalTime}
 @import java.awt.Color
-@import dao.ProductConfigDAO
+
+@import dao.{PingExtrasDAO, ProductConfigDAO, ProductsDAO}
+@import model.Product
+@import org.joda.time.{LocalDate, LocalTime}
+@import util.FutureUtils._
 @import util.TwirlUtils._
+
+@import scala.concurrent.ExecutionContext
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @scripts = {
 
     <script type="application/javascript">
+        var valueDistDayCtx = document.getElementById("chart_valueDistDay").getContext("2d");
+        var valueDistDayChart = new Chart(valueDistDayCtx, {
+            type: "pie",
+            data: {
+                @defining(pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await) { data =>
+                    labels: [
+                        @for((value, daycount) <- data) {
+                            @value match {
+                                case Some(x) => { "@x",  }
+                                case None => { "no value", }
+                            }
+                        }
+                    ],
+                    datasets: [{
+                        data: [
+                            @for((value, daycounts) <- data) {
+                                @daycounts.map(_._2).sum,
+                            }
+                        ],
+                        backgroundColor: [
+                            @for(i <- 0 until data.length) {
+                                @defining(Color.getHSBColor(i * 0.618033988749895f, 0.8f, 0.85f)) { clr =>
+                                    'rgba(@clr.getRed, @clr.getGreen, @clr.getBlue, 0.4)', 
+                                }
+                            }
+                        ]
+                    }]
+                }
+            }
+        });
+
         var valueDistWeekCtx = document.getElementById("chart_valueDistWeek").getContext("2d");
         var valueDistWeekChart = new Chart(valueDistWeekCtx, {
             type: "line",
@@ -53,27 +84,8 @@
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <h3>Value distribution in past 24 hours (per user)</h3>
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td>Value</td>
-                        <td>Count</td>
-                    </tr>
-                </thead>
-                <tbody>
-                @for((value, daycounts) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await) {
-                    <tr>
-                        <td>
-                        @value match {
-                            case Some(x) => { @x }
-                            case None => { <i>no value</i> }
-                        }
-                        </td>
-                        <td>@daycounts.map(_._2).sum</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
+
+            <canvas id="chart_valueDistDay" width="400" height="300"></canvas>
         </div>
         <div class="col-xs-12 col-md-6">
             <h3>Value distribution in past 7 days (per user)</h3>
