@@ -36,6 +36,18 @@ __License__ = a Product- specific id that is usually given to a single person/en
 
 __User name/id__ = an identifier identifying specific instance of the license (this could be MAC or IP address)
 
+### Developing custom backends
+
+While Cyan by itself is a very generic application, you can easily add custom behavior using backends. Backends allow for instance
+modifying `License` or `User` html cells in ping tables to be suffixed by a button or an icon. To create a new backend you need to
+create a new (preferably sbt) project that depends on the `backend-core` module in the root folder of Cyan. You do not currently
+need to depend on Cyan itself, just the backend module.
+
+Backends that are `jar` files in the `extensions` folder are automatically loaded to classpath. During development you might want
+to also use the `cyan.backend.classpath` configuration property, which loads the extension classes from a folder instead of a jar.
+You also need `cyan.backend.class` in both development and production and it should point to the class name of your backend class.
+
+Example backend configuration: `-Dcyan.backend.class=mybackend.Backend -Dcyan.backend.classpath=../Cyan-mybackend/target/scala-2.11/classes/`
 
 ### Code conventions
 
