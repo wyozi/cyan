@@ -80,10 +80,10 @@ class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit
     }
   }
 
-  def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], responseId: Option[Int]): Future[Unit] = {
-    getExactPingResponse(productId, license, user).map {
-      case Some(pr) => db.run(sqlu"UPDATE pingresponses SET response_id = ${responseId} WHERE id = ${pr.id}")
-      case None => db.run(sqlu"INSERT INTO pingresponses(product_id, license, user_name, response_id) VALUES (${productId}, ${license}, ${user}, ${responseId})")
+  def upsertExactPingResponse(productId: Option[Int], license: Option[String], user: Option[String], responseId: Option[Int]): Future[Int] = {
+    getExactPingResponse(productId, license, user).flatMap {
+      case Some(pr) => db.run(PingResponses.filter(_.id === pr.id).map(_.responseId).update(responseId))
+      case None => db.run(PingResponses.map(c => (c.productId, c.license, c.userName, c.responseId)) += (productId, license, user, responseId))
     }
   }
 
