@@ -15,9 +15,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
+
   import driver.api._
 
   private[dao] val PingResponses = TableQuery[PingResponsesTable]
+
+  def getPingResponse(id: Int): Future[Option[PingResponse]] =
+    db.run(PingResponses.filter(_.id === id).take(1).result.headOption)
 
   def pingResponseCount: Future[Int] = db.run(PingResponses.length.result)
 

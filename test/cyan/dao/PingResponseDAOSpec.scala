@@ -30,14 +30,22 @@ class PingResponseDAOSpec extends PlaySpec with OneAppPerTest with DBSpec {
       // Test adding more and more exact ping responses and checking result
       await(pingResponsesDAO.pingResponseCount) mustEqual 0
 
-      await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), Some(resp1)))
+      val id1 = await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), Some(resp1)))
       await(pingResponsesDAO.pingResponseCount) mustEqual 1
+      val pr1 = await(pingResponsesDAO.getPingResponse(id1))
+      pr1 mustBe defined
+      pr1.get.responseId mustBe Some(resp1)
 
-      await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), Some(resp2)))
+      val id2 = await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), Some(resp2)))
       await(pingResponsesDAO.pingResponseCount) mustEqual 1
+      val pr2 = await(pingResponsesDAO.getPingResponse(id2))
+      pr2 mustBe defined
+      pr2.get.responseId mustBe Some(resp2)
 
-      await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), None))
+      val id3 = await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), None))
       await(pingResponsesDAO.pingResponseCount) mustEqual 1 // TODO: should this remove the row?
+      val pr3 = await(pingResponsesDAO.getPingResponse(id3))
+      pr3 must not be defined
     }
     "return correct exact ping response ids" in {
       val responsesDAO = app.injector.instanceOf[ResponsesDAO]
@@ -52,8 +60,6 @@ class PingResponseDAOSpec extends PlaySpec with OneAppPerTest with DBSpec {
       await(pingResponsesDAO.upsertExactPingResponse(Some(1), None           , None,         Some(onlyprodRespId)))
 
       // Test added responses
-      println(await(pingResponsesDAO.pingResponseCount) + "XX" + frid)
-      println(await(pingResponsesDAO.getExactPingResponse(Some(1), Some("license"), Some("user"))))
       await(pingResponsesDAO.getExactPingResponse(Some(1), Some("license"), Some("user"))).flatMap(_.responseId) mustEqual Some(fullRespId)
       await(pingResponsesDAO.getExactPingResponse(Some(1), Some("license"), None)).flatMap(_.responseId) mustEqual Some(nouserRespId)
       await(pingResponsesDAO.getExactPingResponse(Some(1), None, None)).flatMap(_.responseId) mustEqual Some(onlyprodRespId)
