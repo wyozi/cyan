@@ -1,4 +1,4 @@
-# Cyan ![](https://travis-ci.org/wyozi/cyan.svg?branch=master)
+# Cyan [![Build Status](https://travis-ci.org/wyozi/cyan.svg?branch=master)](https://travis-ci.org/wyozi/cyan)
 
 Cyan is a generic license server running on top of Play 2 framework.
 It is primarily meant to be used for managing licences for services/applications that can access internet.
