@@ -13,13 +13,15 @@ import play.api.{Configuration, Environment, Logger}
   */
 class BackendModule(environment: Environment, configuration: Configuration) extends AbstractModule {
   def classloader: URLClassLoader = {
-    val classPath = configuration.getStringSeq("cyan.backend.classpath").getOrElse(Seq())
-    val cpUrls = classPath.map(s => new File(s).toURI.toURL)
+    val jarUrls = new File("extensions/").listFiles.filter(_.getName.endsWith(".jar")).map(_.toURI.toURL)
 
-    val lookUrls = cpUrls
+    val beClassDir = configuration.getString("cyan.backend.classpath")
+    val dirUrls = beClassDir.map(s => Seq(new File(s).toURI.toURL)).getOrElse(Seq())
+
+    val lookUrls = jarUrls ++ dirUrls
     Logger.info("Backend classpath URLs: " + lookUrls.mkString(","))
 
-    new URLClassLoader(lookUrls.toArray, environment.classLoader)
+    new URLClassLoader(lookUrls, environment.classLoader)
   }
 
   override def configure(): Unit = {
