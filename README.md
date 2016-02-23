@@ -16,8 +16,9 @@ Future versions of Cyan might include small-scale error reporting server (someth
 4. Run Cyan with  ```target/universal/stage/bin/cyan -DapplyEvolutions.default=true -Dcyan.password=test``` (remember to use different password for production usage)
 5. Access admin panel in ```http://localhost:9000/admin/products``` using `admin` for user and `test` for password
 
-If you'd like to use postgres instead, add this after the "Run Cyan" line:
-```-Dslick.dbs.default.driver=slick.driver.PostgresDriver$ -Dslick.dbs.default.db.driver=org.postgresql.Driver -Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan -Dslick.dbs.default.db.user=cyanuser -Dslick.dbs.default.db.password=cyanpass```
+By default Cyan places the H2 database files in your home directory. If you'd like to change that, pass `-Dslick.dbs.default.db.urljdbc:h2:dbpath` in run options where `dbpath` is the path for database files.
+
+If you'd like to use postgres instead, add this to run options: ```-Dslick.dbs.default.driver=slick.driver.PostgresDriver$ -Dslick.dbs.default.db.driver=org.postgresql.Driver -Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan -Dslick.dbs.default.db.user=cyanuser -Dslick.dbs.default.db.password=cyanpass```
 where `cyan` is database name, `cyanuser` is database user and `cyanpass` is database password
 
 ### Terminology briefly
@@ -43,8 +44,7 @@ modifying `License` or `User` html cells in ping tables to be suffixed by a butt
 create a new (preferably sbt) project that depends on the `backend-core` module in the root folder of Cyan. You do not currently
 need to depend on Cyan itself, just the backend module.
 
-Backends that are `jar` files in the `extensions` folder are automatically loaded to classpath. During development you might want
-to also use the `cyan.backend.classpath` configuration property, which loads the extension classes from a folder instead of a jar.
+Backends that are `jar` files in the `extensions` folder are automatically loaded to classpath. During development you might want to also use the `cyan.backend.classpath` configuration property, which loads the extension classes from a folder instead of a jar.
 You also need `cyan.backend.class` in both development and production and it should point to the class name of your backend class.
 
 Example backend configuration: `-Dcyan.backend.class=mybackend.Backend -Dcyan.backend.classpath=../Cyan-mybackend/target/scala-2.11/classes/`
