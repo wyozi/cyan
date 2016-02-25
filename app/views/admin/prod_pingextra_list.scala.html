@@ -1,0 +1,33 @@
+@import dao._
+@import util.FutureUtils._
+@import shapeless._
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext
+@(prod: model.Product)(implicit ex: ExecutionContext, pingExtrasDAO: PingExtrasDAO, productsDAO: ProductsDAO)
+
+@layout_admin("ping extras") {
+    @prod_sidebar(prod)
+
+    <div class="col-sm-10 main">
+        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Ping Extras"))
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>Key</td>
+                        <td>Ping count</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for((key, count) <- pingExtrasDAO.findExtraKeysAndCounts(prod.shortName).await) {
+                        <tr>
+                            <td><a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, key)">@key</a></td>
+                            <td>@count</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

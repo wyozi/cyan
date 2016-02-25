@@ -21,9 +21,10 @@ POST        /admin/products/:id/:cfgkey                        controllers.admin
 GET         /admin/products/:id/licences/:lid                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
 POST        /admin/products/:pid/licenses/:lid/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
 
+GET         /admin/products/:id/extras                         controllers.admin.prod.ProductPingExtras.list(id: Int)
 GET         /admin/products/:id/extras/:key                    controllers.admin.prod.ProductPingExtras.view(id: Int, key)
 
-GET         /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.view(id: Int)
+GET         /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.list(id: Int)
 
 GET         /admin/pings/:id/:key                              controllers.admin.Pings.showPingExtra(id: Int, key: String)
 

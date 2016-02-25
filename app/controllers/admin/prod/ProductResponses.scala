@@ -17,10 +17,10 @@ class ProductResponses @Inject() ()
     plpDAO: ProdLicensePingDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
-  def view(prodId: Int) = SecureAction.async {
+  def list(prodId: Int) = SecureAction.async {
     productsDAO.findById(prodId).map {
       case Some(prod) =>
-        Ok(views.html.admin.prod_resps_view(prod))
+        Ok(views.html.admin.prod_resp_list(prod))
     }
   }
 }

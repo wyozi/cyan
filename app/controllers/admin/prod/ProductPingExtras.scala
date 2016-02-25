@@ -18,6 +18,12 @@ class ProductPingExtras @Inject() ()
     pingExtrasDAO: PingExtrasDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
+  def list(prodId: Int) = SecureAction.async {
+    productsDAO.findById(prodId).map {
+      case Some(prod) => Ok(views.html.admin.prod_pingextra_list(prod))
+    }
+  }
+
   def view(prodId: Int, pingExtra: String) = SecureAction.async {
     productsDAO.findById(prodId).map {
       case Some(prod) => Ok(views.html.admin.prod_pingextra_view(prod, pingExtra))

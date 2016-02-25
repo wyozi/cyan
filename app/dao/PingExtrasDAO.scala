@@ -54,6 +54,22 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       )
   }
 
+  /**
+    * Finds distinct ping extra keys and their value counts for given product.
+    * @param prodShortName
+    */
+  def findExtraKeysAndCounts(prodShortName: String): Future[Seq[(String, Int)]] =
+    db.run(
+        pingsDAO.Pings
+          .filter(_.product === prodShortName)
+      join
+        PingExtras
+      on (_.id === _.pingId)
+      groupBy(_._2.key)
+      map { case (key, rows) => (key, rows.length) }
+      result
+    )
+
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =
     db.run(PingExtras.filter(_.pingId === pingId).result)
 
