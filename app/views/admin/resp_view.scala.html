@@ -1,7 +1,14 @@
 @import model.Response
 @import dao.ProductsDAO
-@(resp: Response)(implicit productsDAO: ProductsDAO)
+@import dao.PingsDAO
+@import util.FutureUtils._
+@import dao.PingExtrasDAO
+@(resp: Response)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
     <pre>@resp.body</pre>
+
+    <h3>Recent pings with this response:</h3>
+
+    @snippet.ping_table(pingsDAO.findRecentForResponse(Some(resp.id), 15).await, showProduct = true, showResponse = false)
 }

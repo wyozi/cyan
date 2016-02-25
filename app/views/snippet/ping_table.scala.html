@@ -7,25 +7,30 @@
 
 @import model.Ping
 @import cyan.backend.Backend
-@(pings: Seq[Ping], showProducts: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true)(implicit productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, backend: Backend = null)
+@(pings: Seq[Ping], showProduct: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true, showResponse: Boolean = true)(implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO = null, pingExtrasDAO: PingExtrasDAO = null, productConfigDAO: ProductConfigDAO = null, backend: Backend = null)
+
+@{
+    if (showExtras) assert(pingExtrasDAO != null, "pingExtrasDAO must not be null if showExtras is enabled")
+    if (showResponse) assert(responsesDAO != null, "responsesDAO must not be null if showResponse is enabled")
+}
 
 <div class="table-responsive">
     <table class="table">
         <thead>
             <tr>
-                @if(showProducts) { <td>Product</td> }
+                @if(showProduct) { <td>Product</td> }
                 @if(showLicense) { <td>License</td> }
                 <td>User</td>
                 <td>IP</td>
                 <td>Timestamp</td>
-                @if(showExtras) { <td>Extra keys</td> }
-                <td>Response</td>
+                @if(showExtras && pingExtrasDAO != null) { <td>Extra keys</td> }
+                @if(showResponse && responsesDAO != null) { <td>Response</td> }
             </tr>
         </thead>
         <tbody>
-            @for(ping :: product :: extras :: response :: HNil <- pings.map(p => hsequence(Future.successful(p) :: p.queryProduct() :: p.queryExtras() :: p.queryResponse() :: HNil)) awaitAll) {
+            @for(ping :: product :: extras :: response :: HNil <- pings.map(p => hsequence(Future.successful(p) :: p.queryProduct() :: (if (showExtras) p.queryExtras() else Future.successful(Seq())) :: (if (showResponse) p.queryResponse() else Future.successful(None)) :: HNil)) awaitAll) {
                 <tr>
-                    @if(showProducts) {
+                    @if(showProduct) {
                         <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td>
                     }
                     @if(showLicense) {
@@ -38,7 +43,7 @@
                     <td>@ping.user</td>
                     <td>@ping.ip</td>
                     <td>@snippet.datetime(ping.date)</td>
-                    @if(showExtras) {
+                    @if(showExtras && pingExtrasDAO != null) {
                         <td>
                         @for(pe <- extras) {
                             <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key">
@@ -47,14 +52,16 @@
                         }
                         </td>
                     }
-                    <td>
-                    @response match {
-                        case Some(resp) => {
-                            <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
+                    @if(showResponse && responsesDAO != null) {
+                        <td>
+                        @response match {
+                            case Some(resp) => {
+                                <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
+                            }
+                            case _ => { Empty }
                         }
-                        case _ => { Empty }
+                        </td>
                     }
-                    </td>
                 </tr>
             }
         </tbody>

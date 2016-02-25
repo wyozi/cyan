@@ -36,6 +36,15 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
         .result
     )
 
+  def findRecentForResponse(resp: Option[Int], limit: Int): Future[Seq[Ping]] =
+    db.run(
+      Pings
+        .filter(_.responseId === resp)
+        .sortBy(_.id.desc)
+        .take(limit)
+        .result
+    )
+
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)
 
