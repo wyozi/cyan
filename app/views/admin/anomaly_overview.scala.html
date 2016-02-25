@@ -6,9 +6,9 @@
 @severityBootstrapClass(severity: AnomalySeverity) = {
     @severity match {
         case Low => { active }
+        case Medium => { }
         case Significant => { warning }
         case Critical => { danger }
-        case _ => {}
     }
 }
 

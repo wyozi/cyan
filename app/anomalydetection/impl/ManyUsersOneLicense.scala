@@ -2,7 +2,7 @@ package anomalydetection.impl
 
 import anomalydetection.{Anomaly, AnomalyDetector, Medium}
 import com.google.inject.Inject
-import dao.MUOLAnomalyDAO
+import dao.anomalydet.MUOLAnomalyDAO
 import play.api.mvc.Call
 
 import scala.concurrent.Future

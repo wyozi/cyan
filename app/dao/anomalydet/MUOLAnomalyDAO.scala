@@ -1,6 +1,7 @@
-package dao
+package dao.anomalydet
 
 import com.google.inject.{Inject, Singleton}
+import dao.{PingsDAO, ProductsDAO}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
