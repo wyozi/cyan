@@ -6,7 +6,40 @@
 @(resp: Response)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
-    <pre>@resp.body</pre>
+
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                Response body
+                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#editModal">
+                    <span class="glyphicon glyphicon-pencil"></span>
+                    Edit
+                </button>
+            </h3>
+        </div>
+        <div class="panel-body">
+            <pre id="responseBody">@resp.body</pre>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">Edit response body</h4>
+                </div>
+                <form action="@controllers.admin.routes.Responses.editBody(resp.id)" method="post">
+                    <div class="modal-body">
+                        <textarea name="body" class="form-control" rows="10">@resp.body</textarea>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 
     <h3>Recent pings with this response:</h3>
 

@@ -9,6 +9,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by wyozi on 4.2.2016.
@@ -31,6 +32,17 @@ class Responses @Inject() (implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO
       case Some(resp) =>
         Ok(views.html.admin.resp_view(resp))
     }
+  }
+
+  def editBody(respId: Int) = SecureAction.async { implicit request =>
+    val form = Form("body" -> text)
+
+    form.bindFromRequest.fold(
+      errors => Future.successful(BadRequest("invalid form")),
+      body => responsesDAO.updateBody(respId, body).map { x =>
+        Redirect(routes.Responses.view(respId))
+      }
+    )
   }
 
   def create = SecureAction { implicit request =>
