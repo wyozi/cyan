@@ -54,12 +54,7 @@
                     }
                     @if(showResponse && responsesDAO != null) {
                         <td>
-                        @response match {
-                            case Some(resp) => {
-                                <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
-                            }
-                            case _ => { Empty }
-                        }
+                        @snippet.response(response)
                         </td>
                     }
                 </tr>

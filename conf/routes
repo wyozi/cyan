@@ -23,6 +23,8 @@ POST        /admin/products/:pid/licenses/:lid/response        controllers.admin
 
 GET         /admin/products/:id/extras/:key                    controllers.admin.prod.ProductPingExtras.view(id: Int, key)
 
+GET         /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.view(id: Int)
+
 GET         /admin/pings/:id/:key                              controllers.admin.Pings.showPingExtra(id: Int, key: String)
 
 GET         /admin/responses                                   controllers.admin.Responses.list

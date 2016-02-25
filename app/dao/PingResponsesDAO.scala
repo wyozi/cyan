@@ -25,6 +25,9 @@ class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit
 
   def pingResponseCount: Future[Int] = db.run(PingResponses.length.result)
 
+  def findForProduct(prodId: Int): Future[Seq[PingResponse]] =
+    db.run(PingResponses.filter(_.productId === prodId).result)
+
   /**
     * Gets the ping response id that best matches given parameters.
     * Checks following in order:

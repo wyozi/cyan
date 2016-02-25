@@ -1,0 +1,51 @@
+@import dao._
+@import util.FutureUtils._
+@import shapeless._
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext
+@(prod: model.Product)(implicit ex: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO)
+
+@layout_admin("product responses") {
+    @prod_sidebar(prod)
+
+    <div class="col-sm-10 main">
+        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Responses"))
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>License</td>
+                        <td>User</td>
+                        <td>Response</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for(pr :: response :: HNil <- pingResponsesDAO.findForProduct(prod.id).await.map(pr => hsequence(Future.successful(pr) :: pr.queryResponse() :: HNil)) awaitAll) {
+                        <tr>
+                            <td>
+                                @pr.license match {
+                                    case Some(license) => {
+                                        <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, license)">@license</a>
+                                    }
+                                    case _ => {
+                                        <i>Empty (matches all)</i>
+                                    }
+                                }
+                            </td>
+                            <td>
+                                @pr.userName match {
+                                    case Some(user) => { user }
+                                    case _ => {
+                                        <i>Empty (matches all)</i>
+                                    }
+                                }
+                            </td>
+                            <td>@snippet.response(response)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+}

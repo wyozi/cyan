@@ -15,20 +15,7 @@
 @(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @layout_admin(prod.name) {
-    <div class="col-sm-2 sidebar">
-        <h4>Product</h4>
-        <ul class="nav nav-sidebar">
-            <li><a href="@controllers.admin.prod.routes.Products.view(prod.id)">Overview</a></li>
-        </ul>
-
-        <h4>Recent extras</h4>
-
-        <ul class="nav nav-sidebar">
-            @for(key <- recentPings.map(_.queryExtras()).awaitAll().flatten.map(_.key).distinct) {
-                <li><a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, key)">@key</a></li>
-            }
-        </ul>
-    </div>
+    @prod_sidebar(prod)
 
     <div class="col-sm-10 main">
         @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod))
