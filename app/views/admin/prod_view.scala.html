@@ -96,6 +96,82 @@
             </div>
         </div>
 
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a role="button" data-toggle="collapse" href="#collapseFakePing">
+                        <span class="glyphicon glyphicon-plus"></span>
+                        Add Ping
+                    </a>
+                </h3>
+            </div>
+            <div id="collapseFakePing" class="panel-collapse collapse">
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="form-group">
+                            <label for="fakepinglicense" class="col-sm-2 control-label">License</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="fakePingLicense" placeholder="License">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="fakePingUser" class="col-sm-2 control-label">User</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="fakePingUser" class="form-control" placeholder="User">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label">Extras</label>
+                            <div class="col-sm-10">
+                                <div class="col-sm-12" id="fakePingExtraList">
+
+                                </div>
+                                <button type="button" id="fakePingNewExtra" class="btn btn-default">Add</button>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <button type="button" id="fakePingSubmit" class="btn btn-primary">Submit</button>
+                            </div>
+                        </div>
+                        <div class="col-sm-12">
+                            <div class="panel panel-default" style="display: none" id="fakePingResponsePanel">
+                                <div class="panel-heading" id="fakePingResponseHeader"></div>
+                                <div class="panel-body" id="fakePingResponseBody"></div>
+                            </div>
+                        </div>
+                    </form>
+
+                    <script type="application/javascript">
+                        $('#fakePingNewExtra').click(function() {
+                            $('#fakePingExtraList').append("<div class='form-group'><div class='col-sm-6'><input class='form-control'></div><div class='col-sm-6'><input class='form-control'></div></div>");
+                        });
+
+                        $('#fakePingSubmit').click(function(e) {
+                            var extras = {};
+                            $("#fakePingExtraList").find("> div").each(function() {
+                                var inputs = $(this).find("input");
+                                extras["x_" + inputs.get(0).value] = inputs.get(1).value;
+                            });
+
+                            $.post(
+                                    "@routes.PingReceiver.ping()",
+                                    $.extend({
+                                        prod: '@prod.shortName',
+                                        license: $('#fakePingLicense').val(),
+                                        user: $('#fakePingUser').val()
+                                    }, extras)
+                            ).done(function(data, statusText, xhr){
+                                $('#fakePingResponsePanel').show().addClass('panel-success');
+                                $('#fakePingResponseHeader').text('Response ' + xhr.status);
+                                $('#fakePingResponseBody').text(data);
+                            });;
+                        });
+                    </script>
+                </div>
+            </div>
+        </div>
+
         <h3>Recent new licenses</h3>
 
         <div class="table-responsive">
