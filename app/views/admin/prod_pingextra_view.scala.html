@@ -75,7 +75,7 @@
     </script>
 }
 
-@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Ping extras", html"Key <code>${pingExtraKey}</code>"), scripts) {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts) {
     <div class="row">
         <div class="col-xs-12 col-md-6">
             <h3>Value distribution in past 24 hours (per user)</h3>
