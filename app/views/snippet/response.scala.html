@@ -5,5 +5,5 @@
     case Some(resp) => {
         <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-info">@resp.name</a>
     }
-    case _ => { Empty }
+    case _ => { <i>Empty</i> }
 }
