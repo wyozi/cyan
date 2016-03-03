@@ -6,6 +6,8 @@ import dao._
 import play.api.mvc.Controller
 import play.twirl.api.Html
 
+
+
 import scala.concurrent.ExecutionContext
 
 class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO) extends Controller with Secured {

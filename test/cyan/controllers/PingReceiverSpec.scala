@@ -69,7 +69,7 @@ class PingReceiverSpec extends PlaySpec with Results with OneAppPerSuite with DB
           .withFormUrlEncodedBody(("user", "Mike"), ("license", "xlicense"), ("prod", "banana"))
       )) mustEqual OK
 
-      val prodPings = await(pingsDAO.findRecentForProduct(Product(productId, "banana", "banana")))
+      val prodPings = await(pingsDAO.findRecentForProduct(Product(productId, "banana", "banana"), 10))
       prodPings.size mustEqual 1
       prodPings.head.user mustEqual "Mike"
       prodPings.head.license mustEqual "xlicense"
