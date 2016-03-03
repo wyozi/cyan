@@ -13,7 +13,8 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @import util.TwirlUtils._
 @import dao.ProductConfigDAO
-@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
+@import dao.PingsDAO
+@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, html"License <code>${prodLicense.license}</code>")) {
     <div class="panel panel-default">
@@ -61,5 +62,5 @@
 
     <h3>Recent pings on this license:</h3>
 
-    @snippet.ping_table(plpDAO.findRecentPings(prodLicense, 15).await, showLicense = false)
+    @snippet.ping_table(pingsDAO.findRecentWithProdLicense(prodLicense, 15).await, showLicense = false)
 }

@@ -16,6 +16,7 @@ class ProductLicenses @Inject() ()
     responsesDAO: ResponsesDAO,
     productConfigDAO: ProductConfigDAO,
     pingExtrasDAO: PingExtrasDAO,
+    pingsDAO: PingsDAO,
     plpDAO: ProdLicensePingDAO,
     productsDAO: ProductsDAO) extends Controller with Secured {
 

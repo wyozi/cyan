@@ -10,5 +10,5 @@
 @layout_admin_simple() {
     <h3>Recent pings</h3>
 
-    @snippet.ping_table(pingsDAO.findRecent().await, showProduct = true)
+    @snippet.ping_table(pingsDAO.findRecent(15).await, showProduct = true)
 }

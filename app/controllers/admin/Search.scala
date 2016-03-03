@@ -8,13 +8,13 @@ import play.twirl.api.Html
 
 import scala.concurrent.ExecutionContext
 
-class Search @Inject() (implicit ec: ExecutionContext, plpDAO: ProdLicensePingDAO, productsDAO: ProductsDAO) extends Controller with Secured {
+class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO) extends Controller with Secured {
   def search = SecureAction.async { req =>
     val fue = req.body.asFormUrlEncoded
     val query = fue.get("query").map(_.trim).head
 
-    plpDAO
-      .findRecentPings(query, 1)
+    pingsDAO
+      .findRecentWithLicense(query, 1)
       .flatMap {
         case x if x.nonEmpty => {
           productsDAO.findByShortName(x.head.product)

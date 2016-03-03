@@ -43,5 +43,5 @@
 
     <h3>Recent pings with this response:</h3>
 
-    @snippet.ping_table(pingsDAO.findRecentForResponse(Some(resp.id), 15).await, showProduct = true, showResponse = false)
+    @snippet.ping_table(pingsDAO.findRecentWithResponse(Some(resp.id), 15).await, showProduct = true, showResponse = false)
 }
