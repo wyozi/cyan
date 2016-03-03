@@ -3,7 +3,7 @@ package dao
 import java.sql.Timestamp
 
 import com.google.inject.{Singleton, Inject}
-import model.{Ping, Product}
+import model.{ProductLicense, Ping, Product}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 
@@ -43,13 +43,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run(Pings.filter(_.userName === user).sortBy(_.id.desc).take(limit).result)
 
   def findRecentForResponse(resp: Option[Int], limit: Int): Future[Seq[Ping]] =
-    db.run(
-      Pings
-        .filter(_.responseId === resp)
-        .sortBy(_.id.desc)
-        .take(limit)
-        .result
-    )
+    db.run(Pings.filter(_.responseId === resp).sortBy(_.id.desc).take(limit).result)
 
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)

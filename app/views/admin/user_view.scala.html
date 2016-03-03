@@ -6,9 +6,39 @@
 @import util.TwirlUtils._
 @import cyan.backend.Backend
 @import dao.ProductConfigDAO
-@(user: String)(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@import dao.ProdLicensePingDAO
+@(user: String)(implicit backend: Backend, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
 
 @layout_admin_simple(Seq("Users", html"<code>$user</code>")) {
+    <h3>Productlicenses used by this user</h3>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Product</td>
+                    <td>License</td>
+                </tr>
+            </thead>
+            <tbody>
+            @for(prodLicense <- plpDAO.findProductLicensesByUser(user).await) {
+                <tr>
+                    <td>
+                    @backend.transformProductHtml(prodLicense.prod.backend) {
+                        <a href="@controllers.admin.prod.routes.Products.view(prodLicense.prod.id)">@prodLicense.prod.name</a>
+                    }
+                    </td>
+                    <td>
+                    @backend.transformLicenseHtml(model.backendLicense(prodLicense.prod, prodLicense.license)) {
+                        <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prodLicense.prod.id, prodLicense.license)">@prodLicense.license</a>
+                    }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
     <h3>Recent pings from user <code>@user</code></h3>
 
     @snippet.ping_table(pingsDAO.findRecentByUser(user, 15).await, showProduct = true)

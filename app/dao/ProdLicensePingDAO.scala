@@ -6,17 +6,20 @@ import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
 import slick.jdbc.GetResult
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
-  * DAO for database operations related to products, licenses and pings (and their relations)
+  * DAO for database operations related to products, licenses and pings (and their relations).
+  * A rule of thumb for including a method here instead of some table-specific DAO is that the query requires access
+  * to multiple tables (through joins etc)
   *
   * Created by wyozi on 8.2.2016.
   */
 @Singleton
 class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider,
   productConfigDAO: ProductConfigDAO,
-  pingsDAO: PingsDAO)
+  productsDAO: ProductsDAO,
+  pingsDAO: PingsDAO)(implicit ec: ExecutionContext)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import driver.api._
@@ -48,6 +51,21 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
         take(limit)
         result
     )
+
+  def findProductLicensesByUser(user: String): Future[Seq[ProductLicense]] =
+    db.run(
+      (
+        pingsDAO.Pings
+          .filter(_.userName === user)
+          .groupBy(r => (r.product, r.license))
+          .map { case ((p, l), _) => (p, l) }
+        join
+          productsDAO.Products
+        on (_._1 === _.shortName)
+      )
+        .map { case ((p, l), prod) => (prod, l) }
+        .result
+    ) map(_.map(r => ProductLicense(r._1, r._2)))
 
   /**
     * Returns a list of pings with license in product. Ordered by latest ping timestamp descendingly. One per user.
