@@ -10,11 +10,13 @@ import scala.concurrent.Future
   */
 trait Secured { self: Results =>
 
+  def isAuthorized(req: RequestHeader): Boolean = req.session.get("loggedIn") match {
+    case Some("true") => true
+    case _ => false
+  }
 
-  def isLoggedIn(req: Request[_]): Boolean = req.session.get("loggedIn").isDefined
-
-  def setLoggedIn(req: Request[_]): Unit = {
-    req.session + ("loggedIn", "true")
+  private def withAuthorization(res: Result): Result = {
+    res.withSession(("loggedIn", "true"))
   }
 
   lazy val password = Play.current.configuration.getString("cyan.password")
@@ -24,9 +26,11 @@ trait Secured { self: Results =>
     case _ => false
   }
 
+  import play.api.libs.concurrent.Execution.Implicits._
+
   object SecureAction extends ActionBuilder[Request] {
     override def invokeBlock[A](req: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
-      if (isLoggedIn(req)) {
+      if (isAuthorized(req)) {
         block(req)
       } else {
         req.headers.get("Authorization").flatMap { authorization =>
@@ -37,7 +41,7 @@ trait Secured { self: Results =>
             }
           }
         } match {
-          case Some(_) => { setLoggedIn(req); block(req) }
+          case Some(_) => block(req).map(res => withAuthorization(res))
           case _ => Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Secured Area""""))
         }
       }
