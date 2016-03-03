@@ -36,6 +36,15 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
         .result
     )
 
+  def findRecentByIp(ip: String, limit: Int = 1000): Future[Seq[Ping]] =
+    db.run(
+      Pings
+        .filter(_.ip === ip)
+        .sortBy(_.id.desc)
+        .take(limit)
+        .result
+    )
+
   def findRecentForResponse(resp: Option[Int], limit: Int): Future[Seq[Ping]] =
     db.run(
       Pings

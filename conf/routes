@@ -26,6 +26,8 @@ GET         /admin/products/:id/extras/:key                    controllers.admin
 
 GET         /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.list(id: Int)
 
+GET         /admin/ips/:ip                                     controllers.admin.IPs.viewIp(ip)
+
 GET         /admin/pings/:id/:key                              controllers.admin.Pings.showPingExtra(id: Int, key: String)
 
 GET         /admin/responses                                   controllers.admin.Responses.list
