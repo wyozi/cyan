@@ -40,7 +40,7 @@
                             }
                         </td>
                     }
-                    <td>@ping.user</td>
+                    <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
                     <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     @if(showExtras && pingExtrasDAO != null) {
