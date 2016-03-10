@@ -3,6 +3,7 @@ package anomalydetection.impl
 import anomalydetection.{Anomaly, AnomalyDetector, Medium}
 import com.google.inject.Inject
 import dao.anomalydet.MUOLAnomalyDAO
+import org.joda.time.LocalDateTime
 import play.api.mvc.Call
 
 import scala.concurrent.Future
@@ -13,11 +14,12 @@ import scala.concurrent.ExecutionContext.Implicits.global
   */
 class ManyUsersOneLicense @Inject() (muolLAnomalyDAO: MUOLAnomalyDAO) extends AnomalyDetector {
   val USER_PER_LICENSE_THRESHOLD = 3
+  val DAY_THRESHOLD = 2
 
   override def name: String = "Many users on license"
 
   override def detectAnomalies(): Future[List[Anomaly]] = {
-    muolLAnomalyDAO.findDistinctUserGroups(USER_PER_LICENSE_THRESHOLD).map(mars => mars.map {
+    muolLAnomalyDAO.findDistinctUserGroups(USER_PER_LICENSE_THRESHOLD, LocalDateTime.now().minusDays(DAY_THRESHOLD)).map(mars => mars.map {
       case (prod, license, userCount) => new MUOLAnomaly(prod.name, prod.id, license, userCount)
     }.toList)
   }
