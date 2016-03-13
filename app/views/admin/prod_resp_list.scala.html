@@ -47,5 +47,45 @@
                 </tbody>
             </table>
         </div>
+
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Add new</h3>
+            </div>
+            <div class="panel-body">
+
+                <form action="@controllers.admin.prod.routes.ProductResponses.insert(prod.id)" method="post">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <td>License</td>
+                                    <td>User</td>
+                                    <td>Response</td>
+                                    <td></td>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <input name="license" type="text" class="form-control">
+                                    </td>
+                                    <td>
+                                        <input name="user" type="text" class="form-control">
+                                    </td>
+                                    <td>
+                                    @snippet.responseselect()
+                                    </td>
+                                    <td>
+                                        <button type="submit" class="btn btn-primary">Submit</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </form>
+
+            </div>
+        </div>
     </div>
 }
