@@ -1,0 +1,6 @@
+@import model.PingExtra
+@(pingExtras: Seq[PingExtra])
+
+@for(pe <- pingExtras) {
+    @snippet.pingextra(pe)
+}

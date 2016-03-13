@@ -57,16 +57,8 @@
                 <tr>
                     <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
                     <td>@snippet.datetime(ping.date)</td>
-                    <td>
-                    @for(pe <- extras) {
-                        <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key">
-                        @pe.key
-                        </a>
-                    }
-                    </td>
-                    <td>
-                        @snippet.response(response)
-                    </td>
+                    <td>@snippet.pingextras(extras)</td>
+                    <td>@snippet.response(response)</td>
                 </tr>
             }
         </tbody>

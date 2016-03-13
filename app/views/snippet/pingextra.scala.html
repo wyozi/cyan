@@ -1,0 +1,16 @@
+@import model.PingExtra
+@import java.awt.Color
+@(pingExtra: PingExtra)
+
+@colorFromHash(hash: Int) = @{
+    val rand = new scala.util.Random(hash)
+    "#%02X%02X%02X".format(
+        (rand.nextInt(256) + 255) / 2,
+        (rand.nextInt(256) + 255) / 2,
+        (rand.nextInt(256) + 255) / 2
+    )
+}
+
+<div class="btn btn-info btn-xs pingextra" title="@pingExtra.key" style="background-color: @colorFromHash(pingExtra.key.hashCode); color: black" data-toggle="tooltip" data-placement="top">
+@pingExtra.value
+</div>

@@ -44,13 +44,7 @@
                     <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     @if(showExtras && pingExtrasDAO != null) {
-                        <td>
-                        @for(pe <- extras) {
-                            <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key">
-                            @pe.key
-                            </a>
-                        }
-                        </td>
+                        <td>@snippet.pingextras(extras)</td>
                     }
                     @if(showResponse && responsesDAO != null) {
                         <td>
