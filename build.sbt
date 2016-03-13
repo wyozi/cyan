@@ -27,7 +27,8 @@ libraryDependencies ++= Seq(
   "org.webjars" % "jquery" % "2.2.0",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "momentjs" % "2.11.1",
-  "org.webjars.bower" % "Chart.js" % "2.0.0-beta2"
+  "org.webjars.bower" % "Chart.js" % "2.0.0-beta2",
+  "org.webjars.bower" % "timeago" % "1.4.1"  exclude("org.webjars.bower", "jquery")
 )
 
 routesGenerator := InjectedRoutesGenerator

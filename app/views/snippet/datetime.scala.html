@@ -1,27 +1,14 @@
 @import java.sql.Timestamp
-@import org.joda.time.format.{PeriodFormatter, PeriodFormatterBuilder}
 @import org.joda.time.DateTime
 @import org.joda.time.Period
 @import org.joda.time.Instant
-@import org.joda.time.DateTimeZone
-@import java.time.ZoneId
 @import java.time.ZoneOffset
 @import org.joda.time.PeriodType
-@(timestamp: Timestamp,
-        formatter: PeriodFormatter = new PeriodFormatterBuilder()
-        .appendDays()
-        .appendSuffix(" day", " days")
-        .appendSeparator(" and ")
-        .printZeroAlways()
-        .minimumPrintedDigits(2)
-        .appendHours()
-        .appendSuffix(":")
-        .appendMinutes()
-        .appendSuffix(":")
-        .appendSeconds()
-        .toFormatter)
+@import org.joda.time.format.DateTimeFormat
+@import java.util.Locale
+@(timestamp: Timestamp)
 
 @* This disgusting piece of code (using both Javatime and Joda time) converts timestamp to UTC based DateTime *@
 @defining(new DateTime(timestamp.toLocalDateTime.atOffset(ZoneOffset.UTC).toInstant.toEpochMilli)) { datetime =>
-    <span title="@datetime">@formatter.print(new Period(datetime.toInstant, Instant.now(), PeriodType.dayTime())) ago</span>
+    <time class="timeago" datetime="@datetime">@datetime.toString(DateTimeFormat.forStyle("SM").withLocale(Locale.getDefault))</time>
 }

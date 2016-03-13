@@ -54,6 +54,7 @@
 } {
     @scripts
 
+    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.timeago.js"))"></script>
     <script type="application/javascript">
         jQuery(document).ready(function($) {
             // Make table cells with a single link child clickable.
@@ -65,6 +66,9 @@
 
             // Add tooltip functionality
             $('[data-toggle="tooltip"]').tooltip();
+
+            // Convert all datetimes to "x ago"
+            $("time.timeago").timeago();
         });
     </script>
 }
