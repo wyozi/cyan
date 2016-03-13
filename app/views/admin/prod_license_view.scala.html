@@ -57,7 +57,7 @@
                 <tr>
                     <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
                     <td>@snippet.datetime(ping.date)</td>
-                    <td>@snippet.pingextras(extras)</td>
+                    <td>@snippet.pingextras(extras)(prodLicense.prod)</td>
                     <td>@snippet.response(response)</td>
                 </tr>
             }

@@ -1,5 +1,6 @@
 @import model.PingExtra
-@(pingExtras: Seq[PingExtra])
+@import model.Product
+@(pingExtras: Seq[PingExtra])(implicit product: Product = null)
 
 @for(pe <- pingExtras) {
     @snippet.pingextra(pe)
