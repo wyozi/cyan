@@ -3,46 +3,44 @@
 # ~~~~
 
 # Home page
-GET         /                                                  controllers.Application.index()
-POST        /ping                                              controllers.PingReceiver.ping()
+GET         /                                             controllers.Application.index()
+POST        /ping                                         controllers.PingReceiver.ping()
 
-GET         /admin                                             controllers.admin.Main.index()
-GET         /javascriptRoutes                                  controllers.admin.Main.javascriptRoutes
+GET         /admin                                        controllers.admin.Main.index()
+GET         /javascriptRoutes                             controllers.admin.Main.javascriptRoutes
 
-GET         /admin/backend                                     controllers.admin.BackendController.view(query, productId: Option[Int], license: Option[String])
+GET         /admin/backend                                controllers.admin.BackendController.view(query, productId: Option[Int], license: Option[String])
 
-POST        /admin/search                                      controllers.admin.Search.search()
+POST        /admin/search                                 controllers.admin.Search.search()
 
-GET         /admin/products                                    controllers.admin.prod.Products.list()
-POST        /admin/products                                    controllers.admin.prod.Products.create()
-GET         /admin/products/:id                                controllers.admin.prod.Products.view(id: Int)
-POST        /admin/products/:id/config/:cfgkey                 controllers.admin.prod.Products.configure(id: Int, cfgkey)
+GET         /admin/products                               controllers.admin.prod.Products.list()
+POST        /admin/products                               controllers.admin.prod.Products.create()
+GET         /admin/products/:id                           controllers.admin.prod.Products.view(id: Int)
+POST        /admin/products/:id/config                    controllers.admin.prod.Products.configure(id: Int, cfgkey)
 
-GET         /admin/products/:id/licences/:lid                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
-POST        /admin/products/:pid/licenses/:lid/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
+GET         /admin/products/:id/licences                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
+POST        /admin/products/:pid/licenses/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
 
-GET         /admin/products/:id/extras                         controllers.admin.prod.ProductPingExtras.list(id: Int)
-GET         /admin/products/:id/extras/:key                    controllers.admin.prod.ProductPingExtras.view(id: Int, key)
+GET         /admin/products/:id/extras                    controllers.admin.prod.ProductPingExtras.list(id: Int)
+GET         /admin/products/:id/extras/keys               controllers.admin.prod.ProductPingExtras.view(id: Int, key)
 
-GET         /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.list(id: Int)
-POST        /admin/products/:id/responses                      controllers.admin.prod.ProductResponses.insert(id: Int)
+GET         /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.list(id: Int)
+POST        /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.insert(id: Int)
 
-GET         /admin/ips/:ip                                     controllers.admin.IPs.viewIp(ip)
-GET         /admin/users/:user                                 controllers.admin.Users.viewUser(user)
+GET         /admin/ips                                    controllers.admin.IPs.viewIp(ip)
+GET         /admin/users                                  controllers.admin.Users.viewUser(user)
 
-GET         /admin/pings/:id/:key                              controllers.admin.Pings.showPingExtra(id: Int, key: String)
+GET         /admin/responses                              controllers.admin.Responses.list
+POST        /admin/responses                              controllers.admin.Responses.create
+GET         /admin/responses/:id                          controllers.admin.Responses.view(id: Int)
+POST        /admin/responses/:id/body                     controllers.admin.Responses.editBody(id: Int)
 
-GET         /admin/responses                                   controllers.admin.Responses.list
-POST        /admin/responses                                   controllers.admin.Responses.create
-GET         /admin/responses/:id                               controllers.admin.Responses.view(id: Int)
-POST        /admin/responses/:id/body                          controllers.admin.Responses.editBody(id: Int)
-
-GET         /admin/anomalies                                   controllers.admin.Anomalies.overview
+GET         /admin/anomalies                              controllers.admin.Anomalies.overview
 
 # WebJar assets
-GET         /webjars/*file                                     controllers.WebJarAssets.at(file)
+GET         /webjars/*file                                controllers.WebJarAssets.at(file)
 
 # Map static resources from the /public folder to the /assets URL path
-GET         /assets/*file                                      controllers.Assets.at(path="/public", file)
+GET         /assets/*file                                 controllers.Assets.at(path="/public", file)
 
     

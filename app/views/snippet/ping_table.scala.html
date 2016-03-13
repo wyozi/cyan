@@ -70,11 +70,6 @@
     }
 
     $(document).ready(function() {
-        function extraContent() {
-            var divId =  "tmp-id-" + $.now();
-            var valueRoute = jsAdminRoutes.controllers.admin.Pings.showPingExtra($(this).data("ping-id"), $(this).data("pingextra-key"));
-            return fetchContents(valueRoute.url, divId);
-        }
         function backendContent() {
             var divId =  "tmp-id-" + $.now();
             var query = $(this).data("backend-query");
@@ -84,12 +79,6 @@
             return fetchContents(queryRoute.url, divId);
         }
 
-        $('a[data-pingextra-key]').popover({
-            html: true,
-            trigger: 'hover',
-            placement: 'bottom',
-            content: extraContent
-        });
         $('a[data-backend-query]').popover({
             html: true,
             trigger: 'hover',
