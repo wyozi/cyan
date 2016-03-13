@@ -54,7 +54,7 @@
         <tbody>
             @for(ping <- plpDAO.findRecentUserPings(prodLicense).await) {
                 <tr>
-                    <td>@ping.user</td>
+                    <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     <td>
                     @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {

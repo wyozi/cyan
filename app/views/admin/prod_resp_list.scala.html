@@ -35,7 +35,9 @@
                             </td>
                             <td>
                                 @pr.userName match {
-                                    case Some(user) => { @user }
+                                    case Some(user) => {
+                                        <a href="@controllers.admin.routes.Users.viewUser(user)">@user</a>
+                                    }
                                     case _ => {
                                         <i>Empty (matches all)</i>
                                     }
