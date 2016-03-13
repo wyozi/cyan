@@ -35,7 +35,7 @@
                             </td>
                             <td>
                                 @pr.userName match {
-                                    case Some(user) => { user }
+                                    case Some(user) => { @user }
                                     case _ => {
                                         <i>Empty (matches all)</i>
                                     }
