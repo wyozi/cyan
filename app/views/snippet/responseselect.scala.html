@@ -4,7 +4,7 @@
 @(selected: Int = -1)(implicit responsesDAO: ResponsesDAO)
 
 <select name="response" class="form-control">
-    <option value="null"
+    <option value=""
     @if(selected == -1) {
         selected="selected"
     }

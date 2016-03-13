@@ -11,6 +11,7 @@ import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by wyozi on 4.2.2016.
@@ -47,23 +48,32 @@ class Products @Inject() (implicit backend: Backend,
     } yield Ok(views.html.admin.prod_view(prod, devLicense, recentNewLicenses, recentPings))
   }
 
-  def configure(prodId: Int, configKey: String) = SecureAction.async { req =>
-    val fue = req.body.asFormUrlEncoded
 
+  import play.api.data.Forms._
+  val productResponseForm = Form("response" -> optional(number))
+  val productConfigForm = Form("value" -> text)
+
+  def configure(prodId: Int, configKey: String) = SecureAction.async { implicit request =>
     productsDAO.findById(prodId).flatMap {
       case Some(prod) =>
         val f = configKey match {
           case "unreg_response" => {
-            val response = fue.get("response").head match {
-              case "null" => Option.empty
-              case x => Some(x.toInt)
-            }
-            pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
+            productResponseForm.bindFromRequest().fold(
+              formWithErrors => Future.failed(new Exception("form error")),
+              response => {
+                pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
+              }
+            )
           }
 
           // assume it's a product config
           case key => {
-            productConfigDAO.upsertValue(prodId, configKey, fue.get("value").head)
+            productConfigForm.bindFromRequest().fold(
+              formWithErrors => Future.failed(new Exception("form error")),
+              value => {
+                productConfigDAO.upsertValue(prodId, configKey, value)
+              }
+            )
           }
         }
 

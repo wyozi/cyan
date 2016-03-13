@@ -4,9 +4,11 @@ import auth.Secured
 import com.google.inject.Inject
 import dao._
 import model.ProductLicense
+import play.api.data.Form
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by wyozi on 16.2.2016.
@@ -27,15 +29,19 @@ class ProductLicenses @Inject() ()
     }
   }
 
-  def setProductLicenseResponse(productId: Int, license: String) = SecureAction { req =>
-    val params = req.body.asFormUrlEncoded.get
 
-    val response = params.get("response").map(_.head.mkString).get match {
-      case "null" => Option.empty
-      case x => Some(x.toInt)
-    }
-
-    pingResponsesDAO.upsertExactPingResponse(Some(productId), Some(license), None, response)
-    Redirect(routes.ProductLicenses.licenseView(productId, license))
+  import play.api.data.Forms._
+  val licenseResponseForm = Form("response" -> optional(number))
+  def setProductLicenseResponse(productId: Int, license: String) = SecureAction.async { implicit request =>
+    licenseResponseForm.bindFromRequest().fold(
+      formWithErrors => Future.successful(BadRequest("Error: " + formWithErrors.toString)), // TODO improve msg
+      plResponse => {
+        pingResponsesDAO
+          .upsertExactPingResponse(Some(productId), Some(license), None, plResponse)
+          .map { x =>
+            Redirect(routes.ProductLicenses.licenseView(productId, license))
+          }
+      }
+    )
   }
 }
