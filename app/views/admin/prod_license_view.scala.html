@@ -48,20 +48,24 @@
             <tr>
                 <td>User</td>
                 <td>Last used</td>
-                <td>Extras (in latest ping)</td>
+                <td>Latest extras</td>
+                <td>Latest response</td>
             </tr>
         </thead>
         <tbody>
-            @for(ping <- plpDAO.findRecentUserPings(prodLicense).await) {
+            @for(ping :: extras :: response :: HNil <- plpDAO.findRecentUserPings(prodLicense).await.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: (p.responseId match { case Some(id) => responsesDAO.findById(id); case _ => Future.successful(None) }) :: HNil)).awaitAll) {
                 <tr>
                     <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     <td>
-                    @for(pe <- pingExtrasDAO.findExtras(ping.id).await) {
+                    @for(pe <- extras) {
                         <a class="btn btn-info btn-xs" role="button" data-toggle="popover" data-trigger="focus" data-ping-id="@ping.id" data-pingextra-key="@pe.key">
                         @pe.key
                         </a>
                     }
+                    </td>
+                    <td>
+                        @snippet.response(response)
                     </td>
                 </tr>
             }
