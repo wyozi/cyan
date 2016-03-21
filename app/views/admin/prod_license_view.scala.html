@@ -4,6 +4,7 @@
 @import dao.PingResponsesDAO
 @import dao.ProductsDAO
 @import util.FutureUtils._
+@import cyan.util.TwirlHelpers._
 @import dao.ResponsesDAO
 @import dao.ProdLicensePingDAO
 @import util.FutureUtils._
@@ -11,7 +12,6 @@
 @import dao.PingExtrasDAO
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@import util.TwirlUtils._
 @import dao.ProductConfigDAO
 @import dao.PingsDAO
 @(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)

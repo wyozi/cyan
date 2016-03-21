@@ -4,7 +4,7 @@
 @import model.Product
 @import org.joda.time.{LocalDate, LocalTime}
 @import util.FutureUtils._
-@import util.TwirlUtils._
+@import cyan.util.TwirlHelpers._
 
 @import scala.concurrent.ExecutionContext
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)

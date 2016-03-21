@@ -3,7 +3,7 @@
 @import dao.PingExtrasDAO
 @import dao.ResponsesDAO
 @import util.FutureUtils._
-@import util.TwirlUtils._
+@import cyan.util.TwirlHelpers._
 @import cyan.backend.Backend
 @import dao.ProductConfigDAO
 @(ip: String)(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
