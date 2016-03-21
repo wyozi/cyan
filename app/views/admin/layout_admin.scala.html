@@ -5,7 +5,7 @@
 @import util.FutureUtils._
 @(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@layout("Admin: " + subTitle) {
+@layout(subTitle) {
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">

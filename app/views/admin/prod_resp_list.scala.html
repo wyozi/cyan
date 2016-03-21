@@ -5,7 +5,7 @@
 @import scala.concurrent.ExecutionContext
 @(prod: model.Product)(implicit ex: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO)
 
-@layout_admin("product responses") {
+@layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Responses"))) {
     @prod_sidebar(prod)
 
     <div class="col-sm-10 main">

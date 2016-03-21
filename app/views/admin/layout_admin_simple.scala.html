@@ -1,7 +1,7 @@
 @import dao.ProductsDAO
 @(nav: Seq[Any] = Seq(), scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@layout_admin(nav.mkString(">"), scripts) {
+@layout_admin(_root_.views.snippet.nav.NavObjects.mkString((Seq('root) ++ nav).takeRight(2)), scripts) {
     <div class="col-sm-12 main">
         @snippet.breadcrumb(nav)
 

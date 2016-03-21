@@ -14,11 +14,13 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
-@layout_admin(prod.name) {
+@navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
+
+@layout_admin(_root_.views.snippet.nav.NavObjects.mkString(navSeq)) {
     @prod_sidebar(prod)
 
     <div class="col-sm-10 main">
-        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod))
+        @snippet.breadcrumb(navSeq)
 
         <div class="panel panel-default">
             <div class="panel-body">
