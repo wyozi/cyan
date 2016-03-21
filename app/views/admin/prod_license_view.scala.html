@@ -14,7 +14,8 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @import dao.ProductConfigDAO
 @import dao.PingsDAO
-@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO)
+@import cyan.backend.Backend
+@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO, backend: Backend)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, html"License <code>${prodLicense.license}</code>")) {
     <div class="panel panel-default">
@@ -55,7 +56,11 @@
         <tbody>
             @for(ping :: extras :: response :: HNil <- plpDAO.findRecentUserPings(prodLicense).await.map(p => hsequence(Future.successful(p) :: pingExtrasDAO.findExtras(p.id) :: (p.responseId match { case Some(id) => responsesDAO.findById(id); case _ => Future.successful(None) }) :: HNil)).awaitAll) {
                 <tr>
-                    <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
+                    <td>
+                        @Option(backend).map(be => be.transformUserHtml(ping.user)(_: Html)).getOrElse((x: Html) => x) {
+                            <a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a>
+                        }
+                    </td>
                     <td>@snippet.datetime(ping.date)</td>
                     <td>@snippet.pingextras(extras)(prodLicense.prod)</td>
                     <td>@snippet.response(response)</td>

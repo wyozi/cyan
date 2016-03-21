@@ -40,7 +40,11 @@
                             }
                         </td>
                     }
-                    <td><a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a></td>
+                    <td>
+                        @Option(backend).map(be => be.transformUserHtml(ping.user)(_: Html)).getOrElse((x: Html) => x) {
+                            <a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a>
+                        }
+                    </td>
                     <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
                     <td>@snippet.datetime(ping.date)</td>
                     @if(showExtras && pingExtrasDAO != null) {
@@ -58,32 +62,4 @@
 </div>
 
 <script type="text/javascript" src="@controllers.admin.routes.Main.javascriptRoutes"></script>
-<script type="text/javascript">
-    function fetchContents(link, divId) {
-        $.ajax({
-            url: link,
-            success: function(response) {
-                $('#' + divId).text(response);
-            }
-        });
-        return '<div id="'+ divId +'">Loading...</div>';
-    }
-
-    $(document).ready(function() {
-        function backendContent() {
-            var divId =  "tmp-id-" + $.now();
-            var query = $(this).data("backend-query");
-            var productId = $(this).data("backend-productid");
-            var license = $(this).data("backend-license");
-            var queryRoute = jsAdminRoutes.controllers.admin.BackendController.view(query, productId, license);
-            return fetchContents(queryRoute.url, divId);
-        }
-
-        $('a[data-backend-query]').popover({
-            html: true,
-            trigger: 'hover',
-            placement: 'bottom',
-            content: backendContent
-        });
-    });
-</script>
+<script type="text/javascript" src="@routes.Assets.at("javascripts/pingtable.js")"></script>
