@@ -1,4 +1,14 @@
+sudo: false # use containers
+
+# cache deps
+cache:
+  directories:
+    - $HOME/.ivy2/cache
+    - $HOME/.sbt/boot/
+
 language: scala
+
 jdk: oraclejdk8
+
 scala:
    - 2.11.7
