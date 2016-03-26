@@ -21,6 +21,12 @@ By default Cyan places the H2 database files in your home directory. If you'd li
 If you'd like to use postgres instead, add this to run options: ```-Dslick.dbs.default.driver=slick.driver.PostgresDriver$ -Dslick.dbs.default.db.driver=org.postgresql.Driver -Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan -Dslick.dbs.default.db.user=cyanuser -Dslick.dbs.default.db.password=cyanpass```
 where `cyan` is database name, `cyanuser` is database user and `cyanpass` is database password
 
+#### Submitting a ping
+
+Cyan accepts pings as POST requests at `/ping`. Username, license and product should be passed as POST parameters `user`, `license` and `prod` respectively. If you want to pass ping extras, they should be passed in POST parameters as well but prefixed by `x_`. For example ping extra `version` should be named `x_version` in POST params.
+
+Here's an example cURL command that submits a ping with an extra: `curl --data "user=Mike&license=XYZ123&prod=SomeProduct&x_version=1.0.1" 0.0.0.0:9000/ping`.
+
 ### Terminology briefly
 
 __Ping__ = a HTTP request sent from the application to Cyan server which usually contains license id, user id and the product id.
