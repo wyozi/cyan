@@ -2,6 +2,7 @@ package controllers.admin
 
 import auth.Secured
 import com.google.inject.Inject
+import cyan.backend.Backend
 import dao.{PingExtrasDAO, PingsDAO, ProductsDAO, ResponsesDAO}
 import play.api.Play.current
 import play.api.data.Form
@@ -14,7 +15,7 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Responses @Inject() (implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO) extends Controller with Secured {
+class Responses @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO) extends Controller with Secured {
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(
