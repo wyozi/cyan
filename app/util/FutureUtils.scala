@@ -12,7 +12,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by wyozi on 8.2.2016.
   */
 object FutureUtils extends App {
-  val FutureTimeout = 10.minutes
+  val FutureTimeout = 1000.seconds
 
   implicit class FutureExt[T](future: Future[T]) {
     def await(): T = Await.result(future, FutureTimeout)
