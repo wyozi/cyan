@@ -12,11 +12,13 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by wyozi on 8.2.2016.
   */
 object FutureUtils extends App {
+  val FutureTimeout = 10.minutes
+
   implicit class FutureExt[T](future: Future[T]) {
-    def await(): T = Await.result(future, 10.seconds)
+    def await(): T = Await.result(future, FutureTimeout)
   }
   implicit class CollectionFutureExt[T](future: Seq[Future[T]]) {
-    def awaitAll(): Seq[T] = Await.result(Future.sequence(future), 10.seconds)
+    def awaitAll(): Seq[T] = Await.result(Future.sequence(future), FutureTimeout)
   }
 
   trait IsHListOfFutures[In <: HList, Out <:HList ] {
