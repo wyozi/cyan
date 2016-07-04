@@ -59,6 +59,23 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     )
 
   /**
+    * Returns one (the most recent) ping per product with given license.
+    */
+  def findMostRecentPingsWithLicense(license: model.License): Future[Seq[Ping]] = {
+    db.run(
+        pingsDAO.Pings
+          .filter(p => p.license === license)
+          .groupBy(_.product)
+          .map { case (prod, pings) => pings.map(_.id).max }
+      join
+        pingsDAO.Pings
+        on (_ === _.id)
+      map { case (id, ping) => ping }
+      result
+    )
+  }
+
+  /**
     * Returns a list of pings in product. Ordered by first (oldest) ping timestamp descendingly. One per license.
     */
   def findRecentNewLicenses(prod: Product, limit: Int, ignoredLicense: Option[String]): Future[Seq[Ping]] = {

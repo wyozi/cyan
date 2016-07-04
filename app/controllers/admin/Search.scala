@@ -24,10 +24,7 @@ class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, produ
             .findRecentWithLicense(query, 1)
             .flatMap {
               case x if x.nonEmpty => {
-                productsDAO.findByShortName(x.head.product)
-                  .map {
-                    case Some(prod) => Seq(Redirect(controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, x.head.license)))
-                  }
+                Future.successful(Seq(Redirect(controllers.admin.routes.GlobalLicenses.viewLicense(query))))
               }
               case _ => Future.successful(Seq())
             }

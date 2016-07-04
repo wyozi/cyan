@@ -1,0 +1,47 @@
+
+@import cyan.backend.Backend
+@import dao.PingsDAO
+@import util.FutureUtils._
+@import cyan.util.TwirlHelpers._
+@import scala.concurrent.Future
+@import shapeless._
+@import dao.ProductsDAO
+@import dao.PingExtrasDAO
+@import dao.ResponsesDAO
+@import dao.ProdLicensePingDAO
+@import scala.concurrent.ExecutionContext
+@import dao.ProductConfigDAO
+@(license: model.License)(implicit ex: ExecutionContext, backend: Backend, pingsDAO: PingsDAO, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, productConfigDAO: ProductConfigDAO, plpDAO: ProdLicensePingDAO)
+
+@layout_admin_simple(Seq("Licenses", html"<code>$license</code>")) {
+    <h3>Products used with this license</h3>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <td>Product</td>
+                    <td>Last used</td>
+                </tr>
+            </thead>
+            <tbody>
+            @for(ping :: prod :: HNil <- plpDAO.findMostRecentPingsWithLicense(license).await.map(p => hsequence(Future.successful(p) :: productsDAO.findByShortName(p.product).map(_.get) :: HNil)).awaitAll) {
+                <tr>
+                    <td>
+                    @backend.transformProductHtml(prod.backend) {
+                        <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, license)">@prod.name</a>
+                    }
+                    </td>
+                    <td>
+                        @snippet.datetime(ping.date)
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+
+    <h3>Recent pings</h3>
+
+    @snippet.ping_table(pingsDAO.findRecentWithLicense(license, 15).await, showProduct = true)
+}

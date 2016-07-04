@@ -30,6 +30,8 @@ POST        /admin/products/:id/responses                 controllers.admin.prod
 GET         /admin/ips                                    controllers.admin.IPs.viewIp(ip)
 GET         /admin/users                                  controllers.admin.Users.viewUser(user)
 
+GET         /admin/licenses/:id                           controllers.admin.GlobalLicenses.viewLicense(id)
+
 GET         /admin/responses                              controllers.admin.Responses.list
 POST        /admin/responses                              controllers.admin.Responses.create
 GET         /admin/responses/:id                          controllers.admin.Responses.view(id: Int)
