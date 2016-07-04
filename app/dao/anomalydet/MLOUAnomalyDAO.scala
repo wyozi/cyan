@@ -13,7 +13,7 @@ class MLOUAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPr
 
   import driver.api._
 
-  def findIpLicenseCount(threshold: Int): Future[Seq[(model.Product, String, Int)]] = {
+  def findUserLicenseCount(threshold: Int): Future[Seq[(model.Product, String, Int)]] = {
     db.run(
       pingsDAO.Pings
         .groupBy(pi => (pi.product, pi.userName))
