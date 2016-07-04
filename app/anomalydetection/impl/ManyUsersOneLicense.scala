@@ -13,7 +13,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by wyozi on 3.2.2016.
   */
 class ManyUsersOneLicense @Inject() (muolLAnomalyDAO: MUOLAnomalyDAO) extends AnomalyDetector {
-  val USER_PER_LICENSE_THRESHOLD = 3
+  val USER_PER_LICENSE_THRESHOLD = 5
   val DAY_THRESHOLD = 2
 
   override def name: String = "Many users on license"
