@@ -21,11 +21,13 @@ POST        /admin/products/:id/config                    controllers.admin.prod
 GET         /admin/products/:id/licences                  controllers.admin.prod.ProductLicenses.licenseView(id: Int, lid: String)
 POST        /admin/products/:pid/licenses/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
 
-GET         /admin/products/:id/extras                    controllers.admin.prod.ProductPingExtras.list(id: Int)
-GET         /admin/products/:id/extras/keys               controllers.admin.prod.ProductPingExtras.view(id: Int, key)
+GET         /admin/products/:id/users                     controllers.admin.prod.ProductUsers.list(id: Int)
 
 GET         /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.list(id: Int)
 POST        /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.insert(id: Int)
+
+GET         /admin/products/:id/extras                    controllers.admin.prod.ProductPingExtras.list(id: Int)
+GET         /admin/products/:id/extras/keys               controllers.admin.prod.ProductPingExtras.view(id: Int, key)
 
 GET         /admin/ips                                    controllers.admin.IPs.viewIp(ip)
 GET         /admin/users                                  controllers.admin.Users.viewUser(user)

@@ -41,9 +41,7 @@
                         </td>
                     }
                     <td>
-                        @Option(backend).map(be => be.transformUserHtml(ping.user)(_: Html)).getOrElse((x: Html) => x) {
-                            <a href="@controllers.admin.routes.Users.viewUser(ping.user)">@ping.user</a>
-                        }
+                        @snippet.pinguser(ping.user)
                     </td>
                     <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
                     <td>@snippet.datetime(ping.date)</td>

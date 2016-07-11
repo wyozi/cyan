@@ -1,0 +1,35 @@
+@import dao._
+@import util.FutureUtils._
+@import shapeless._
+@import scala.concurrent.Future
+@import scala.concurrent.ExecutionContext
+@import cyan.backend.Backend
+@(prod: model.Product, users: Seq[String])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO)
+
+@layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Users"))) {
+    @prod_sidebar(prod)
+
+    <div class="col-sm-10 main">
+        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Users"))
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>User</td>
+                    </tr>
+                </thead>
+                <tbody>
+                @for(user <- users) {
+                    <tr>
+                        <td>@snippet.pinguser(user)</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="@controllers.admin.routes.Main.javascriptRoutes"></script>
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/pingtable.js")"></script>
+}

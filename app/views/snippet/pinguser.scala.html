@@ -1,0 +1,6 @@
+@import cyan.backend.Backend
+@(user: String)(implicit backend: Backend = null)
+
+@Option(backend).map(be => be.transformUserHtml(user)(_: Html)).getOrElse((x: Html) => x) {
+    <a href="@controllers.admin.routes.Users.viewUser(user)">@user</a>
+}
