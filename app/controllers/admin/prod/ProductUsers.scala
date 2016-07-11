@@ -22,13 +22,6 @@ class ProductUsers @Inject() ()
       prod <- productsDAO.findById(productId).map(_.get)
       users <- usersDAO.findDistinctUsersOf(prod)
     } yield Ok(views.html.admin.prod_user_list(prod, users))
-    /*
-    productsDAO.findById(productId).flatMap {
-      case Some(prod) =>
-        usersDAO.findDistinctUsersOf(prod).map(s => (prod, s))
-    }.map { (prod, users) =>
-      Ok(views.html.admin.prod_user_list(prod, users))
-    }*/
   }
 
   private def buildCSV(users: Seq[String]) = "User\n" + users.mkString("\n")
