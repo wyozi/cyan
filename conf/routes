@@ -22,6 +22,7 @@ GET         /admin/products/:id/licences                  controllers.admin.prod
 POST        /admin/products/:pid/licenses/response        controllers.admin.prod.ProductLicenses.setProductLicenseResponse(pid: Int, lid: String)
 
 GET         /admin/products/:id/users                     controllers.admin.prod.ProductUsers.list(id: Int)
+GET         /admin/products/:id/users/export              controllers.admin.prod.ProductUsers.export(id: Int, format)
 
 GET         /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.list(id: Int)
 POST        /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.insert(id: Int)

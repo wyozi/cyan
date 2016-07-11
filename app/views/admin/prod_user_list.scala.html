@@ -10,7 +10,14 @@
     @prod_sidebar(prod)
 
     <div class="col-sm-10 main">
-        @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Users"))
+        <div class="row">
+            <div class="col-sm-10">
+            @snippet.breadcrumb(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, "Users"))
+            </div>
+            <div class="col-sm-2">
+                <a class="btn btn-default" href="@controllers.admin.prod.routes.ProductUsers.export(prod.id, "csv")" role="button">Export CSV</a>
+            </div>
+        </div>
 
         <div class="table-responsive">
             <table class="table">

@@ -30,4 +30,13 @@ class ProductUsers @Inject() ()
       Ok(views.html.admin.prod_user_list(prod, users))
     }*/
   }
+
+  private def buildCSV(users: Seq[String]) = "User\n" + users.mkString("\n")
+
+  def export(productId: Int, format: String) = SecureAction.async {
+    for {
+      prod <- productsDAO.findById(productId).map(_.get)
+      users <- usersDAO.findDistinctUsersOf(prod)
+    } yield Ok(buildCSV(users))
+  }
 }
