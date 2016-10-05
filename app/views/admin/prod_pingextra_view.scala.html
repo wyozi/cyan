@@ -9,14 +9,14 @@
 @import scala.concurrent.ExecutionContext
 @(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
-@scripts = {
+@scripts(data1: Seq[(Option[String], Seq[(LocalDate, Int)])], data7: Seq[(Option[String], Seq[(LocalDate, Int)])]) = {
 
     <script type="application/javascript">
         var valueDistDayCtx = document.getElementById("chart_valueDistDay").getContext("2d");
         var valueDistDayChart = new Chart(valueDistDayCtx, {
             type: "pie",
             data: {
-                @defining(pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await) { data =>
+                @defining(data1) { data =>
                     labels: [
                         @for((value, daycount) <- data) {
                             @value match {
@@ -53,7 +53,7 @@
                     }
                 ],
                 datasets: [
-                    @for(((value, daycounts), index) <- pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7), prod.queryDevLicense().await).await.zipWithIndex) {
+                    @for(((value, daycounts), index) <- data7.zipWithIndex) {
                         {
                             label: "@value match {
                                 case Some(x) => {@x}
@@ -75,16 +75,53 @@
     </script>
 }
 
-@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts) {
-    <div class="row">
-        <div class="col-xs-12 col-md-6">
-            <h3>Value distribution in past 24 hours (per user)</h3>
+@defining(
+    (
+            pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await,
+            pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7), prod.queryDevLicense().await).await
+    )
+) { tuple =>
+    @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts(tuple._1, tuple._2)) {
+        <div class="row">
+            <div class="col-xs-12 col-md-6">
+                <h3>Value distribution in past 24 hours (per user)</h3>
 
-            <canvas id="chart_valueDistDay" width="400" height="300"></canvas>
+                <canvas id="chart_valueDistDay" width="400" height="300"></canvas>
+            </div>
+            <div class="col-xs-12 col-md-6">
+                <h3>Value distribution in past 7 days (per user)</h3>
+                <canvas id="chart_valueDistWeek" width="400" height="300"></canvas>
+            </div>
         </div>
-        <div class="col-xs-12 col-md-6">
-            <h3>Value distribution in past 7 days (per user)</h3>
-            <canvas id="chart_valueDistWeek" width="400" height="300"></canvas>
+        <div class="row">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <td>Value</td>
+                            <td>Count (1 day)</td>
+                            <td>Count (7 days)</td>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @defining(tuple._2.toMap) { day7valueToData =>
+                        @for((data, onedayPingCount) <- tuple._1.map(r => (r, r._2.map(_._2).sum)).sortBy(n => -n._2)) {
+                            <tr>
+                                <td>
+                                    <a href="@{controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, Some(data._1.getOrElse("")))}">@data._1.getOrElse(html"<i>Empty</i>")</a>
+                                </td>
+                                <td>
+                                @onedayPingCount
+                                </td>
+                                <td>
+                                @{day7valueToData.get(data._1).map(_.map(_._2).sum).getOrElse("-")}
+                                </td>
+                            </tr>
+                        }
+                    }
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
+    }
 }

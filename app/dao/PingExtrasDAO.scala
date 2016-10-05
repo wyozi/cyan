@@ -31,6 +31,10 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     qb.sqlBuilder += ")"
   }
 
+  /**
+    * Finds the count of distinct users on different days that pinged this product.
+    * The returned value is sequence of (PingExtraValue, Seq[(Day, CountOfDistinctUserPings)])
+    */
   def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate, ignoredLicense: Option[String]): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
     db.run(
       (
