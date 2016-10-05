@@ -13,7 +13,7 @@
 }
 
 <a
-@if(product != null) { href="@controllers.admin.prod.routes.ProductPingExtras.view(product.id, pingExtra.key)" }
+@if(product != null) { href="@controllers.admin.prod.routes.ProductPingExtras.view(product.id, pingExtra.key, Option(pingExtra.value))" }
 class="btn btn-info btn-xs pingextra" title="@pingExtra.key" style="background-color: @colorFromHash(pingExtra.key.hashCode); color: black" data-toggle="tooltip" data-placement="top">
 @pingExtra.value
 </a>

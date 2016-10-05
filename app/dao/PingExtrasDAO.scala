@@ -3,7 +3,7 @@ package dao
 import java.sql.Timestamp
 
 import com.google.inject.{Inject, Singleton}
-import model.PingExtra
+import model.{PingExtra, ProductLicense}
 import org.joda.time.LocalDate
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.driver.JdbcProfile
@@ -69,6 +69,30 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       map { case (key, rows) => (key, rows.length) }
       result
     )
+
+  def findProductLicensesByExtraKeyValue(prod: model.Product, key: String, value: String): Future[Seq[ProductLicense]] =
+    db.run(
+        pingsDAO.Pings
+          .filter(_.product === prod.shortName)
+        join
+          PingExtras
+              .filter(r => r.key === key && r.value === value)
+        on(_.id === _.pingId)
+        map(_._1.license)
+        distinctOn(x => x)
+        result
+          /*
+        pingsDAO.Pings
+          .filter(_.userName === user)
+          .groupBy(r => (r.product, r.license))
+          .map { case ((p, l), _) => (p, l) }
+          join
+          productsDAO.Products
+          on (_._1 === _.shortName)
+        )
+        .map { case ((p, l), prod) => (prod, l) }
+        .result*/
+    ) map(_.map(l => ProductLicense(prod, l)))
 
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =
     db.run(PingExtras.filter(_.pingId === pingId).result)
