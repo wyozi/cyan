@@ -13,6 +13,7 @@ object NavObjects {
     case prod: model.Product => (html"${prod.name}", Some(controllers.admin.prod.routes.Products.view(prod.id)))
     case resp: model.Response => (html"""${resp.name}""", Some(controllers.admin.routes.Responses.view(resp.id)))
     case (name: String, path: Call) => (html"""$name""", Some(path))
+    case (html: Html, path: Call) => (html, Some(path))
     case 'root => (Html("Cyan"), Some(controllers.admin.routes.Main.index()))
     case h: Html => (h, None)
     case x => (html"""$x""", None)

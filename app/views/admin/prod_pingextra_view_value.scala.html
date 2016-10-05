@@ -10,7 +10,7 @@
 @import cyan.backend.Backend
 @(prod: Product, pingExtraKey: String, pingExtraValue: String)(implicit ec: ExecutionContext, backend: Backend, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO, productsDAO: ProductsDAO)
 
-@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>", html"<code>${pingExtraValue}</code>")) {
+@layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), (html"Key <code>${pingExtraKey}</code>", controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, None)), html"<code>${pingExtraValue}</code>")) {
     <h3>Associated licenses</h3>
 
     <div class="table-responsive">
