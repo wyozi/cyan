@@ -13,6 +13,9 @@
 }
 
 @layout_admin_simple(Seq("Anomaly overview")) {
+    <p id="loadStatus">
+
+    </p>
     <div class="table-responsive">
         <table class="table">
             <thead>
@@ -22,21 +25,77 @@
                     <td>Related links</td>
                 </tr>
             </thead>
-            <tbody>
-            @for(det <- detectors) {
-                @for(a <- det.detectAnomalies().await) {
-                    <tr class="@severityBootstrapClass(a.severity)">
-                        <td>@a.severity</td>
-                        <td>@a.toShortString</td>
-                        <td>
-                        @for((name, targ) <- a.relatedLinks) {
-                            <a href="@targ" class="btn btn-info">@name</a>
-                        }
-                        </td>
-                    </tr>
-                }
-            }
+            <tbody id="anomalies">
             </tbody>
         </table>
     </div>
+
+    <script type="application/javascript">
+        var anomalies = document.getElementById("anomalies");
+
+        var anomalyPaths = [
+            @for(det <- detectors) {
+                "@controllers.admin.routes.Anomalies.fetch(det.id)",
+            }
+        ];
+        var anomalyLoadStatuses = {};
+
+        function updateLoadStatuses() {
+            var stillLoading = [];
+
+            for (var al in anomalyLoadStatuses) {
+                if (anomalyLoadStatuses[al]) {
+                    stillLoading.push(al);
+                }
+            }
+
+            document.getElementById("loadStatus").innerText = stillLoading.length > 0 ? ("Loading anomalies: " + stillLoading.join(", ")) : "";
+        }
+
+        function createTd(text) {
+            var td = document.createElement("td");
+            td.innerText = text;
+            return td;
+        }
+
+        anomalyPaths.forEach(function(path) {
+            var req = new XMLHttpRequest();
+            anomalyLoadStatuses[path] = true;
+
+            req.onreadystatechange = function() {
+                if (req.readyState == 4 && req.status == 200) {
+                    var parsed = JSON.parse(req.responseText);
+
+                    if (parsed.status == "ok") {
+                        parsed.anomalies.forEach(function(anomaly) {
+                            var row = document.createElement("tr");
+
+                            row.appendChild(createTd(anomaly.severity));
+                            row.appendChild(createTd(anomaly.desc));
+
+                            var links = document.createElement("td");
+                            anomaly.links.forEach(function(link) {
+                                var a = document.createElement("a");
+                                a.innerText = link.name;
+                                a.setAttribute("href", link.link);
+                                a.setAttribute("class", "btn btn-info");
+                                links.appendChild(a);
+                            });
+                            row.appendChild(links);
+
+                            anomalies.appendChild(row);
+                        });
+                    }
+
+                    anomalyLoadStatuses[path] = false;
+                    updateLoadStatuses();
+                }
+            };
+            req.open("GET", path, true);
+            req.send();
+        });
+
+        updateLoadStatuses();
+
+    </script>
 }

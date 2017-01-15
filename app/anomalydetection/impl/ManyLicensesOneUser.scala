@@ -13,6 +13,8 @@ class ManyLicensesOneUser @Inject() (anomalyDAO: MLOUAnomalyDAO) extends Anomaly
 
   override def name: String = "Many licenses by one user"
 
+  override def id: String = "mlou"
+
   override def detectAnomalies(): Future[List[Anomaly]] = {
     anomalyDAO.findUserLicenseCount(LICENSE_PER_USER_THRESHOLD).map(pic => pic.map {
       case (prod, user, licenseCount) => new MLOUAnomaly(prod, user, licenseCount)

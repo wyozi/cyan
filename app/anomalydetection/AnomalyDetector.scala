@@ -7,5 +7,11 @@ import scala.concurrent.Future
   */
 abstract class AnomalyDetector {
   def name: String
+
+  /**
+    * @return identifier of this anomaly detector. Must be unique
+    */
+  def id: String
+
   def detectAnomalies(): Future[List[Anomaly]]
 }

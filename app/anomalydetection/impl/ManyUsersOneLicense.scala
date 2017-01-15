@@ -18,6 +18,8 @@ class ManyUsersOneLicense @Inject() (muolLAnomalyDAO: MUOLAnomalyDAO) extends An
 
   override def name: String = "Many users on license"
 
+  override def id: String = "muol"
+
   override def detectAnomalies(): Future[List[Anomaly]] = {
     muolLAnomalyDAO.findDistinctUserGroups(USER_PER_LICENSE_THRESHOLD, LocalDateTime.now().minusDays(DAY_THRESHOLD)).map(mars => mars.map {
       case (prod, license, userCount) => new MUOLAnomaly(prod.name, prod.id, license, userCount)

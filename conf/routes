@@ -41,6 +41,7 @@ GET         /admin/responses/:id                          controllers.admin.Resp
 POST        /admin/responses/:id/body                     controllers.admin.Responses.editBody(id: Int)
 
 GET         /admin/anomalies                              controllers.admin.Anomalies.overview
+GET         /admin/anomalies/:id                          controllers.admin.Anomalies.fetch(id)
 
 # WebJar assets
 GET         /webjars/*file                                controllers.WebJarAssets.at(file)
