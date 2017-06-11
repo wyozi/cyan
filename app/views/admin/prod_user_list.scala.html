@@ -4,7 +4,7 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
-@(prod: model.Product, users: Seq[String])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO)
+@(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO)
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Users"))) {
     @prod_sidebar(prod)
@@ -19,24 +19,37 @@
             </div>
         </div>
 
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td>User</td>
-                    </tr>
-                </thead>
-                <tbody>
-                @for(user <- users) {
-                    <tr>
-                        <td>@snippet.pinguser(user)</td>
-                    </tr>
+        <div class="row form-inline">
+            <label for="users-since">Displaying users that have pinged within the last </label>
+            <select class="form-control" id="users-since">
+                @for((name, hours) <- List(
+                    ("hour", 1),
+                    ("6 hours", 6),
+                    ("24 hours", 24),
+                    ("48 hours", 48),
+                    ("7 days", 168),
+                    ("month", 720),
+                    ("6 months", 4320),
+                    ("year", 8640)
+                )) {
+                    <option value="@hours"
+                        @if(hoursAgo == hours) {
+                            selected="selected"
+                        }
+                    >@name</option>
                 }
-                </tbody>
-            </table>
+            </select>
         </div>
+
+        @snippet.ping_table(userPings, showProduct = false, showLicense = false, showExtras = false, showResponse = false)
     </div>
 
+    <script type="text/javascript">
+        var usersSince = document.getElementById("users-since");
+        usersSince.onchange = function() {
+            window.location = jsAdminRoutes.controllers.admin.prod.ProductUsers.list(@prod.id, parseInt(this.value)).url;
+        }
+    </script>
     <script type="text/javascript" src="@controllers.admin.routes.Main.javascriptRoutes"></script>
     <script type="text/javascript" src="@routes.Assets.at("javascripts/pingtable.js")"></script>
 }

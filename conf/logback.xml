@@ -27,6 +27,9 @@
 
     <logger name="play" level="INFO" />
     <logger name="application" level="INFO" />
+    <logger name="slick" level="INFO" />
+    <logger name="slick.jdbc" level="DEBUG" />
+
 
     <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
 

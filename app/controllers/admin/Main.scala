@@ -15,7 +15,8 @@ class Main @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, produ
   def javascriptRoutes = SecureAction { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsAdminRoutes")(
-        controllers.admin.routes.javascript.BackendController.view
+        controllers.admin.routes.javascript.BackendController.view,
+        controllers.admin.prod.routes.javascript.ProductUsers.list
       )
     ).as("text/javascript")
   }

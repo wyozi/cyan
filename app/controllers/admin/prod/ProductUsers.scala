@@ -1,9 +1,14 @@
 package controllers.admin.prod
 
+import java.sql.Timestamp
+import java.time.Instant
+import java.time.temporal.ChronoUnit
+
 import auth.Secured
 import com.google.inject.Inject
 import cyan.backend.Backend
 import dao.{ProductsDAO, _}
+import model.Ping
 import play.api.mvc.Controller
 
 import scala.concurrent.ExecutionContext
@@ -17,14 +22,17 @@ class ProductUsers @Inject() ()
     pingResponsesDAO: PingResponsesDAO,
     usersDAO: UsersDAO) extends Controller with Secured {
 
-  def list(productId: Int) = SecureAction.async {
+  def list(productId: Int, withinHours: Option[Long] = None) = SecureAction.async {
+    val hours = withinHours.getOrElse(24L)
+    val hoursAgo = Timestamp.from(Instant.now().minus(hours, ChronoUnit.HOURS))
+
     for {
       prod <- productsDAO.findById(productId).map(_.get)
-      users <- usersDAO.findDistinctUsersOf(prod)
-    } yield Ok(views.html.admin.prod_user_list(prod, users))
+      users <- usersDAO.findDistinctUsersOf(prod, Some(hoursAgo))
+    } yield Ok(views.html.admin.prod_user_list(prod, hours, users))
   }
 
-  private def buildCSV(users: Seq[String]) = "User\n" + users.mkString("\n")
+  private def buildCSV(users: Seq[Ping]) = "User\n" + users.map(_.user).mkString("\n")
 
   def export(productId: Int, format: String) = SecureAction.async {
     for {
@@ -32,4 +40,5 @@ class ProductUsers @Inject() ()
       users <- usersDAO.findDistinctUsersOf(prod)
     } yield Ok(buildCSV(users))
   }
+
 }
