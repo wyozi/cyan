@@ -1,12 +1,13 @@
 package filters.impl
 
+import akka.stream.Materializer
 import com.google.inject.Inject
 import play.api.Logger
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LoggingFilter @Inject() (implicit val ec: ExecutionContext) extends Filter {
+class LoggingFilter @Inject() (implicit val mat: Materializer, val ec: ExecutionContext) extends Filter {
 
   def apply(nextFilter: RequestHeader => Future[Result])
     (requestHeader: RequestHeader): Future[Result] = {
