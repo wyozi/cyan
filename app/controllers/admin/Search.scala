@@ -4,11 +4,11 @@ import auth.Secured
 import com.google.inject.Inject
 import dao._
 import play.api.data.Form
-import play.api.mvc.Controller
+import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO) extends Controller with Secured {
+class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends Controller with Secured {
   import cyan.util.TwirlHelpers._
   import play.api.data.Forms._
   val queryForm = Form("query" -> text)

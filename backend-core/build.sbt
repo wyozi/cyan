@@ -6,5 +6,5 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq(
   "com.google.inject" % "guice" % "4.0",
-  "com.typesafe.play" %% "twirl-api" % "1.1.1"
+  "com.typesafe.play" %% "twirl-api" % "1.3.2"
 )

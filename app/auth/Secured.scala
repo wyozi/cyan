@@ -1,14 +1,16 @@
 package auth
 
+import javax.inject.Inject
+
 import play.api.Play
 import play.api.mvc._
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by wyozi on 3.2.2016.
   */
-trait Secured { self: Results =>
+trait Secured {
 
   def isAuthorized(req: RequestHeader): Boolean = req.session.get("loggedIn") match {
     case Some("true") => true
@@ -26,9 +28,7 @@ trait Secured { self: Results =>
     case _ => false
   }
 
-  import play.api.libs.concurrent.Execution.Implicits._
-
-  object SecureAction extends ActionBuilder[Request] {
+  class SecureAction @Inject() (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends ActionBuilderImpl(parser) {
     override def invokeBlock[A](req: Request[A], block: (Request[A]) => Future[Result]): Future[Result] = {
       if (isAuthorized(req)) {
         block(req)
@@ -42,9 +42,17 @@ trait Secured { self: Results =>
           }
         } match {
           case Some(_) => block(req).map(res => withAuthorization(res))
-          case _ => Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Secured Area""""))
+          case _ => Future.successful(Results.Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Secured Area""""))
         }
       }
     }
   }
+  object SecureAction {
+    def apply(block: (Request[AnyContent]) => Result)(implicit ec: ExecutionContext, parser: BodyParsers.Default) = new SecureAction().apply(block)
+    def apply(block:  => Result)(implicit ec: ExecutionContext, parser: BodyParsers.Default) = new SecureAction().apply(_ => block)
+
+    def async(block: (Request[AnyContent]) => Future[Result])(implicit ec: ExecutionContext, parser: BodyParsers.Default) = new SecureAction().async(block)
+    def async(block: => Future[Result])(implicit ec: ExecutionContext, parser: BodyParsers.Default) = new SecureAction().async(_ => block)
+  }
+
 }

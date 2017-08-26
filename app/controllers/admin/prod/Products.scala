@@ -5,10 +5,9 @@ import javax.inject.Inject
 import auth.Secured
 import cyan.backend.Backend
 import dao._
-import play.api.Play.current
 import play.api.data.Form
-import play.api.i18n.Messages.Implicits._
-import play.api.mvc.Controller
+import play.api.i18n.I18nSupport
+import play.api.mvc.{BaseController, BodyParsers, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,14 +15,15 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Products @Inject() (implicit backend: Backend,
+class Products @Inject()(val controllerComponents: ControllerComponents) (implicit backend: Backend,
   responsesDAO: ResponsesDAO,
   pingResponsesDAO: PingResponsesDAO,
   pingsDAO: PingsDAO,
   productsDAO: ProductsDAO,
   productConfigDAO: ProductConfigDAO,
   plpDAO: ProdLicensePingDAO,
-  pingExtrasDAO: PingExtrasDAO) extends Controller with Secured {
+  parser: BodyParsers.Default,
+  pingExtrasDAO: PingExtrasDAO) extends BaseController with Secured with I18nSupport {
   import play.api.data.Forms._
   val productForm = Form(
     tuple(
@@ -32,7 +32,7 @@ class Products @Inject() (implicit backend: Backend,
     )
   )
 
-  def list = SecureAction.async {
+  def list = SecureAction.async { implicit request =>
     productsDAO.getAll().map(prods => Ok(views.html.admin.prods(prods, productForm)))
   }
 

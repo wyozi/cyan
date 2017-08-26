@@ -6,7 +6,7 @@ import cyan.backend.Backend
 import dao._
 import model.ProductLicense
 import play.api.data.Form
-import play.api.mvc.Controller
+import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -22,6 +22,7 @@ class ProductLicenses @Inject() ()
     pingExtrasDAO: PingExtrasDAO,
     pingsDAO: PingsDAO,
     plpDAO: ProdLicensePingDAO,
+    parser: BodyParsers.Default,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
   def licenseView(prodId: Int, licenseId: String) = SecureAction.async {

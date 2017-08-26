@@ -4,7 +4,7 @@ import auth.Secured
 import com.google.inject.Inject
 import cyan.backend.Backend
 import dao._
-import play.api.mvc.Controller
+import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -18,6 +18,7 @@ class ProductPingExtras @Inject() ()
     plpDAO: ProdLicensePingDAO,
     productConfigDAO: ProductConfigDAO,
     pingExtrasDAO: PingExtrasDAO,
+    parser: BodyParsers.Default,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
   def list(prodId: Int) = SecureAction.async {

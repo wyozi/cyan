@@ -27,13 +27,12 @@
 
     <logger name="play" level="INFO" />
     <logger name="application" level="INFO" />
-    <logger name="slick" level="INFO" />
-    <logger name="slick.jdbc" level="DEBUG" />
-
+    <logger name="slick.jdbc" level="WARN"/>
 
     <logger name="com.gargoylesoftware.htmlunit.javascript" level="OFF" />
+    <logger name="com.github.koraktor.steamcondenser" level="WARN" />
 
-    <root level="WARN">
+    <root level="INFO">
         <appender-ref ref="ASYNCFILE" />
         <appender-ref ref="ASYNCSTDOUT" />
     </root>

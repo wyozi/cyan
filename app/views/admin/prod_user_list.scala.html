@@ -4,7 +4,7 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
-@(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO)
+@(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Users"))) {
     @prod_sidebar(prod)
@@ -41,7 +41,7 @@
             </select>
         </div>
 
-        @snippet.ping_table(userPings, showProduct = false, showLicense = false, showExtras = false, showResponse = false)
+        @snippet.ping_table(userPings, showLicense = false, showResponse = false)
     </div>
 
     <script type="text/javascript">

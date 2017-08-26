@@ -4,10 +4,9 @@ import auth.Secured
 import com.google.inject.Inject
 import cyan.backend.Backend
 import dao.{PingExtrasDAO, PingsDAO, ProductsDAO, ResponsesDAO}
-import play.api.Play.current
 import play.api.data.Form
-import play.api.i18n.Messages.Implicits._
-import play.api.mvc.Controller
+import play.api.i18n.I18nSupport
+import play.api.mvc.{BaseController, BodyParsers, ControllerComponents}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -15,7 +14,7 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Responses @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO) extends Controller with Secured {
+class Responses @Inject()(val controllerComponents: ControllerComponents) (implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO,  parser: BodyParsers.Default) extends BaseController with Secured with I18nSupport {
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(
@@ -24,11 +23,11 @@ class Responses @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, 
     )
   )
 
-  def list = SecureAction.async {
+  def list = SecureAction.async { implicit request =>
     responsesDAO.getAll().map(resps => Ok(views.html.admin.resps(resps, responseForm)))
   }
 
-  def view(respId: Int) = SecureAction.async {
+  def view(respId: Int) = SecureAction.async { implicit request =>
     responsesDAO.findById(respId).map {
       case Some(resp) =>
         Ok(views.html.admin.resp_view(resp))

@@ -9,20 +9,19 @@ function fetchContents(link, divId) {
 }
 
 $(document).ready(function() {
-    function backendContent() {
-        var divId =  "tmp-id-" + $.now();
-        var query = $(this).data("backend-query");
-        var productId = $(this).data("backend-productid");
-        var license = $(this).data("backend-license");
-        var queryRoute = jsAdminRoutes.controllers.admin.BackendController.view(query, productId, license);
-        return fetchContents(queryRoute.url, divId);
-    }
 
     $('a[data-backend-query-popover]').popover({
         html: true,
         trigger: 'hover',
         placement: 'bottom',
-        content: backendContent
+        content: function() {
+            var divId =  "tmp-id-" + $.now();
+            var query = $(this).data("backend-query-popover");
+            var productId = $(this).data("backend-productid");
+            var license = $(this).data("backend-license");
+            var queryRoute = jsAdminRoutes.controllers.admin.BackendController.view(query, productId, license);
+            return fetchContents(queryRoute.url, divId);
+        }
     });
 
     $('a[data-backend-query-replace]').each(function() {

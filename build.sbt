@@ -10,11 +10,11 @@ lazy val `cyan` = (project in file("."))
 
 scalaVersion := "2.11.7"
 
-libraryDependencies ++= Seq( cache , ws, evolutions, specs2 % Test )
+libraryDependencies ++= Seq( cache , ws, evolutions, specs2 % Test, guice )
 
 libraryDependencies ++= Seq(
-  "com.typesafe.play" %% "play-slick" % "2.1.0",
-  "com.typesafe.play" %% "play-slick-evolutions" % "2.1.0",
+  "com.typesafe.play" %% "play-slick" % "3.0.0",
+  "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
   "com.h2database" % "h2" % "1.4.191", // for development
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4", // for prod
   "com.google.inject.extensions" % "guice-multibindings" % "4.0",
@@ -23,7 +23,7 @@ libraryDependencies ++= Seq(
 )
 
 libraryDependencies ++= Seq(
-  "org.webjars" %% "webjars-play" % "2.4.0-1",
+  "org.webjars" %% "webjars-play" % "2.6.0-M1",
   "org.webjars" % "jquery" % "2.2.0",
   "org.webjars" % "bootstrap" % "3.3.6",
   "org.webjars" % "momentjs" % "2.11.1",

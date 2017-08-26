@@ -4,10 +4,12 @@ import auth.Secured
 import com.google.inject.Inject
 import cyan.backend.Backend
 import dao._
-import play.api.mvc.{Action, Controller}
+import play.api.mvc.{Action, BodyParsers, Controller}
 import play.api.routing.JavaScriptReverseRouter
 
-class Main @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO) extends Controller with Secured {
+import scala.concurrent.ExecutionContext
+
+class Main @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, parser: BodyParsers.Default, ec: ExecutionContext) extends Controller with Secured {
   def index = SecureAction {
     Ok(views.html.admin.main())
   }

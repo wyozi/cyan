@@ -1,15 +1,19 @@
 package controllers.admin
 
+import anomalydetection.AnomalyDetector
 import auth.Secured
 import com.google.inject.Inject
-import anomalydetection.AnomalyDetector
 import dao.ProductsDAO
 import play.api.libs.json.Json
-import play.api.mvc.Controller
+import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Anomalies @Inject() (val detections: java.util.Set[AnomalyDetector])(implicit productsDAO: ProductsDAO, ex: ExecutionContext) extends Controller with Secured {
+class Anomalies @Inject() (val detections: java.util.Set[AnomalyDetector])(
+  implicit productsDAO: ProductsDAO,
+  parser: BodyParsers.Default,
+  ex: ExecutionContext
+) extends Controller with Secured {
   def overview = SecureAction {
     Ok(views.html.admin.anomaly_overview(detections))
   }

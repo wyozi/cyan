@@ -1,4 +1,4 @@
-@(title: String)(content: Html)(scripts: Html)
+@(title: String)(content: Html)(scripts: Html)(implicit webJarAssets: WebJarAssets = play.api.Play.current.injector.instanceOf[WebJarAssets])
 
 <!DOCTYPE html>
 
@@ -6,18 +6,18 @@
     <head>
         <title>@Html(title)</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel='stylesheet' href="@routes.WebJarAssets.at(WebJarAssets.locate("css/bootstrap.min.css"))">
+        <link rel='stylesheet' href="@routes.WebJarAssets.at(webJarAssets.locate("css/bootstrap.min.css"))">
         <link rel='stylesheet' href="@routes.Assets.at("stylesheets/dashboard.css")">
 <body>
     @* jquery is randomly used throughout views so it must exist before content *@
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.min.js"))"></script>
 
     @content
 
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("js/bootstrap.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("min/moment.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("Chart.min.js"))"></script>
-    <script src="@routes.WebJarAssets.at(WebJarAssets.locate("jquery.timeago.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webJarAssets.locate("js/bootstrap.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webJarAssets.locate("min/moment.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webJarAssets.locate("Chart.min.js"))"></script>
+    <script src="@routes.WebJarAssets.at(webJarAssets.locate("jquery.timeago.js"))"></script>
     <script src="@routes.Assets.at("javascripts/main.js")"></script>
 
     @scripts
