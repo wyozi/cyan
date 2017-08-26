@@ -24,6 +24,9 @@ class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: Databas
   def insert(name: String, body: String): Future[Int] =
     db.run((Responses.map(c => (c.name, c.body)) returning Responses.map(_.id)) += (name, body))
 
+  def updateName(respId: Int, name: String)(implicit ec: ExecutionContext): Future[Unit] =
+    db.run(Responses.filter(_.id === respId).map(_.name).update(name)).map(_ => ())
+
   def updateBody(respId: Int, body: String)(implicit ec: ExecutionContext): Future[Unit] =
     db.run(Responses.filter(_.id === respId).map(_.body).update(body)).map(_ => ())
 

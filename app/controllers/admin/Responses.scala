@@ -34,13 +34,24 @@ class Responses @Inject()(val controllerComponents: ControllerComponents) (impli
     }
   }
 
+  def editName(respId: Int) = SecureAction.async { implicit request =>
+    val form = Form("name" -> text)
+
+    form.bindFromRequest.fold(
+      errors => Future.successful(BadRequest("invalid form")),
+      name => responsesDAO.updateName(respId, name).map { x =>
+        Ok("")
+      }
+    )
+  }
+
   def editBody(respId: Int) = SecureAction.async { implicit request =>
     val form = Form("body" -> text)
 
     form.bindFromRequest.fold(
       errors => Future.successful(BadRequest("invalid form")),
       body => responsesDAO.updateBody(respId, body).map { x =>
-        Redirect(routes.Responses.view(respId))
+        Ok("")
       }
     )
   }

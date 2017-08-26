@@ -5,17 +5,28 @@
 @import util.FutureUtils._
 @import dao.PingExtrasDAO
 @import play.filters.csrf.CSRF
-@(resp: Response)(implicit requestHeader: RequestHeader, backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
+@(resp: Response)(implicit requestHeader: RequestHeader, webJarAssets: WebJarAssets = play.api.Play.current.injector.instanceOf[WebJarAssets], backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
+
+    <div class="panel panel-default">
+        <div class="panel-body">
+            <div class="panel-body">
+                <b>Response name
+                    <button type="button" class="btn btn-primary btn-xs" id="responseNameEdit">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </button>
+                    :</b> <code id="responseName">@resp.name</code>
+            </div>
+        </div>
+    </div>
 
     <div class="panel panel-default">
         <div class="panel-heading">
             <h3 class="panel-title">
                 Response body
-                <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#editModal">
+                <button type="button" class="btn btn-primary btn-xs" id="responseBodyEdit">
                     <span class="glyphicon glyphicon-pencil"></span>
-                    Edit
                 </button>
             </h3>
         </div>
@@ -23,30 +34,33 @@
             <pre id="responseBody">@resp.body</pre>
         </div>
     </div>
-
-    <div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                    <h4 class="modal-title" id="myModalLabel">Edit response body</h4>
-                </div>
-                <form action="@controllers.admin.routes.Responses.editBody(resp.id)" method="post">
-                    @for(t <- CSRF.getToken) {
-                        <input type="hidden" name="@t.name" value="@t.value"/>
-                    }
-                    <div class="modal-body">
-                        <textarea name="body" class="form-control" rows="10">@resp.body</textarea>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="submit" class="btn btn-primary">Save</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
     <h3>Recent pings with this response:</h3>
 
     @snippet.ping_table(pingsDAO.findRecentWithResponse(Some(resp.id), 15).await, showProduct = true, showResponse = false)
+
+    <script type="text/javascript" src="@routes.Assets.at("javascripts/inline-edit.js")"></script>
+    <script type="application/ecmascript">
+        $("#responseNameEdit").inlineEditable({
+            type: "text",
+            target: $("#responseName"),
+            url: "@controllers.admin.routes.Responses.editName(resp.id)",
+            postDataKey: "name",
+            extraData: {
+                @for(t <- CSRF.getToken) {
+                    "@t.name": "@t.value"
+                }
+            }
+        });
+        $("#responseBodyEdit").inlineEditable({
+            type: "textarea",
+            target: $("#responseBody"),
+            url: "@controllers.admin.routes.Responses.editBody(resp.id)",
+            postDataKey: "body",
+            extraData: {
+                @for(t <- CSRF.getToken) {
+                "@t.name": "@t.value"
+                }
+            }
+        });
+    </script>
 }
