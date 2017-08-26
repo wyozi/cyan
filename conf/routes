@@ -4,6 +4,7 @@
 
 # Home page
 GET         /                                             controllers.Application.index()
++ nocsrf
 POST        /ping                                         controllers.PingReceiver.ping()
 
 GET         /admin                                        controllers.admin.Main.index()
