@@ -19,6 +19,7 @@ libraryDependencies ++= Seq(
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4", // for prod
   "com.google.inject.extensions" % "guice-multibindings" % "4.0",
   "com.chuusai" %% "shapeless" % "2.2.5", // THERE IS NO COMING BACK
+  "org.luaj" % "luaj-jse" % "3.0.1",
   "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
 )
 

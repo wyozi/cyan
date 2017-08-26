@@ -43,7 +43,7 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
       prod <- productsDAO.findById(prodId).map(_.get)
       devLicense <- prod.queryDevLicense()
       recentPings <- pingsDAO.findRecentForProduct(prod, 25, devLicense)
-    } yield Ok(views.html.admin.prod_view(prod, devLicense, recentPings))
+    } yield Ok(views.html.admin.prod_view(prod, recentPings))
   }
 
 

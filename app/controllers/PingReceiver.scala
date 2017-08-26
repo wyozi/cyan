@@ -5,6 +5,7 @@ import javax.inject.Inject
 import dao._
 import model.PingExtra
 import play.api.mvc._
+import util.PingCheckDSL
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,7 +17,8 @@ class PingReceiver @Inject() (productsDAO: ProductsDAO,
   pingsDAO: PingsDAO,
   responsesDAO: ResponsesDAO,
   pingResponsesDAO: PingResponsesDAO,
-  pingExtrasDAO: PingExtrasDAO) extends Controller {
+  pingExtrasDAO: PingExtrasDAO,
+  pingCheckDSL: PingCheckDSL) extends Controller {
 
   private case class ProductNotFound() extends Exception("product not found")
 
@@ -30,9 +32,14 @@ class PingReceiver @Inject() (productsDAO: ProductsDAO,
       .flatMap { prod => // product to (product, response)
           pingResponsesDAO.getBestResponse(Some(prod.id), Some(license), Some(user)).map(resp => (prod, resp))
       }
+      .flatMap {
+        case (prod, resp) => pingCheckDSL.check(prod, license, user, extras, resp).map {
+          case None => (prod, resp)
+          case _ => ??? // XXX response modification not yet added in
+        }
+      }
       .flatMap { // (prod, resp) to (pingId, resp)
-        case (prod, resp) =>
-          pingsDAO.insert(product, license, user, req.remoteAddress, resp.map(_.id)).map(pingId => (pingId, resp))
+        case (prod, resp) => pingsDAO.insert(product, license, user, req.remoteAddress, resp.map(_.id)).map(pingId => (pingId, resp))
       }
       .map { // (pingId, resp) to resp
         case (pingId, response) =>

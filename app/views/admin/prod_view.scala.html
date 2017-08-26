@@ -6,14 +6,14 @@
 @import dao.PingResponsesDAO
 @import scala.concurrent.ExecutionContext
 @import util.FutureUtils._
-@import play.filters.csrf.CSRF
 @import dao.ResponsesDAO
 @import dao.ProductsDAO
 @import dao.ProductConfigDAO
 @import model.ProductConfig
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@(prod: Product, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@import play.filters.csrf.CSRF
+@(prod: Product, recentPings: Seq[Ping])(implicit backend: Backend, rh: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 
@@ -74,7 +74,7 @@
                                     <input type="hidden" name="@t.name" value="@t.value"/>
                                 }
                                 <div class="input-group">
-                                    <input class="form-control" name="value" value="@devlicense.getOrElse("")" type="text" />
+                                    <input class="form-control" name="value" value="@prod.queryDevLicense().await.getOrElse("")" type="text" />
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-primary">Set</button>
                                     </span>
@@ -104,6 +104,23 @@
                         </div>
                         <br>
                     }
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <label class="control-label">Custom ping check script:</label>
+                        </div>
+                        <div class="col-sm-8">
+                            <form action="@controllers.admin.prod.routes.Products.configure(prod.id, ProductConfig.Keys.PingCheckScript)" method="post">
+                                @for(t <- CSRF.getToken) {
+                                    <input type="hidden" name="@t.name" value="@t.value"/>
+                                }
+                                <div class="form-group">
+                                    <textarea class="form-control" name="value" rows="3">@productConfigDAO.getValue(prod.id, ProductConfig.Keys.PingCheckScript).await</textarea>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Set</button>
+                            </form>
+                        </div>
+                    </div>
+                    <br>
                 </div>
             </div>
         </div>
