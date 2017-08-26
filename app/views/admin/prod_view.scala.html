@@ -6,13 +6,14 @@
 @import dao.PingResponsesDAO
 @import scala.concurrent.ExecutionContext
 @import util.FutureUtils._
+@import play.filters.csrf.CSRF
 @import dao.ResponsesDAO
 @import dao.ProductsDAO
 @import dao.ProductConfigDAO
 @import model.ProductConfig
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@(prod: Product, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 
@@ -45,6 +46,9 @@
                         </div>
                         <div class="col-sm-8">
                             <form action="@controllers.admin.prod.routes.Products.configure(prod.id, "unreg_response")" method="post">
+                                @for(t <- CSRF.getToken) {
+                                    <input type="hidden" name="@t.name" value="@t.value"/>
+                                }
                                 <div class="input-group">
                                     @snippet.responseselect(
                                         pingResponsesDAO
@@ -66,6 +70,9 @@
                         </div>
                         <div class="col-sm-8">
                             <form action="@controllers.admin.prod.routes.Products.configure(prod.id, ProductConfig.Keys.DevLicense)" method="post">
+                                @for(t <- CSRF.getToken) {
+                                    <input type="hidden" name="@t.name" value="@t.value"/>
+                                }
                                 <div class="input-group">
                                     <input class="form-control" name="value" value="@devlicense.getOrElse("")" type="text" />
                                     <span class="input-group-btn">
@@ -83,6 +90,9 @@
                             </div>
                             <div class="col-sm-8">
                                 <form action="@controllers.admin.prod.routes.Products.configure(prod.id, cfg.id)" method="post">
+                                    @for(t <- CSRF.getToken) {
+                                        <input type="hidden" name="@t.name" value="@t.value"/>
+                                    }
                                     <div class="input-group">
                                         <input class="form-control" name="value" value="@productConfigDAO.getValue(prod.id, cfg.id).await" type="text" />
                                         <span class="input-group-btn">
@@ -110,6 +120,9 @@
             <div id="collapseFakePing" class="panel-collapse collapse">
                 <div class="panel-body">
                     <form class="form-horizontal">
+                        @for(t <- CSRF.getToken) {
+                            <input type="hidden" name="@t.name" value="@t.value"/>
+                        }
                         <div class="form-group">
                             <label for="fakepinglicense" class="col-sm-2 control-label">License</label>
                             <div class="col-sm-10">

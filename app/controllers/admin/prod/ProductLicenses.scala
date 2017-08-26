@@ -25,7 +25,7 @@ class ProductLicenses @Inject() ()
     parser: BodyParsers.Default,
     productsDAO: ProductsDAO) extends Controller with Secured {
 
-  def licenseView(prodId: Int, licenseId: String) = SecureAction.async {
+  def licenseView(prodId: Int, licenseId: String) = SecureAction.async { implicit request =>
     productsDAO.findById(prodId).map {
       case Some(prod) =>
         Ok(views.html.admin.prod_license_view(ProductLicense(prod, licenseId)))

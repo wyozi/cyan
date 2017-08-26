@@ -11,6 +11,7 @@ GET         /javascriptRoutes                             controllers.admin.Main
 
 GET         /admin/backend                                controllers.admin.BackendController.view(query, productId: Option[Int], license: Option[String])
 
++ nocsrf
 POST        /admin/search                                 controllers.admin.Search.search()
 
 GET         /admin/products                               controllers.admin.prod.Products.list()

@@ -6,12 +6,12 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
 @import dao.PingsDAO
-@(products: Seq[Product], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO, pingsDAO: PingsDAO, plpDAO: ProdLicensePingDAO)
+@(products: Seq[Product], userForm: Form[(String, String)])(implicit requestHeader: RequestHeader, messages: Messages, productsDAO: ProductsDAO, pingsDAO: PingsDAO, plpDAO: ProdLicensePingDAO)
 
 @layout_admin_simple(Seq("Products")) {
     <h2>Create product</h2>
 
-    @helper.form(action = controllers.admin.prod.routes.Products.create()) {
+    @helper.form(action = helper.CSRF(controllers.admin.prod.routes.Products.create())) {
         @helper.inputText(userForm("name"))
         @helper.inputText(userForm("shortName"))
 
@@ -31,7 +31,7 @@
                 </tr>
             </thead>
             <tbody>
-            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: p.queryLicenseCount() ::  p.queryPingCount() :: p.queryRecentPings(1) :: HNil)) awaitAll) {
+            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: Future.successful(-1) /*p.queryLicenseCount()*/ ::  /*p.queryPingCount()*/ Future.successful(-1) :: p.queryRecentPings(1) :: HNil)) awaitAll) {
                 <tr>
                     <td><a href="@controllers.admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
                     <td>@licenseCount</td>

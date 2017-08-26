@@ -36,7 +36,7 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
     productsDAO.getAll().map(prods => Ok(views.html.admin.prods(prods, productForm)))
   }
 
-  def view(prodId: Int) = SecureAction.async {
+  def view(prodId: Int) = SecureAction.async { implicit request =>
     val futureProd = productsDAO.findById(prodId)
 
     for {

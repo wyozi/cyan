@@ -1,11 +1,11 @@
 @import model.Response
 @import dao.ProductsDAO
-@(responses: Seq[Response], userForm: Form[(String, String)])(implicit messages: Messages, productsDAO: ProductsDAO)
+@(responses: Seq[Response], userForm: Form[(String, String)])(implicit requestHeader: RequestHeader, messages: Messages, productsDAO: ProductsDAO)
 
 @layout_admin_simple(Seq("Responses")) {
     <h2>Create response</h2>
 
-    @helper.form(action = controllers.admin.routes.Responses.create()) {
+    @helper.form(action = helper.CSRF(controllers.admin.routes.Responses.create())) {
         @helper.inputText(userForm("name"))
         @helper.textarea(userForm("response"))
 

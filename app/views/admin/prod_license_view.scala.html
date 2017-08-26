@@ -15,7 +15,8 @@
 @import dao.ProductConfigDAO
 @import dao.PingsDAO
 @import cyan.backend.Backend
-@(prodLicense: ProductLicense)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO, backend: Backend)
+@import play.filters.csrf.CSRF
+@(prodLicense: ProductLicense)(implicit requestHeader: RequestHeader, productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO, backend: Backend)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, html"License <code>${prodLicense.license}</code>")) {
     <div class="panel panel-default">
@@ -29,6 +30,9 @@
                 </div>
                 <div class="col-sm-8">
                     <form action="@controllers.admin.prod.routes.ProductLicenses.setProductLicenseResponse(prodLicense.prod.id, prodLicense.license)" method="post">
+                        @for(t <- CSRF.getToken) {
+                            <input type="hidden" name="@t.name" value="@t.value"/>
+                        }
                         <div class="input-group">
                             @defining(pingResponsesDAO.getExactResponse(Some(prodLicense.prod.id), Some(prodLicense.license), None).await) { resp =>
                                 @snippet.responseselect(resp.map(_.id).getOrElse(-1))
