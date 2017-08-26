@@ -13,7 +13,7 @@
 @import model.ProductConfig
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@(prod: Product, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, recentPingsPage: Int, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 
@@ -190,5 +190,12 @@
         <h3>Recent pings</h3>
 
         @snippet.ping_table(recentPings)
+
+        <div class="col-sm-12 text-center">
+            @if(recentPingsPage > 0) {
+                <a href="@controllers.admin.prod.routes.Products.view(prod.id, recentPingsPage - 1)" class="btn btn-default">Newer pings</a>
+            }
+            <a href="@controllers.admin.prod.routes.Products.view(prod.id, recentPingsPage + 1)" class="btn btn-default">Older pings</a>
+        </div>
     </div>
 }

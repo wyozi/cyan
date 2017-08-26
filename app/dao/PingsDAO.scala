@@ -39,12 +39,13 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     * @param limit
     * @param ignoredLicense license to ignore from output
     */
-  def findRecentForProduct(prod: Product, limit: Int, ignoredLicense: Option[String] = None): Future[Seq[Ping]] =
+  def findRecentForProduct(prod: Product, limit: Int, offset: Int = 0, ignoredLicense: Option[String] = None): Future[Seq[Ping]] =
     db.run(
       Pings
         .filter(_.product === prod.shortName)
         .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
         .sortBy(_.id.desc)
+        .drop(offset)
         .take(limit)
         .result
     )
