@@ -4,7 +4,8 @@
 @import cyan.backend.Backend
 @import util.FutureUtils._
 @import dao.PingExtrasDAO
-@(resp: Response)(implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
+@import play.filters.csrf.CSRF
+@(resp: Response)(implicit requestHeader: RequestHeader, backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
 
 @layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
 
@@ -31,6 +32,9 @@
                     <h4 class="modal-title" id="myModalLabel">Edit response body</h4>
                 </div>
                 <form action="@controllers.admin.routes.Responses.editBody(resp.id)" method="post">
+                    @for(t <- CSRF.getToken) {
+                        <input type="hidden" name="@t.name" value="@t.value"/>
+                    }
                     <div class="modal-body">
                         <textarea name="body" class="form-control" rows="10">@resp.body</textarea>
                     </div>
