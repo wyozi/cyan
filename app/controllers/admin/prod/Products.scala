@@ -39,13 +39,11 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
   def view(prodId: Int) = SecureAction.async {
     val futureProd = productsDAO.findById(prodId)
 
-    import shapeless._
-
     for {
       prod <- productsDAO.findById(prodId).map(_.get)
       devLicense <- prod.queryDevLicense()
-      recentNewLicenses :: recentPings :: HNil <- util.FutureUtils.hsequence(plpDAO.findRecentNewLicenses(prod, 15, devLicense) :: pingsDAO.findRecentForProduct(prod, 15, devLicense) :: HNil)
-    } yield Ok(views.html.admin.prod_view(prod, devLicense, recentNewLicenses, recentPings))
+      recentPings <- pingsDAO.findRecentForProduct(prod, 25, devLicense)
+    } yield Ok(views.html.admin.prod_view(prod, devLicense, recentPings))
   }
 
 

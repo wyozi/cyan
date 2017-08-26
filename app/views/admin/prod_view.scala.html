@@ -12,7 +12,7 @@
 @import model.ProductConfig
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@(prod: Product, devlicense: Option[String], recentNewLicenses: Seq[Ping], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 
@@ -172,31 +172,6 @@
                     </script>
                 </div>
             </div>
-        </div>
-
-        <h3>Recent new licenses</h3>
-
-        <div class="table-responsive">
-            <table class="table">
-                <thead>
-                    <tr>
-                        <td>License</td>
-                        <td>First timestamp</td>
-                    </tr>
-                </thead>
-                <tbody>
-                @for(ping <- recentNewLicenses) {
-                    <tr>
-                        <td>
-                            @backend.transformLicenseHtml(model.backendLicense(prod, ping.license)) {
-                                <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prod.id, ping.license)">@ping.license</a>
-                            }
-                        </td>
-                        <td>@snippet.datetime(ping.date)</td>
-                    </tr>
-                }
-                </tbody>
-            </table>
         </div>
 
         <h3>Recent pings</h3>
