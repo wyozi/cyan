@@ -29,9 +29,7 @@
             </tr>
         </thead>
         <tbody>
-            @import scala.collection.mutable.HashMap; var productCache = HashMap[String, Future[Product]]()
-
-            @for(ping :: product :: extras :: response :: HNil <- pings.map(p => hsequence(Future.successful(p) :: productCache.getOrElseUpdate(p.product, p.queryProduct()) :: (if (showExtras) p.queryExtras() else Future.successful(Seq())) :: (if (showResponse) p.queryResponse() else Future.successful(None)) :: HNil)) awaitAll) {
+            @for((ping, product, extras, response) <- views.snippet.PingTable.fetch(pings, showExtras, showResponse)) {
                 <tr>
                     @if(showProduct) {
                         <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td>
