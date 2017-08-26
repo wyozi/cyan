@@ -30,7 +30,7 @@ GET         /admin/products/:id/responses                 controllers.admin.prod
 POST        /admin/products/:id/responses                 controllers.admin.prod.ProductResponses.insert(id: Int)
 
 GET         /admin/products/:id/extras                    controllers.admin.prod.ProductPingExtras.list(id: Int)
-GET         /admin/products/:id/extras/keys               controllers.admin.prod.ProductPingExtras.view(id: Int, key, value: Option[String])
+GET         /admin/products/:id/extras/keys               controllers.admin.prod.ProductPingExtras.view(id: Int, key, days: Int ?= 14, value: Option[String] ?= None)
 
 GET         /admin/ips                                    controllers.admin.IPs.viewIp(ip)
 GET         /admin/users                                  controllers.admin.Users.viewUser(user)

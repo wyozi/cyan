@@ -7,53 +7,25 @@
 @import cyan.util.TwirlHelpers._
 
 @import scala.concurrent.ExecutionContext
-@(prod: Product, pingExtraKey: String)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, pingExtraKey: String, days: Int)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
-@scripts(data1: Seq[(Option[String], Seq[(LocalDate, Int)])], data7: Seq[(Option[String], Seq[(LocalDate, Int)])]) = {
+@* Calculate how many steps between each datapoint *@
+@countDataStep(totalDays: Int) = @{1 + (totalDays / 100)}
+
+@scripts(data: Seq[(Option[String], Seq[(LocalDate, Int)])]) = {
 
     <script type="application/javascript">
-        var valueDistDayCtx = document.getElementById("chart_valueDistDay").getContext("2d");
-        var valueDistDayChart = new Chart(valueDistDayCtx, {
-            type: "pie",
-            data: {
-                @defining(data1) { data =>
-                    labels: [
-                        @for((value, daycount) <- data) {
-                            @value match {
-                                case Some(x) => { "@x",  }
-                                case None => { "no value", }
-                            }
-                        }
-                    ],
-                    datasets: [{
-                        data: [
-                            @for((value, daycounts) <- data) {
-                                @daycounts.map(_._2).sum,
-                            }
-                        ],
-                        backgroundColor: [
-                            @for(i <- 0 until data.length) {
-                                @defining(Color.getHSBColor(i * 0.618033988749895f, 0.8f, 0.85f)) { clr =>
-                                    'rgba(@clr.getRed, @clr.getGreen, @clr.getBlue, 0.4)',
-                                }
-                            }
-                        ]
-                    }]
-                }
-            }
-        });
-
         var valueDistWeekCtx = document.getElementById("chart_valueDistWeek").getContext("2d");
         var valueDistWeekChart = new Chart(valueDistWeekCtx, {
             type: "line",
             data: {
                 labels: [
-                    @for(i <- 6 to 0 by -1) {
+                    @for(i <- days to 0 by -countDataStep(days)) {
                         "@LocalDate.now().minusDays(i)",
                     }
                 ],
                 datasets: [
-                    @for(((value, daycounts), index) <- data7.zipWithIndex) {
+                    @for(((value, daycounts), index) <- data.zipWithIndex) {
                         {
                             label: "@value match {
                                 case Some(x) => {@x}
@@ -63,33 +35,67 @@
                                 'rgba(@clr.getRed, @clr.getGreen, @clr.getBlue, 0.4)'
                             },
                             data: [
-                                @for(i <- 6 to 0 by -1) {
+                                @for(i <- days to 0 by -countDataStep(days)) {
                                     @daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2).getOrElse(0) ,
                                 }
                             ]
                         },
                     }
                 ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            min: 0
+                        }
+                    }]
+                }
             }
         });
     </script>
+    <script type="text/javascript">
+            var usersSince = document.getElementById("timescale");
+            usersSince.onchange = function() {
+                window.location = jsAdminRoutes.controllers.admin.prod.ProductPingExtras.view(@prod.id, "@pingExtraKey", parseInt(this.value), null).url;
+            }
+    </script>
+    <script type="text/javascript" src="@controllers.admin.routes.Main.javascriptRoutes"></script>
 }
 
 @defining(
-    (
-            pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(1), prod.queryDevLicense().await).await,
-            pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(7), prod.queryDevLicense().await).await
-    )
-) { tuple =>
-    @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts(tuple._1, tuple._2)) {
-        <div class="row">
-            <div class="col-xs-12 col-md-6">
-                <h3>Value distribution in past 24 hours (per user)</h3>
+        pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(days), prod.queryDevLicense().await).await
+) { data =>
+    @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts(data)) {
 
-                <canvas id="chart_valueDistDay" width="400" height="300"></canvas>
+        <div class="panel panel-default">
+
+            <div class="panel-body form-inline">
+                <label for="users-since">Displaying value distribution in last </label>
+                <select class="form-control" id="timescale">
+                @for((name, odays) <- List(
+                    ("1 day", 1),
+                    ("2 days", 2),
+                    ("1 week", 7),
+                    ("2 weeks", 14),
+                    ("month", 30),
+                    ("3 months", 90),
+                    ("6 months", 180),
+                    ("year", 365),
+                    ("2 years", 730)
+                )) {
+                    <option value="@odays"
+                        @if(days == odays) {
+                            selected="selected"
+                            }
+                    >@name</option>
+                }
+                </select>
             </div>
-            <div class="col-xs-12 col-md-6">
-                <h3>Value distribution in past 7 days (per user)</h3>
+        </div>
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                <h3>Value distribution</h3>
                 <canvas id="chart_valueDistWeek" width="400" height="300"></canvas>
             </div>
         </div>
@@ -99,22 +105,38 @@
                     <thead>
                         <tr>
                             <td>Value</td>
-                            <td>Count (1 day)</td>
-                            <td>Count (7 days)</td>
+                            <td>Userdays (for past @days days)</td>
+                            <td>Relative change (in @days days)</td>
+                            <td>Percentage of total (during @days days)</td>
                         </tr>
                     </thead>
                     <tbody>
-                    @defining(tuple._2.toMap) { day7valueToData =>
-                        @for((data, onedayPingCount) <- tuple._1.map(r => (r, r._2.map(_._2).sum)).sortBy(n => -n._2)) {
+                    @defining(data.map(_._2.map(_._2).sum).sum) { totalSum =>
+                        @for((value, dayCounts, sum) <- data.map { case (value, dayCounts) => (value, dayCounts, dayCounts.map(_._2).sum) }.sortBy(-_._3)) {
                             <tr>
                                 <td>
-                                    <a href="@{controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, Some(data._1.getOrElse("")))}">@data._1.getOrElse(html"<i>Empty</i>")</a>
+                                    <a href="@{controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(value.getOrElse("")))}">@value.getOrElse(html"<i>Empty</i>")</a>
                                 </td>
                                 <td>
-                                @onedayPingCount
+                                    @sum
                                 </td>
                                 <td>
-                                @{day7valueToData.get(data._1).map(_.map(_._2).sum).getOrElse("-")}
+                                    @if(dayCounts.size < (days * 0.9)) {
+                                        N/a
+                                    } else {
+                                        @defining((((dayCounts.last._2 - dayCounts.head._2) / dayCounts.head._2.toDouble) * 100.0).toInt) { perc =>
+                                          <span style="color:
+                                          @if(perc < 0) {
+                                            red
+                                          } else {
+                                            green
+                                          }
+                                          ">@perc%</span>
+                                        }
+                                    }
+                                </td>
+                                <td>
+                                    @{(sum.toDouble / totalSum * 100.0).toInt}%
                                 </td>
                             </tr>
                         }

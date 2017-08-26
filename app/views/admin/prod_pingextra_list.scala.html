@@ -22,7 +22,7 @@
                 <tbody>
                     @for((key, count) <- pingExtrasDAO.findExtraKeysAndCounts(prod.shortName).await) {
                         <tr>
-                            <td><a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, key, None)">@key</a></td>
+                            <td><a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, key)">@key</a></td>
                             <td>@count</td>
                         </tr>
                     }

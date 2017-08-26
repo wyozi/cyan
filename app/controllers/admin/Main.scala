@@ -4,7 +4,7 @@ import auth.Secured
 import com.google.inject.Inject
 import cyan.backend.Backend
 import dao._
-import play.api.mvc.{Action, BodyParsers, Controller}
+import play.api.mvc.{BodyParsers, Controller}
 import play.api.routing.JavaScriptReverseRouter
 
 import scala.concurrent.ExecutionContext
@@ -18,7 +18,8 @@ class Main @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, produ
     Ok(
       JavaScriptReverseRouter("jsAdminRoutes")(
         controllers.admin.routes.javascript.BackendController.view,
-        controllers.admin.prod.routes.javascript.ProductUsers.list
+        controllers.admin.prod.routes.javascript.ProductUsers.list,
+        controllers.admin.prod.routes.javascript.ProductPingExtras.view
       )
     ).as("text/javascript")
   }
