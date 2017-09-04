@@ -19,9 +19,9 @@
     <table class="table">
         <thead>
             <tr>
+                <td>User</td>
                 @if(showProduct) { <td>Product</td> }
                 @if(showLicense) { <td>License</td> }
-                <td>User</td>
                 <td>IP</td>
                 <td>Timestamp</td>
                 @if(showExtras && pingExtrasDAO != null) { <td>Extra keys</td> }
@@ -29,33 +29,38 @@
             </tr>
         </thead>
         <tbody>
-            @for((ping, product, extras, response) <- views.snippet.PingTable.fetch(pings, showExtras, showResponse)) {
-                <tr>
-                    @if(showProduct) {
-                        <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td>
-                    }
-                    @if(showLicense) {
-                        <td>
+            @for((user, pings) <- views.snippet.PingTable.sequentialGrouping[(Ping, Product, scala.Seq[model.PingExtra], Option[model.Response]), String](views.snippet.PingTable.fetch(pings, showExtras, showResponse), x => x._1.user)) {
+                @for(((ping, product, extras, response), idx) <- pings.zipWithIndex) {
+                    <tr>
+                        @if(idx == 0) {
+                            <td rowspan="@pings.size" style="vertical-align: middle">
+                            @snippet.pinguser(ping.user)
+                            </td>
+                        }
+                        @if(showProduct) {
+                            <td><a href="@controllers.admin.prod.routes.Products.view(product.id)">@product.name</a></td>
+                        }
+                        @if(showLicense) {
+                            <td>
                             @Option(backend).map(be => be.transformLicenseHtml(model.backendLicense(product, ping.license))(_: Html)).getOrElse((x: Html) => x) {
                                 <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(product.id, ping.license)">@ping.license</a>
                             }
-                        </td>
-                    }
-                    <td>
-                        @snippet.pinguser(ping.user)
-                    </td>
-                    <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
-                    <td>@snippet.datetime(ping.date)</td>
-                    @if(showExtras && pingExtrasDAO != null) {
-                        <td>@snippet.pingextras(extras)(product)</td>
-                    }
-                    @if(showResponse && responsesDAO != null) {
-                        <td>
-                        @snippet.response(response)
-                        </td>
-                    }
-                </tr>
+                            </td>
+                        }
+                        <td><a href="@controllers.admin.routes.IPs.viewIp(ping.ip)">@ping.ip</a></td>
+                        <td>@snippet.datetime(ping.date)</td>
+                        @if(showExtras && pingExtrasDAO != null) {
+                            <td>@snippet.pingextras(extras)(product)</td>
+                        }
+                        @if(showResponse && responsesDAO != null) {
+                            <td>
+                            @snippet.response(response)
+                            </td>
+                        }
+                    </tr>
+                }
             }
+
         </tbody>
     </table>
 </div>
