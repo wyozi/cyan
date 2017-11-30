@@ -10,7 +10,7 @@
 @import model.Product
 @import cyan.backend.Backend
 
-@(pings: (Int) => Seq[Ping], showProduct: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true, showResponse: Boolean = true)(implicit req: RequestHeader, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO = null, pingExtrasDAO: PingExtrasDAO = null, productConfigDAO: ProductConfigDAO = null, backend: Backend = null)
+@(pings: (Int) => Seq[Ping], route: Call, showProduct: Boolean = false, showLicense: Boolean = true, showExtras: Boolean = true, showResponse: Boolean = true)(implicit req: RequestHeader, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO = null, pingExtrasDAO: PingExtrasDAO = null, productConfigDAO: ProductConfigDAO = null, backend: Backend = null)
 
 @page = @{req.getQueryString("page").flatMap(p => scala.util.Try(p.toInt).toOption).getOrElse(1).max(1)}
 
@@ -28,6 +28,6 @@
                 case _ => {  }
             }"><a class="page-link" href="@controllers.admin.routes.Main.index().withQueryString("page" -> Seq(i.toString))">@i</a></li>
         }
-        <li class="page-item"><a class="page-link" href="@controllers.admin.routes.Main.index().withQueryString("page" -> Seq((page + 1).toString))">&raquo;</a></li>
+        <li class="page-item"><a class="page-link" href="@route.withQueryString("page" -> Seq((page + 1).toString))">&raquo;</a></li>
     </ul>
 </div>
