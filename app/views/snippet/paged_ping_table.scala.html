@@ -20,13 +20,13 @@
 <div class="text-center">
     <ul class="pagination">
         @if(page > 1) {
-            <li class="page-item"><a class="page-link" href="@controllers.admin.routes.Main.index().withQueryString("page" -> Seq((page - 1).toString))">&laquo;</a></li>
+            <li class="page-item"><a class="page-link" href="@route.withQueryString("page" -> Seq((page - 1).toString))">&laquo;</a></li>
         }
         @for(i <- 1 until 5) {
             <li class="page-item @page match {
                 case `i` => { active }
                 case _ => {  }
-            }"><a class="page-link" href="@controllers.admin.routes.Main.index().withQueryString("page" -> Seq(i.toString))">@i</a></li>
+            }"><a class="page-link" href="@route.withQueryString("page" -> Seq(i.toString))">@i</a></li>
         }
         <li class="page-item"><a class="page-link" href="@route.withQueryString("page" -> Seq((page + 1).toString))">&raquo;</a></li>
     </ul>
