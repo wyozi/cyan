@@ -29,8 +29,8 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   /**
     * Find latest pings sorted by ID descendingly.
     */
-  def findRecent(limit: Int): Future[Seq[Ping]] =
-    db.run(Pings.sortBy(_.id.desc).take(limit).result)
+  def findRecent(amount: Int, offset: Int = 0): Future[Seq[Ping]] =
+    db.run(Pings.sortBy(_.id.desc).drop(offset).take(amount).result)
 
   /**
     * Find recent pings for given product.

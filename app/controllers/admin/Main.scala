@@ -10,7 +10,7 @@ import play.api.routing.JavaScriptReverseRouter
 import scala.concurrent.ExecutionContext
 
 class Main @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, parser: BodyParsers.Default, ec: ExecutionContext) extends Controller with Secured {
-  def index = SecureAction {
+  def index = SecureAction { implicit request =>
     Ok(views.html.admin.main())
   }
 

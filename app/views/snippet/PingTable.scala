@@ -3,6 +3,7 @@ package views.snippet
 import cyan.backend.Backend
 import dao.{PingExtrasDAO, ProductConfigDAO, ProductsDAO, ResponsesDAO}
 import model.{Ping, PingExtra, Product, Response}
+import play.api.mvc.Call
 import shapeless._
 
 import scala.collection.mutable
@@ -27,5 +28,23 @@ object PingTable {
             :: HNil
         )) awaitAll)
       yield (ping, product, extras, response)
+  }
+
+  // Add withQueryString to Calls to allow addition of new query string params in reverse routing
+  // Source: https://stackoverflow.com/a/36320319
+  implicit class CallOps (c: Call) {
+    import play.shaded.ahc.io.netty.handler.codec.http.{QueryStringDecoder, QueryStringEncoder}
+    import scala.collection.JavaConverters._
+
+    def withQueryString(query: (String,Seq[String])*): Call = {
+      val decoded = new QueryStringDecoder(c.url)
+      val newUrl = new QueryStringEncoder(decoded.path())
+      val params = decoded.parameters().asScala.mapValues(_.asScala.toSeq).toSeq
+      for {
+        (key, values) <- params ++ query
+        value <- values
+      } newUrl.addParam(key, value)
+      Call(c.method, newUrl.toString, c.fragment)
+    }
   }
 }
