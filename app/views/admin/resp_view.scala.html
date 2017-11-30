@@ -36,7 +36,7 @@
     </div>
     <h3>Recent pings with this response:</h3>
 
-    @snippet.ping_table(pingsDAO.findRecentWithResponse(Some(resp.id), 15).await, showProduct = true, showResponse = false)
+    @snippet.paged_ping_table(page => pingsDAO.findRecentWithResponse(Some(resp.id), 15, offset = 15 * page).await, controllers.admin.routes.Responses.view(resp.id), showProduct = true, showResponse = false)
 
     <script type="text/javascript" src="@routes.Assets.at("javascripts/inline-edit.js")"></script>
     <script type="application/ecmascript">

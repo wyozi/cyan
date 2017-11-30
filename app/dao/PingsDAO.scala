@@ -65,8 +65,8 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   /**
     * Find recent pings with given response id.
     */
-  def findRecentWithResponse(resp: Option[Int], limit: Int): Future[Seq[Ping]] =
-    db.run(Pings.filter(_.responseId === resp).sortBy(_.id.desc).take(limit).result)
+  def findRecentWithResponse(resp: Option[Int], limit: Int, offset: Int = 0): Future[Seq[Ping]] =
+    db.run(Pings.filter(_.responseId === resp).sortBy(_.id.desc).drop(offset).take(limit).result)
 
   /**
     * Find count of distinct licenses for given product.
