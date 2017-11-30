@@ -13,7 +13,8 @@
 @import model.ProductConfig
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
-@(prod: Product, recentPingsPage: Int, devlicense: Option[String], recentPings: Seq[Ping])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@import controllers.admin.prod.Products
+@(prod: Product, devLicense: Option[String])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 
@@ -74,7 +75,7 @@
                                     <input type="hidden" name="@t.name" value="@t.value"/>
                                 }
                                 <div class="input-group">
-                                    <input class="form-control" name="value" value="@devlicense.getOrElse("")" type="text" />
+                                    <input class="form-control" name="value" value="@devLicense.getOrElse("")" type="text" />
                                     <span class="input-group-btn">
                                         <button type="submit" class="btn btn-primary">Set</button>
                                     </span>
@@ -186,13 +187,6 @@
 
         <h3>Recent pings</h3>
 
-        @snippet.ping_table(recentPings)
-
-        <div class="col-sm-12 text-center">
-            @if(recentPingsPage > 0) {
-                <a href="@controllers.admin.prod.routes.Products.view(prod.id, recentPingsPage - 1)" class="btn btn-default">Newer pings</a>
-            }
-            <a href="@controllers.admin.prod.routes.Products.view(prod.id, recentPingsPage + 1)" class="btn btn-default">Older pings</a>
-        </div>
+        @snippet.paged_ping_table(page => pingsDAO.findRecentForProduct(prod, Products.PingsPerPage, offset = Products.PingsPerPage * page, ignoredLicense = devLicense).await, controllers.admin.prod.routes.Products.view(prod.id))
     </div>
 }

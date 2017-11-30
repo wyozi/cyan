@@ -36,14 +36,13 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
     productsDAO.getAll().map(prods => Ok(views.html.admin.prods(prods, productForm)))
   }
 
-  def view(prodId: Int, page: Int) = SecureAction.async { implicit request =>
+  def view(prodId: Int) = SecureAction.async { implicit request =>
     val futureProd = productsDAO.findById(prodId)
 
     for {
       prod <- productsDAO.findById(prodId).map(_.get)
       devLicense <- prod.queryDevLicense()
-      recentPings <- pingsDAO.findRecentForProduct(prod, Products.PingsPerPage, offset = Products.PingsPerPage * page, ignoredLicense = devLicense)
-    } yield Ok(views.html.admin.prod_view(prod, page, devLicense, recentPings))
+    } yield Ok(views.html.admin.prod_view(prod, devLicense))
   }
 
 
