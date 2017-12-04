@@ -15,40 +15,103 @@
 @scripts(data: Seq[(Option[String], Seq[(LocalDate, Int)])]) = {
 
     <script type="application/javascript">
-        var valueDistWeekCtx = document.getElementById("chart_valueDistWeek").getContext("2d");
-        var valueDistWeekChart = new Chart(valueDistWeekCtx, {
-            type: "line",
-            data: {
-                labels: [
+        var labels = [
+            @for(i <- days to 0 by -countDataStep(days)) {
+            "@LocalDate.now().minusDays(i)",
+            }
+        ];
+
+        var absoluteDistribDatasets = [];
+        var stackedDatasets = [];
+
+        @for(((value, daycounts), index) <- data.zipWithIndex) {
+            absoluteDistribDatasets.push({
+                label: "@value match {
+                case Some(x) => {@x}
+                case None => {no value}
+                }",
+                spanGaps: true,
+                borderColor: @defining(Color.getHSBColor(index.toFloat / data.length, 0.8f, 0.85f)) { clr =>
+                        'rgb(@clr.getRed, @clr.getGreen, @clr.getBlue )'
+                                },
+                fill: false,
+                data: [
                     @for(i <- days to 0 by -countDataStep(days)) {
-                        "@LocalDate.now().minusDays(i)",
-                    }
-                ],
-                datasets: [
-                    @for(((value, daycounts), index) <- data.zipWithIndex) {
-                        {
-                            label: "@value match {
-                                case Some(x) => {@x}
-                                case None => {no value}
-                            }",
-                            backgroundColor: @defining(Color.getHSBColor(index * 0.618033988749895f, 0.8f, 0.85f)) { clr =>
-                                'rgba(@clr.getRed, @clr.getGreen, @clr.getBlue, 0.4)'
-                            },
-                            data: [
-                                @for(i <- days to 0 by -countDataStep(days)) {
-                                    @daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2).getOrElse(0) ,
-                                }
-                            ]
-                        },
+                        @daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2.toString).getOrElse("null") ,
                     }
                 ]
+            });
+            stackedDatasets.push({
+                label: "@value match {
+                case Some(x) => {@x}
+                case None => {no value}
+                }",
+                spanGaps: true,
+                backgroundColor: @defining(Color.getHSBColor(index.toFloat / data.length, 0.8f, 0.85f)) { clr =>
+            'rgb(@clr.getRed, @clr.getGreen, @clr.getBlue )'
+                    },
+                data: [
+                    @for(i <- days to 0 by -countDataStep(days)) {
+                       @data.flatMap(_._2).groupBy(_._1).mapValues(_.map(_._2).sum).get(LocalDate.now().minusDays(i)).map(t => {
+                        daycounts.find(_._1 == LocalDate.now().minusDays(i)).map(_._2).getOrElse(0).toDouble / t * 100.0
+                       }).map(_.formatted("%.01f")).getOrElse("null"),
+                    }
+                ]
+            });
+        }
+
+        var absoluteDistributionChart = new Chart(document.getElementById("chart_absDistribution").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: absoluteDistribDatasets
             },
             options: {
+                tooltips: {
+                    mode: 'index',
+                },
                 scales: {
                     yAxes: [{
                         ticks: {
                             min: 0
+                        },
+                        scaleLabel: {
+                            display: true,
+                            labelString: 'unique users'
                         }
+                    }]
+                }
+            }
+        });
+
+        var uniqueAdoptionChart = new Chart(document.getElementById("chart_uniqueAdoption").getContext("2d"), {
+            type: "line",
+            data: {
+                labels: labels,
+                datasets: stackedDatasets
+            },
+            options: {
+                tooltips: {
+                    callbacks: {
+                        label: function(tooltipItem, data) {
+                            return tooltipItem.yLabel + '% (' + data.datasets[tooltipItem.datasetIndex].label + ')';
+                        }
+                    },
+                    filter: function(o) {
+                        return o.yLabel !== 0;
+                    },
+                    mode: 'index',
+                },
+                scales: {
+                    yAxes: [{
+                        stacked: true,
+                        ticks: {
+                            min: 0,
+                            max: 100,
+                            callback: function(value, index, values) {
+                                return value + '%';
+                            }
+                        },
                     }]
                 }
             }
@@ -95,8 +158,14 @@
         </div>
         <div class="row">
             <div class="col-xs-10 col-xs-offset-1">
-                <h3>Value distribution</h3>
-                <canvas id="chart_valueDistWeek" width="400" height="300"></canvas>
+                <h3>Unique value adoption</h3>
+                <canvas id="chart_uniqueAdoption" width="400" height="300"></canvas>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-xs-10 col-xs-offset-1">
+                <h3>Absolute value distribution</h3>
+                <canvas id="chart_absDistribution" width="400" height="300"></canvas>
             </div>
         </div>
         <div class="row">

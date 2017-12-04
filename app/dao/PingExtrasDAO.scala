@@ -50,11 +50,14 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
         .map { case ((date, value), rows) => (date, value, rows.map(_._1.userName).countDistinct) }
         .result
     )
-      .map(_.groupBy(_._2)
-      .mapValues(
-        _.map { case (t, v, c) => (new LocalDate(t), c) }
-          .sortBy(_._1.toDateTimeAtStartOfDay.getMillis))
+      .map(
+        _.groupBy(_._2)
+          .mapValues(
+            _.map { case (t, v, c) => (new LocalDate(t), c) }
+              .sortBy(_._1.toDateTimeAtStartOfDay.getMillis)
+          )
           .toSeq
+          .sortBy(_._1) // lexicographically sort string keys; better than arbitrary order
       )
   }
 
