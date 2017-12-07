@@ -14,6 +14,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
+
   import driver.api._
 
   private[dao] val Responses = TableQuery[ResponsesTable]
@@ -32,6 +33,10 @@ class ResponsesDAO @Inject() ()(protected implicit val dbConfigProvider: Databas
 
   def findById(id: Int): Future[Option[Response]] =
     db.run(Responses.filter(_.id === id).result.headOption)
+
+  def findByIds(ids: Seq[Int]): Future[Seq[Response]] =
+    db.run(Responses.filter(_.id inSetBind ids).result)
+
 
   private[dao] class ResponsesTable(tag: Tag) extends Table[Response](tag, "responses") {
     def id = column[Int]("id", O.AutoInc)

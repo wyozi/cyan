@@ -104,6 +104,9 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =
     db.run(PingExtras.filter(_.pingId === pingId).result)
 
+  def findExtras(pingIds: Seq[Int]): Future[Seq[PingExtra]] =
+    db.run(PingExtras.filter(_.pingId inSetBind pingIds).result)
+
   def findValue(pingId: Int, key: String): Future[Option[String]] =
     db.run(PingExtras.filter(r => r.pingId === pingId && r.key === key).map(_.value).result.headOption)
 

@@ -31,6 +31,10 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
   def findByShortName(shortName: String): Future[Option[Product]] =
     db.run(Products.filter(_.shortName === shortName).result.headOption)
 
+  def findByShortNames(shortNames: Seq[String]): Future[Seq[Product]] =
+    db.run(Products.filter(_.shortName inSetBind shortNames).result)
+
+
   private[dao] class ProductsTable(tag: Tag) extends Table[Product](tag, "products") {
     def id = column[Int]("id", O.AutoInc)
 
