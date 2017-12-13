@@ -17,6 +17,7 @@ class ProductPingExtras @Inject() ()
     responsesDAO: ResponsesDAO,
     plpDAO: ProdLicensePingDAO,
     productConfigDAO: ProductConfigDAO,
+    pingsDAO: PingsDAO,
     pingExtrasDAO: PingExtrasDAO,
     parser: BodyParsers.Default,
     productsDAO: ProductsDAO) extends Controller with Secured {
@@ -27,7 +28,7 @@ class ProductPingExtras @Inject() ()
     }
   }
 
-  def view(prodId: Int, key: String, days: Int, value: Option[String]) = SecureAction.async { request =>
+  def view(prodId: Int, key: String, days: Int, value: Option[String]) = SecureAction.async { implicit request =>
     productsDAO.findById(prodId).map {
       case Some(prod) => Ok(value match {
         case Some(v) => views.html.admin.prod_pingextra_view_value(prod, key, v)

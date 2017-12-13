@@ -16,6 +16,7 @@ import scala.concurrent.Future
 class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
+
   import driver.api._
 
   private[dao] val Pings = TableQuery[PingsTable]
@@ -96,6 +97,27 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
       Pings.filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
         .sortBy(_.date.desc).take(limit).result
     )
+
+  /**
+    * Find recent pings with given pingextra key->value, optionally input the product
+    */
+  def findRecentWithExtraValue(pingExtraKey: String, pingExtraValue: String, amount: Int, product: Option[Product], offset: Int = 0)(implicit pingExtrasDAO: PingExtrasDAO): Future[Seq[Ping]] = {
+    db.run(
+      (
+          Pings
+            .filter(pi => product.map(_.shortName).map(pi.product === _).getOrElse(true:Rep[Boolean]))
+        join
+          pingExtrasDAO.PingExtras
+            .filter(pe => pe.key === pingExtraKey && pe.value === pingExtraValue)
+        on (_.id === _.pingId)
+      )
+          .map { case (ping, extra) => ping }
+          .sortBy(_.date.desc)
+          .drop(offset)
+          .take(amount)
+          .result
+    )
+  }
 
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)

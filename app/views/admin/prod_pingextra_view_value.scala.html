@@ -8,9 +8,15 @@
 
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
-@(prod: Product, pingExtraKey: String, pingExtraValue: String)(implicit ec: ExecutionContext, backend: Backend, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO, productsDAO: ProductsDAO)
+@import dao.PingsDAO
+@import dao.ResponsesDAO
+@(prod: Product, pingExtraKey: String, pingExtraValue: String)(implicit ec: ExecutionContext, reqHeader: RequestHeader, backend: Backend, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), (html"Key <code>${pingExtraKey}</code>", controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = None)), html"<code>${pingExtraValue}</code>")) {
+    <h3>Recent pings</h3>
+
+    @snippet.paged_ping_table(page => pingsDAO.findRecentWithExtraValue(pingExtraKey, pingExtraValue, 15, product = Some(prod), offset = 15 * page).await, controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)), showResponse = true)
+
     <h3>Associated licenses</h3>
 
     <div class="table-responsive">
