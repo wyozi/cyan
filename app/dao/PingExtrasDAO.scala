@@ -81,24 +81,13 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     db.run(
         pingsDAO.Pings
           .filter(_.product === prod.shortName)
-        join
+        joinLeft
           PingExtras
               .filter(r => r.key === key && r.value === value)
         on(_.id === _.pingId)
         map(_._1.license)
         distinctOn(x => x)
         result
-          /*
-        pingsDAO.Pings
-          .filter(_.userName === user)
-          .groupBy(r => (r.product, r.license))
-          .map { case ((p, l), _) => (p, l) }
-          join
-          productsDAO.Products
-          on (_._1 === _.shortName)
-        )
-        .map { case ((p, l), prod) => (prod, l) }
-        .result*/
     ) map(_.map(l => ProductLicense(prod, l)))
 
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =

@@ -106,7 +106,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
       (
           Pings
             .filter(pi => product.map(_.shortName).map(pi.product === _).getOrElse(true:Rep[Boolean]))
-        join
+        joinLeft
           pingExtrasDAO.PingExtras
             .filter(pe => pe.key === pingExtraKey && pe.value === pingExtraValue)
         on (_.id === _.pingId)
