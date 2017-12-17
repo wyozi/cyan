@@ -106,15 +106,15 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
       (
           Pings
             .filter(pi => product.map(_.shortName).map(pi.product === _).getOrElse(true:Rep[Boolean]))
-        joinLeft
+        join
           pingExtrasDAO.PingExtras
             .filter(pe => pe.key === pingExtraKey && pe.value === pingExtraValue)
-        on (_.id === _.pingId)
+        on ((a, b) => a.id === b.pingId)
       )
-          .map { case (ping, extra) => ping }
-          .sortBy(_.date.desc)
+          .sortBy(_._1.id.desc)
           .drop(offset)
           .take(amount)
+          .map { case (ping, extra) => ping }
           .result
     )
   }

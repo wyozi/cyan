@@ -77,16 +77,24 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
       result
     )
 
-  def findProductLicensesByExtraKeyValue(prod: model.Product, key: String, value: String): Future[Seq[ProductLicense]] =
+  /**
+    * Finds distinct product licenses whose latest ping has given pingextra key->value
+    * @param prod
+    * @param key
+    * @param value
+    * @return
+    */
+  def findProductLicensesByLatestExtraKeyValue(prod: model.Product, key: String, value: String): Future[Seq[ProductLicense]] =
     db.run(
         pingsDAO.Pings
           .filter(_.product === prod.shortName)
-        joinLeft
+          .groupBy(_.license)
+          .map{ case (license, rows) => (license, rows.map(_.id).max) }
+        join
           PingExtras
-              .filter(r => r.key === key && r.value === value)
-        on(_.id === _.pingId)
-        map(_._1.license)
-        distinctOn(x => x)
+              .filter(r => r.key === key)
+        on( (a, b) => a._2 === b.pingId && b.value === value)
+        map(_._1._1)
         result
     ) map(_.map(l => ProductLicense(prod, l)))
 

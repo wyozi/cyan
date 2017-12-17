@@ -18,6 +18,7 @@
     @snippet.paged_ping_table(page => pingsDAO.findRecentWithExtraValue(pingExtraKey, pingExtraValue, 15, product = Some(prod), offset = 15 * page).await, controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)), showResponse = true)
 
     <h3>Associated licenses</h3>
+    <i>Includes only licenses whose latest ping had this pingextra key and value </i>
 
     <div class="table-responsive">
         <table class="table">
@@ -27,7 +28,7 @@
                 </tr>
             </thead>
             <tbody>
-            @for(prodLicense <- pingExtrasDAO.findProductLicensesByExtraKeyValue(prod, pingExtraKey, pingExtraValue).await) {
+            @for(prodLicense <- pingExtrasDAO.findProductLicensesByLatestExtraKeyValue(prod, pingExtraKey, pingExtraValue).await) {
                 <tr>
                     <td>
                     @backend.transformLicenseHtml(model.backendLicense(prodLicense.prod, prodLicense.license)) {
