@@ -5,7 +5,7 @@
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
 
-@this()(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
+@this(layout_admin: views.html.admin.layout_admin)(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
 @(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Users"))) {

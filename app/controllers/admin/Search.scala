@@ -8,7 +8,10 @@ import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends Controller with Secured {
+class Search @Inject()
+  (layout_admin_simple: views.html.admin.layout_admin_simple)
+  (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends Controller with Secured {
+
   import cyan.util.TwirlHelpers._
   import play.api.data.Forms._
   val queryForm = Form("query" -> text)
@@ -53,7 +56,7 @@ class Search @Inject() (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parse
           .sequence(licenseSearch :: userSearch :: ipSearch :: Nil)
           .map(_.flatten.head) // flatten results and pick first one
           .recover {
-            case _ => Ok(views.html.admin.layout_admin_simple(Seq(html"""Search: <code>$query</code>"""))(html"No results!"))
+            case _ => Ok(layout_admin_simple(Seq(html"""Search: <code>$query</code>"""))(html"No results!"))
           }
       }
     )

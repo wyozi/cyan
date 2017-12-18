@@ -5,7 +5,7 @@
 @import util.FutureUtils._
 @import cyan.backend.Backend
 @import dao.ProductConfigDAO
-@this()(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@this(layout_admin_simple: views.html.admin.layout_admin_simple)(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
 @()(implicit req: RequestHeader)
 
 @layout_admin_simple() {

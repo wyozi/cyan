@@ -1,7 +1,7 @@
 @import anomalydetection._
 @import dao.ProductsDAO
 @import util.FutureUtils._
-@this(implicit productsDAO: ProductsDAO)
+@this(layout_admin_simple: views.html.admin.layout_admin_simple)(implicit productsDAO: ProductsDAO)
 @(detectors: java.util.Set[AnomalyDetector])
 
 @severityBootstrapClass(severity: AnomalySeverity) = {

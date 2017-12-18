@@ -17,7 +17,7 @@
 @import cyan.backend.Backend
 @import play.filters.csrf.CSRF
 
-@this()(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO, backend: Backend)
+@this(layout_admin_simple: views.html.admin.layout_admin_simple)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, productConfigDAO: ProductConfigDAO, responsesDAO: ResponsesDAO, pingExtrasDAO: PingExtrasDAO, pingResponsesDAO: PingResponsesDAO, plpDAO: ProdLicensePingDAO, backend: Backend)
 @(prodLicense: ProductLicense)(implicit requestHeader: RequestHeader)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prodLicense.prod, html"License <code>${prodLicense.license}</code>")) {

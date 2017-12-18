@@ -7,7 +7,7 @@
 @import scala.concurrent.ExecutionContext.Implicits.global
 @import dao.PingsDAO
 
-@this()(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, plpDAO: ProdLicensePingDAO)
+@this(layout_admin_simple: views.html.admin.layout_admin_simple)(implicit productsDAO: ProductsDAO, pingsDAO: PingsDAO, plpDAO: ProdLicensePingDAO)
 @(products: Seq[Product], userForm: Form[(String, String)])(implicit requestHeader: RequestHeader, messages: Messages)
 
 @layout_admin_simple(Seq("Products")) {

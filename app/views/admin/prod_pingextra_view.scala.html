@@ -8,7 +8,7 @@
 
 @import scala.concurrent.ExecutionContext
 
-@this()(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@this(layout_admin_simple: views.html.admin.layout_admin_simple)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
 @(prod: Product, pingExtraKey: String, days: Int)
 
 @* Calculate how many steps between each datapoint *@

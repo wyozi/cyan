@@ -3,9 +3,10 @@
 @import controllers.admin.Anomalies
 @import dao.ProductsDAO
 @import util.FutureUtils._
+@this(root_layout: views.html.layout)
 @(subTitle: String, scripts: Html = Html(""))(content: Html)(implicit productsDAO: ProductsDAO)
 
-@layout(subTitle) {
+@root_layout(subTitle) {
     <nav class="navbar navbar-default navbar-fixed-top">
         <div class="container">
             <div class="navbar-header">

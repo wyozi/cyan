@@ -4,7 +4,7 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext
 
-@this()(implicit ex: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO)
+@this(layout_admin: views.html.admin.layout_admin)(implicit ex: ExecutionContext, pingsDAO: PingsDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO)
 @(prod: model.Product)
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Responses"))) {
