@@ -1,0 +1,3 @@
+#!/bin/bash
+
+docker run --name cyan-dev -p 127.0.0.1:5432:5432 -e POSTGRES_USER=cyan -e POSTGRES_PASSWORD=secretpass -d postgres:10

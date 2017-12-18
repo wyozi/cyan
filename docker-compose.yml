@@ -1,0 +1,19 @@
+version: "2"
+
+services:
+  cyan:
+    image: hseeberger/scala-sbt
+    ports:
+      - "9000:9000"
+    volumes:
+      - ".:/root/cyan"
+    working_dir: /root/cyan
+    command: scripts/run_dev
+    depends_on:
+      - db
+    stdin_open: true
+    tty: true
+  db:
+    image: postgres
+    ports:
+      - "5432:5432"

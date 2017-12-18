@@ -1,0 +1,9 @@
+#!/bin/bash
+
+sbt run -DapplyEvolutions.default=true \
+-Dcyan.password=test \
+-Dslick.dbs.default.driver=slick.driver.PostgresDriver$ \
+-Dslick.dbs.default.db.driver=org.postgresql.Driver \
+-Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan \
+-Dslick.dbs.default.db.user=cyan \
+-Dslick.dbs.default.db.password=secretpass

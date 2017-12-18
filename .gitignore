@@ -16,4 +16,5 @@ extensions/*.jar
 /RUNNING_PID
 /.settings
 cyan.db*
-    
+
+scripts/deploy

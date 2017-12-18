@@ -18,18 +18,17 @@ Cyan is best used with software products that are always connected to the intern
 #### Version/PingData development
 ![](http://fruitshake.wyozi.xyz:8080/f/2017-08-26_20-42-40.png)
 
-### Simple usage
+### Running development environment (using Docker)
 
-Note: these instructions are best used for quick development/testing purposes. For production deployment see [Play framework deployment documentation](https://www.playframework.com/documentation/2.6.x/Deploying).
+Note: these instructions are primarily meant for development and local testing. For deployment to production, see [Play framework deployment documentation](https://www.playframework.com/documentation/2.6.x/Deploying).
 
 __Requirements:__
-- [Scala Build Tool](http://www.scala-sbt.org/)
-- Postgres server (technically Cyan comes with H2 as the default database server, but the support is lacking)
+- Docker
 
 __Steps:__  
-1. Clone Cyan repository, start cmd/terminal in the cloned folder and run `sbt` to fetch dependencies
-2. Running `sbt` should have put you in the SBT console. Start the server with ```run -DapplyEvolutions.default=true -Dcyan.password=test -Dslick.dbs.default.driver=slick.driver.PostgresDriver$ -Dslick.dbs.default.db.driver=org.postgresql.Driver -Dslick.dbs.default.db.url=jdbc:postgresql://localhost/cyan -Dslick.dbs.default.db.user=cyanuser -Dslick.dbs.default.db.password=cyanpass```. You should replace postgres user/pass/db/url and the cyan.password to your own.
-3. Access admin panel in ```http://localhost:9000/admin``` using `admin` for user and `test` (or whatever you chose) for password
+1. Clone Cyan repository
+2. Run `docker-compose up`
+3. Access admin panel in ```http://localhost:9000/admin``` using `admin` for user and `test` for password
 
 ### Getting started
 
