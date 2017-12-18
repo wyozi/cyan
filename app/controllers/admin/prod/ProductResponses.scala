@@ -8,21 +8,16 @@ import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ProductResponses @Inject() ()
-  (implicit ec: ExecutionContext,
-    pingsDAO: PingsDAO,
-    pingResponsesDAO: PingResponsesDAO,
-    responsesDAO: ResponsesDAO,
-    productConfigDAO: ProductConfigDAO,
-    pingExtrasDAO: PingExtrasDAO,
-    plpDAO: ProdLicensePingDAO,
-    parser: BodyParsers.Default,
-    productsDAO: ProductsDAO) extends Controller with Secured {
+class ProductResponses @Inject()
+  (val listTemplate: views.html.admin.prod_resp_list,
+   productsDAO: ProductsDAO,
+   pingResponsesDAO: PingResponsesDAO)
+  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends Controller with Secured {
 
   def list(prodId: Int) = SecureAction.async {
     productsDAO.findById(prodId).map {
       case Some(prod) =>
-        Ok(views.html.admin.prod_resp_list(prod))
+        Ok(listTemplate(prod))
     }
   }
 

@@ -14,21 +14,14 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 16.2.2016.
   */
-class ProductLicenses @Inject() ()
-  (implicit backend: Backend,
-    pingResponsesDAO: PingResponsesDAO,
-    responsesDAO: ResponsesDAO,
-    productConfigDAO: ProductConfigDAO,
-    pingExtrasDAO: PingExtrasDAO,
-    pingsDAO: PingsDAO,
-    plpDAO: ProdLicensePingDAO,
-    parser: BodyParsers.Default,
-    productsDAO: ProductsDAO) extends Controller with Secured {
+class ProductLicenses @Inject()
+  (val viewTemplate: views.html.admin.prod_license_view, productsDAO: ProductsDAO, pingResponsesDAO: PingResponsesDAO)
+  (implicit parser: BodyParsers.Default) extends Controller with Secured {
 
   def licenseView(prodId: Int, licenseId: String) = SecureAction.async { implicit request =>
     productsDAO.findById(prodId).map {
       case Some(prod) =>
-        Ok(views.html.admin.prod_license_view(ProductLicense(prod, licenseId)))
+        Ok(viewTemplate(ProductLicense(prod, licenseId)))
     }
   }
 

@@ -11,7 +11,8 @@
 @import dao.ProdLicensePingDAO
 @import scala.concurrent.ExecutionContext
 @import dao.ProductConfigDAO
-@(license: model.License)(implicit ex: ExecutionContext, backend: Backend, pingsDAO: PingsDAO, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, productConfigDAO: ProductConfigDAO, plpDAO: ProdLicensePingDAO)
+@this()(implicit ex: ExecutionContext, backend: Backend, pingsDAO: PingsDAO, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO, productConfigDAO: ProductConfigDAO, plpDAO: ProdLicensePingDAO)
+@(license: model.License)
 
 @layout_admin_simple(Seq("Licenses", html"<code>$license</code>")) {
     <h3>Products used with this license</h3>

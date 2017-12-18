@@ -14,7 +14,9 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext.Implicits.global
 @import controllers.admin.prod.Products
-@(prod: Product, devLicense: Option[String])(implicit backend: Backend, reqHeader: RequestHeader, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+
+@this()(implicit backend: Backend, ec: ExecutionContext, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO, pingResponsesDAO: PingResponsesDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, devLicense: Option[String])(implicit reqHeader: RequestHeader)
 
 @navSeq = @{Seq(("Products", controllers.admin.prod.routes.Products.list()), prod)}
 

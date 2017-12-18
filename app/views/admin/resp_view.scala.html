@@ -5,7 +5,8 @@
 @import util.FutureUtils._
 @import dao.PingExtrasDAO
 @import play.filters.csrf.CSRF
-@(resp: Response)(implicit requestHeader: RequestHeader, webJarAssets: WebJarAssets = play.api.Play.current.injector.instanceOf[WebJarAssets], backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
+@this(webJarAssets: WebJarAssets)(implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO)
+@(resp: Response)(implicit requestHeader: RequestHeader)
 
 @layout_admin_simple(Seq(("Responses", controllers.admin.routes.Responses.list()), resp)) {
 

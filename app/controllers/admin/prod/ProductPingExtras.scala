@@ -11,28 +11,24 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by wyozi on 16.2.2016.
   */
-class ProductPingExtras @Inject() ()
-  (implicit backend: Backend,
-    pingResponsesDAO: PingResponsesDAO,
-    responsesDAO: ResponsesDAO,
-    plpDAO: ProdLicensePingDAO,
-    productConfigDAO: ProductConfigDAO,
-    pingsDAO: PingsDAO,
-    pingExtrasDAO: PingExtrasDAO,
-    parser: BodyParsers.Default,
-    productsDAO: ProductsDAO) extends Controller with Secured {
+class ProductPingExtras @Inject()
+  (val listTemplate: views.html.admin.prod_pingextra_list,
+   viewKeyTemplate: views.html.admin.prod_pingextra_view,
+   viewValueTemplate: views.html.admin.prod_pingextra_view_value,
+   productsDAO: ProductsDAO)
+  (implicit parser: BodyParsers.Default) extends Controller with Secured {
 
   def list(prodId: Int) = SecureAction.async {
     productsDAO.findById(prodId).map {
-      case Some(prod) => Ok(views.html.admin.prod_pingextra_list(prod))
+      case Some(prod) => Ok(listTemplate(prod))
     }
   }
 
   def view(prodId: Int, key: String, days: Int, value: Option[String]) = SecureAction.async { implicit request =>
     productsDAO.findById(prodId).map {
       case Some(prod) => Ok(value match {
-        case Some(v) => views.html.admin.prod_pingextra_view_value(prod, key, v)
-        case _ => views.html.admin.prod_pingextra_view(prod, key, days)
+        case Some(v) => viewValueTemplate(prod, key, v)
+        case _ => viewKeyTemplate(prod, key, days)
       })
     }
   }

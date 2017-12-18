@@ -10,7 +10,9 @@
 @import cyan.backend.Backend
 @import dao.PingsDAO
 @import dao.ResponsesDAO
-@(prod: Product, pingExtraKey: String, pingExtraValue: String)(implicit ec: ExecutionContext, reqHeader: RequestHeader, backend: Backend, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO)
+
+@this()(implicit ec: ExecutionContext, backend: Backend, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO, productsDAO: ProductsDAO, responsesDAO: ResponsesDAO)
+@(prod: Product, pingExtraKey: String, pingExtraValue: String)(implicit reqHeader: RequestHeader)
 
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), (html"Key <code>${pingExtraKey}</code>", controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = None)), html"<code>${pingExtraValue}</code>")) {
     <h3>Recent pings</h3>

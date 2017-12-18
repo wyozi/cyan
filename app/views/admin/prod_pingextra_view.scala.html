@@ -7,7 +7,9 @@
 @import cyan.util.TwirlHelpers._
 
 @import scala.concurrent.ExecutionContext
-@(prod: Product, pingExtraKey: String, days: Int)(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+
+@this()(implicit ec: ExecutionContext, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO, productConfigDAO: ProductConfigDAO)
+@(prod: Product, pingExtraKey: String, days: Int)
 
 @* Calculate how many steps between each datapoint *@
 @countDataStep(totalDays: Int) = @{1 + (totalDays / 100)}

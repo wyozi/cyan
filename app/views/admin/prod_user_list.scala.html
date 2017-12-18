@@ -4,7 +4,9 @@
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
-@(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
+
+@this()(implicit ex: ExecutionContext, backend: Backend, productsDAO: ProductsDAO, pingExtrasDAO: PingExtrasDAO)
+@(prod: model.Product, hoursAgo: Long, userPings: Seq[model.Ping])
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Users"))) {
     @prod_sidebar(prod)

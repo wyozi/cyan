@@ -9,13 +9,12 @@ import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class Anomalies @Inject() (val detections: java.util.Set[AnomalyDetector])(
-  implicit productsDAO: ProductsDAO,
-  parser: BodyParsers.Default,
-  ex: ExecutionContext
-) extends Controller with Secured {
+class Anomalies @Inject()
+  (val detections: java.util.Set[AnomalyDetector], overviewView: views.html.admin.anomaly_overview)
+  (implicit parser: BodyParsers.Default, ex: ExecutionContext) extends Controller with Secured {
+
   def overview = SecureAction {
-    Ok(views.html.admin.anomaly_overview(detections))
+    Ok(overviewView(detections))
   }
 
   def fetch(anomalyId: String) = SecureAction.async { req =>

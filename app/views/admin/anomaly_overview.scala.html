@@ -1,7 +1,8 @@
 @import anomalydetection._
 @import dao.ProductsDAO
 @import util.FutureUtils._
-@(detectors: java.util.Set[AnomalyDetector])(implicit productsDAO: ProductsDAO)
+@this(implicit productsDAO: ProductsDAO)
+@(detectors: java.util.Set[AnomalyDetector])
 
 @severityBootstrapClass(severity: AnomalySeverity) = {
     @severity match {

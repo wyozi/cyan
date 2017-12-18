@@ -9,8 +9,8 @@ import play.api.mvc.{BodyParsers, Controller}
 
 import scala.concurrent.ExecutionContext
 
-class IPs @Inject() (implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, parser: BodyParsers.Default, ec: ExecutionContext, responsesDAO: ResponsesDAO) extends Controller with Secured {
+class IPs @Inject() (viewTemplate: views.html.admin.ip_view)(implicit ec: ExecutionContext, parser: BodyParsers.Default) extends Controller with Secured {
   def viewIp(ip: String) = SecureAction {
-    Ok(views.html.admin.ip_view(ip))
+    Ok(viewTemplate(ip))
   }
 }

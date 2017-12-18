@@ -6,7 +6,8 @@
 @import cyan.util.TwirlHelpers._
 @import cyan.backend.Backend
 @import dao.ProductConfigDAO
-@(ip: String)(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@this(implicit backend: Backend, productsDAO: ProductsDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@(ip: String)
 
 @layout_admin_simple(Seq("IPs", html"<code>${ip}</code>")) {
     <h3>Recent pings from IP <code>@ip</code></h3>

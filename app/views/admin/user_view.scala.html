@@ -7,7 +7,8 @@
 @import cyan.backend.Backend
 @import dao.ProductConfigDAO
 @import dao.ProdLicensePingDAO
-@(user: String)(implicit backend: Backend, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@this()(implicit backend: Backend, productsDAO: ProductsDAO, plpDAO: ProdLicensePingDAO, productConfigDAO: ProductConfigDAO, pingExtrasDAO: PingExtrasDAO, pingsDAO: PingsDAO, responsesDAO: ResponsesDAO)
+@(user: String)
 
 @layout_admin_simple(Seq("Users", html"<code>$user</code>")) {
     <h3>Productlicenses used by this user</h3>

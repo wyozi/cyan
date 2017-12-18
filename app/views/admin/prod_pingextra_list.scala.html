@@ -3,7 +3,9 @@
 @import shapeless._
 @import scala.concurrent.Future
 @import scala.concurrent.ExecutionContext
-@(prod: model.Product)(implicit ex: ExecutionContext, pingExtrasDAO: PingExtrasDAO, productsDAO: ProductsDAO)
+
+@this()(implicit ex: ExecutionContext, pingExtrasDAO: PingExtrasDAO, productsDAO: ProductsDAO)
+@(prod: model.Product)
 
 @layout_admin(_root_.views.snippet.nav.NavObjects.mkString(Seq(prod, "Ping Extras"))) {
     @prod_sidebar(prod)

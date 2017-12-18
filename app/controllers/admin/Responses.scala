@@ -14,7 +14,11 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Responses @Inject()(val controllerComponents: ControllerComponents) (implicit backend: Backend, productsDAO: ProductsDAO, pingsDAO: PingsDAO, pingExtrasDAO: PingExtrasDAO, responsesDAO: ResponsesDAO,  parser: BodyParsers.Default) extends BaseController with Secured with I18nSupport {
+class Responses @Inject()
+  (val controllerComponents: ControllerComponents, listTemplate: views.html.admin.resps, viewTemplate: views.html.admin.resp_view,
+   responsesDAO: ResponsesDAO)
+  (implicit parser: BodyParsers.Default) extends BaseController with Secured with I18nSupport {
+
   import play.api.data.Forms._
   val responseForm = Form(
     tuple(
@@ -24,13 +28,13 @@ class Responses @Inject()(val controllerComponents: ControllerComponents) (impli
   )
 
   def list = SecureAction.async { implicit request =>
-    responsesDAO.getAll().map(resps => Ok(views.html.admin.resps(resps, responseForm)))
+    responsesDAO.getAll().map(resps => Ok(listTemplate(resps, responseForm)))
   }
 
   def view(respId: Int) = SecureAction.async { implicit request =>
     responsesDAO.findById(respId).map {
       case Some(resp) =>
-        Ok(views.html.admin.resp_view(resp))
+        Ok(viewTemplate(resp))
     }
   }
 
@@ -58,7 +62,7 @@ class Responses @Inject()(val controllerComponents: ControllerComponents) (impli
 
   def create = SecureAction { implicit request =>
     responseForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin.resps(Seq(), formWithErrors)),
+      formWithErrors => BadRequest(listTemplate(Seq(), formWithErrors)),
       resp => {
         responsesDAO.insert(resp._1, resp._2)
         Redirect(routes.Responses.list())

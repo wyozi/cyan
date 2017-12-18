@@ -15,15 +15,14 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 4.2.2016.
   */
-class Products @Inject()(val controllerComponents: ControllerComponents) (implicit backend: Backend,
-  responsesDAO: ResponsesDAO,
-  pingResponsesDAO: PingResponsesDAO,
-  pingsDAO: PingsDAO,
-  productsDAO: ProductsDAO,
-  productConfigDAO: ProductConfigDAO,
-  plpDAO: ProdLicensePingDAO,
-  parser: BodyParsers.Default,
-  pingExtrasDAO: PingExtrasDAO) extends BaseController with Secured with I18nSupport {
+class Products @Inject()
+  (val controllerComponents: ControllerComponents,
+   listTemplate: views.html.admin.prods,
+   viewTemplate: views.html.admin.prod_view,
+   productsDAO: ProductsDAO,
+   pingResponsesDAO: PingResponsesDAO)
+  (implicit parser: BodyParsers.Default, productConfigDAO: ProductConfigDAO) extends BaseController with Secured with I18nSupport {
+
   import play.api.data.Forms._
   val productForm = Form(
     tuple(
@@ -33,7 +32,7 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
   )
 
   def list = SecureAction.async { implicit request =>
-    productsDAO.getAll().map(prods => Ok(views.html.admin.prods(prods, productForm)))
+    productsDAO.getAll().map(prods => Ok(listTemplate(prods, productForm)))
   }
 
   def view(prodId: Int) = SecureAction.async { implicit request =>
@@ -42,7 +41,7 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
     for {
       prod <- productsDAO.findById(prodId).map(_.get)
       devLicense <- prod.queryDevLicense()
-    } yield Ok(views.html.admin.prod_view(prod, devLicense))
+    } yield Ok(viewTemplate(prod, devLicense))
   }
 
 
@@ -82,7 +81,7 @@ class Products @Inject()(val controllerComponents: ControllerComponents) (implic
 
   def create = SecureAction { implicit request =>
     productForm.bindFromRequest().fold(
-      formWithErrors => BadRequest(views.html.admin.prods(Seq(), formWithErrors)),
+      formWithErrors => BadRequest(listTemplate(Seq(), formWithErrors)),
       prod => {
         productsDAO.insert(prod._1, prod._2)
         Redirect(routes.Products.list())
