@@ -23,18 +23,18 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
 
   import profile.api._
 
-  implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, product = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
+  implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, productId = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
 
   def findProductLicensesByUser(user: String): Future[Seq[ProductLicense]] =
     db.run(
       (
         pingsDAO.Pings
           .filter(_.userName === user)
-          .groupBy(r => (r.product, r.license))
+          .groupBy(r => (r.productId, r.license))
           .map { case ((p, l), _) => (p, l) }
         join
           productsDAO.Products
-        on (_._1 === _.shortName)
+        on (_._1 === _.id)
       )
         .map { case ((p, l), prod) => (prod, l) }
         .result
@@ -46,7 +46,7 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   def findRecentUserPings(prodLicense: ProductLicense): Future[Seq[Ping]] =
     db.run(
         pingsDAO.Pings
-          .filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+          .filter(p => p.productId === prodLicense.prod.id && p.license === prodLicense.license)
           .groupBy(_.userName)
           .map { case (user, pings) => pings.map(_.id).max }
       join
@@ -64,7 +64,7 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
     db.run(
         pingsDAO.Pings
           .filter(p => p.license === license)
-          .groupBy(_.product)
+          .groupBy(_.productId)
           .map { case (prod, pings) => pings.map(_.id).max }
       join
         pingsDAO.Pings

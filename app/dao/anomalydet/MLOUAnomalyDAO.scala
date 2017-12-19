@@ -16,12 +16,12 @@ class MLOUAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPr
   def findUserLicenseCount(threshold: Int): Future[Seq[(model.Product, String, Int)]] = {
     db.run(
       pingsDAO.Pings
-        .groupBy(pi => (pi.product, pi.userName))
+        .groupBy(pi => (pi.productId, pi.userName))
         .map { case ((prod, userName), rows) => (prod, userName, rows.map(_.license).distinct.length) }
         .filter(r => r._3 >= threshold)
       join
         productsDAO.Products
-      on (_._1 === _.shortName)
+      on (_._1 === _.id)
       map {
         case ((prodName, userName, count), prod) => (prod, userName, count)
       }

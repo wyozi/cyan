@@ -35,11 +35,11 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
     * Finds the count of distinct users on different days that pinged this product.
     * The returned value is sequence of (PingExtraValue, Seq[(Day, CountOfDistinctUserPings)])
     */
-  def findProductExtraDistinctValueCountsPerDay(product: String, key: String, since: LocalDate, ignoredLicense: Option[String]): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
+  def findProductExtraDistinctValueCountsPerDay(product: model.Product, key: String, since: LocalDate, ignoredLicense: Option[String]): Future[Seq[(Option[String], Seq[(LocalDate, Int)])]] = {
     db.run(
       (
           pingsDAO.Pings
-            .filter(pi => pi.product === product && pi.date >= new Timestamp(since.toDate.getTime))
+            .filter(pi => pi.productId === product.id && pi.date >= new Timestamp(since.toDate.getTime))
             .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
         joinLeft
           PingExtras
@@ -63,12 +63,12 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
 
   /**
     * Finds distinct ping extra keys and their value counts for given product.
-    * @param prodShortName
+    * @param prod
     */
-  def findExtraKeysAndCounts(prodShortName: String): Future[Seq[(String, Int)]] =
+  def findExtraKeysAndCounts(prod: model.Product): Future[Seq[(String, Int)]] =
     db.run(
         pingsDAO.Pings
-          .filter(_.product === prodShortName)
+          .filter(_.productId === prod.id)
       join
         PingExtras
       on (_.id === _.pingId)
@@ -87,7 +87,7 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
   def findProductLicensesByLatestExtraKeyValue(prod: model.Product, key: String, value: String): Future[Seq[ProductLicense]] =
     db.run(
         pingsDAO.Pings
-          .filter(_.product === prod.shortName)
+          .filter(_.productId === prod.id)
           .groupBy(_.license)
           .map{ case (license, rows) => (license, rows.map(_.id).max) }
         join

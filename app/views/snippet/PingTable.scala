@@ -14,14 +14,14 @@ object PingTable {
   import util.FutureUtils._
   def fetch(pings: Seq[Ping], showExtras: Boolean, showResponse: Boolean)(implicit productsDAO: ProductsDAO, responsesDAO: ResponsesDAO = null, pingExtrasDAO: PingExtrasDAO = null, productConfigDAO: ProductConfigDAO = null, backend: Backend = null, ec: ExecutionContext): Seq[(Ping, Product, Seq[PingExtra], Option[Response])] = {
 
-    val allProducts = productsDAO.findByShortNames(pings.map(_.product)).await()
+    val allProducts = productsDAO.findByIds(pings.map(_.productId)).await()
     val allExtras = if (showExtras) pingExtrasDAO.findExtras(pings.map(_.id)).await() else Nil
     val allResponses = if (showResponse) responsesDAO.findByIds(pings.flatMap(_.responseId)).await() else Nil
 
     pings.map { ping =>
       (
         ping,
-        allProducts.find(_.shortName == ping.product).get,
+        allProducts.find(_.id == ping.productId).get,
         allExtras.filter(_.pingId == ping.id),
         ping.responseId.flatMap(rid => allResponses.find(_.id == rid))
       )

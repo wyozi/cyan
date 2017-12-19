@@ -27,6 +27,9 @@ class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvi
   def findById(id: Int): Future[Option[Product]] =
     db.run(Products.filter(_.id === id).result.headOption)
 
+  def findByIds(ids: Seq[Int]): Future[Seq[Product]] =
+    db.run(Products.filter(_.id inSetBind ids).result)
+
   def findByShortName(shortName: String): Future[Option[Product]] =
     db.run(Products.filter(_.shortName === shortName).result.headOption)
 

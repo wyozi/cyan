@@ -129,7 +129,7 @@
 }
 
 @defining(
-        pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod.shortName, pingExtraKey, LocalDate.now().minusDays(days), prod.queryDevLicense().await).await
+        pingExtrasDAO.findProductExtraDistinctValueCountsPerDay(prod, pingExtraKey, LocalDate.now().minusDays(days), prod.queryDevLicense().await).await
 ) { data =>
     @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), html"Key <code>${pingExtraKey}</code>"), scripts(data)) {
 

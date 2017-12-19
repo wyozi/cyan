@@ -34,7 +34,7 @@ class PingReceiver @Inject()
       }
       .flatMap { // (prod, resp) to (pingId, resp)
         case (prod, resp) =>
-          pingsDAO.insert(product, license, user, req.remoteAddress, resp.map(_.id)).map(pingId => (pingId, resp))
+          pingsDAO.insert(prod.id, license, user, req.remoteAddress, resp.map(_.id)).map(pingId => (pingId, resp))
       }
       .map { // (pingId, resp) to resp
         case (pingId, response) =>

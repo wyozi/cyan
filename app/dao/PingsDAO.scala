@@ -23,8 +23,8 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   /**
     * Inserts given ping to Pings table and returns id.
     */
-  def insert(product: String, license: String, user: String, remoteAddress: String, responseId: Option[Int]): Future[Int] =
-    db.run((Pings.map(c => (c.product, c.license, c.userName, c.ip, c.responseId)) returning Pings.map(_.id)) += (product, license, user, remoteAddress, responseId))
+  def insert(productId:Int , license: String, user: String, remoteAddress: String, responseId: Option[Int]): Future[Int] =
+    db.run((Pings.map(c => (c.productId, c.license, c.userName, c.ip, c.responseId)) returning Pings.map(_.id)) += (productId, license, user, remoteAddress, responseId))
 
   /**
     * Find latest pings sorted by ID descendingly.
@@ -42,7 +42,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   def findRecentForProduct(prod: Product, limit: Int, offset: Int = 0, ignoredLicense: Option[String] = None): Future[Seq[Ping]] =
     db.run(
       Pings
-        .filter(_.product === prod.shortName)
+        .filter(_.productId === prod.id)
         .filterNot(pi => ignoredLicense.map(pi.license === _).getOrElse(false:Rep[Boolean]))
         .sortBy(_.id.desc)
         .drop(offset)
@@ -72,13 +72,13 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     * Find count of distinct licenses for given product.
     */
   def findLicenseCount(prod: Product): Future[Int] =
-    db.run(Pings.filter(_.product === prod.shortName).map(_.license).countDistinct.result)
+    db.run(Pings.filter(_.productId === prod.id).map(_.license).distinct.length.result)
 
   /**
     * Find amount of pings for given product.
     */
   def findPingCount(prod: Product): Future[Int] =
-    db.run(Pings.filter(_.product === prod.shortName).length.result)
+    db.run(Pings.filter(_.productId === prod.id).length.result)
 
   /**
     * Find recent pings with given license.
@@ -93,7 +93,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     */
   def findRecentWithProdLicense(prodLicense: ProductLicense, limit: Int): Future[Seq[Ping]] =
     db.run(
-      Pings.filter(p => p.product === prodLicense.prod.shortName && p.license === prodLicense.license)
+      Pings.filter(p => p.productId === prodLicense.prod.id && p.license === prodLicense.license)
         .sortBy(_.date.desc).take(limit).result
     )
 
@@ -104,7 +104,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run(
       (
           Pings
-            .filter(pi => product.map(_.shortName).map(pi.product === _).getOrElse(true:Rep[Boolean]))
+            .filter(pi => product.map(_.id).map(pi.productId === _).getOrElse(true:Rep[Boolean]))
         join
           pingExtrasDAO.PingExtras
             .filter(pe => pe.key === pingExtraKey && pe.value === pingExtraValue)
@@ -121,15 +121,15 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)
 
-    def product = column[String]("product", O.SqlType("VARCHAR(255)"))
     def license = column[String]("license", O.SqlType("VARCHAR(255)"))
     def userName = column[String]("user_name", O.SqlType("VARCHAR(64)"))
     def date = column[Timestamp]("date")
     def responseId = column[Option[Int]]("response_id")
+    def productId = column[Int]("product_id")
 
     def ip = column[String]("ip", O.SqlType("VARCHAR(16)"))
 
-    override def * = (id, date, product, license, userName, ip, responseId) <> (Ping.tupled, Ping.unapply _)
+    override def * = (id, date, productId, license, userName, ip, responseId) <> (Ping.tupled, Ping.unapply _)
     //def response = foreignKey("RESPONSE_FK", responseId, )
   }
 }
