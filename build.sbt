@@ -15,8 +15,7 @@ libraryDependencies ++= Seq( cache , ws, evolutions, specs2 % Test, guice )
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
-  "com.h2database" % "h2" % "1.4.191", // for development
-  "org.postgresql" % "postgresql" % "9.4-1206-jdbc4", // for prod
+  "org.postgresql" % "postgresql" % "9.4-1206-jdbc4",
   "com.google.inject.extensions" % "guice-multibindings" % "4.0",
   "com.chuusai" %% "shapeless" % "2.2.5", // THERE IS NO COMING BACK
   "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
