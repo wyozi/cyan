@@ -1,10 +1,9 @@
 package dao
 
-import com.google.inject.{Singleton, Inject}
+import com.google.inject.{Inject, Singleton}
 import model.{Ping, Product, ProductLicense}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
-import slick.jdbc.GetResult
+import slick.jdbc.{GetResult, JdbcProfile}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -22,7 +21,7 @@ class ProdLicensePingDAO @Inject() (protected val dbConfigProvider: DatabaseConf
   pingsDAO: PingsDAO)(implicit ec: ExecutionContext)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  import driver.api._
+  import profile.api._
 
   implicit val getAnomalyResult = GetResult(r => Ping(id = r.<<, product = r.<<, license = r.<<, user = r.<<, date = r.<<, responseId = r.<<, ip = r.<<))
 

@@ -6,7 +6,7 @@ import com.google.inject.{Inject, Singleton}
 import dao.{PingsDAO, ProductsDAO}
 import org.joda.time.LocalDateTime
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 
@@ -17,14 +17,14 @@ import scala.concurrent.Future
 class MUOLAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, pingsDAO: PingsDAO, productsDAO: ProductsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  import driver.api._
+  import profile.api._
 
   def findDistinctUserGroups(threshold: Int, since: LocalDateTime): Future[Seq[(model.Product, String, Int)]] = {
     db.run(
         pingsDAO.Pings
           .filter(_.date >= new Timestamp(since.toDate.getTime))
           .groupBy(pi => (pi.product, pi.license))
-          .map { case ((prod, license), rows) => (prod, license, rows.map(_.userName).countDistinct) }
+          .map { case ((prod, license), rows) => (prod, license, rows.map(_.userName).distinct.length) }
           .filter(r => r._3 >= threshold)
       join
         productsDAO.Products

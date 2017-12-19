@@ -5,7 +5,7 @@ import java.sql.Timestamp
 import com.google.inject.{Singleton, Inject}
 import model.{ProductLicense, Ping, Product}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 
@@ -16,8 +16,7 @@ import scala.concurrent.Future
 class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-
-  import driver.api._
+  import profile.api._
 
   private[dao] val Pings = TableQuery[PingsTable]
 

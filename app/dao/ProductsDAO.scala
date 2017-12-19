@@ -3,7 +3,7 @@ package dao
 import com.google.inject.{Singleton, Inject}
 import model.Product
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 
@@ -14,8 +14,7 @@ import scala.concurrent.Future
 class ProductsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-
-  import driver.api._
+  import profile.api._
 
   private[dao] val Products = TableQuery[ProductsTable]
 

@@ -3,7 +3,7 @@ package dao
 import com.google.inject.{Singleton, Inject}
 import model.{PingResponse, Response}
 import play.api.db.slick.{HasDatabaseConfigProvider, DatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,8 +15,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class PingResponsesDAO @Inject() (responsesDAO: ResponsesDAO)(protected implicit val dbConfigProvider: DatabaseConfigProvider)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-
-  import driver.api._
+  import profile.api._
 
   private[dao] val PingResponses = TableQuery[PingResponsesTable]
 

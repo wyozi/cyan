@@ -6,7 +6,7 @@ import com.google.inject.{Inject, Singleton}
 import model.{PingExtra, ProductLicense}
 import org.joda.time.LocalDate
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
-import slick.driver.JdbcProfile
+import slick.jdbc.JdbcProfile
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -18,7 +18,7 @@ import scala.concurrent.Future
 class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider, pingsDAO: PingsDAO)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
-  import driver.api._
+  import profile.api._
 
   private[dao] val PingExtras = TableQuery[PingExtrasTable]
 
