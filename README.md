@@ -30,6 +30,8 @@ __Steps:__
 2. Run `docker-compose up`
 3. Access admin panel in ```http://localhost:9000/admin``` using `admin` for user and `test` for password
 
+Included Docker compose file uses host's cached SBT/Ivy2 files if available, and exposes PostgreSQL and Cyan on ports 5432 and 9000 respectively on the host.
+
 ### Getting started
 
 Once you have Cyan server setup, it's time to actually use it for something.

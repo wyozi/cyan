@@ -2,11 +2,13 @@ version: "2"
 
 services:
   cyan:
-    image: hseeberger/scala-sbt
+    image: hseeberger/scala-sbt:8u151-2.12.4-1.0.4
     ports:
       - "9000:9000"
     volumes:
       - ".:/root/cyan"
+      - "~/.sbt:/root/.sbt"
+      - "~/.ivy2:/root/.ivy2"
     working_dir: /root/cyan
     command: scripts/run_dev
     depends_on:
@@ -14,6 +16,10 @@ services:
     stdin_open: true
     tty: true
   db:
-    image: postgres
+    image: postgres:9.5
+    environment:
+      - POSTGRES_USER=cyan
+      - POSTGRES_PASSWORD=secretpass
+      - POSTGRES_DB=cyan
     ports:
       - "5432:5432"
