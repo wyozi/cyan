@@ -12,11 +12,13 @@ import scala.concurrent.Future
 /**
   * Created by wyozi on 3.2.2016.
   */
-class PingReceiver @Inject() (productsDAO: ProductsDAO,
-  pingsDAO: PingsDAO,
-  responsesDAO: ResponsesDAO,
-  pingResponsesDAO: PingResponsesDAO,
-  pingExtrasDAO: PingExtrasDAO) extends Controller {
+class PingReceiver @Inject()
+  (cc: ControllerComponents,
+    productsDAO: ProductsDAO,
+    pingsDAO: PingsDAO,
+    responsesDAO: ResponsesDAO,
+    pingResponsesDAO: PingResponsesDAO,
+    pingExtrasDAO: PingExtrasDAO) extends AbstractController(cc) {
 
   private case class ProductNotFound() extends Exception("product not found")
 
@@ -44,7 +46,7 @@ class PingReceiver @Inject() (productsDAO: ProductsDAO,
       .map(resp => Ok(resp.map(_.body).getOrElse("")))
   }
 
-  def ping = Action.async { req =>
+  def ping: Action[AnyContent] = Action.async { req =>
     req.body.asFormUrlEncoded
         .map { params => // unpack user, license, prod, extras into a tuple
           (
