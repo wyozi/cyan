@@ -18,7 +18,7 @@ class Authentication @Inject() (val config: Configuration, actionBuilder: Defaul
     res.withSession(("loggedIn", "true"))
   }
 
-  private def testAuth(testUser: String, testPass: String): Boolean = (Some("admin"), password) match {
+  private def testAuth(testUser: String, testPass: String): Boolean = (Some(Authentication.AdminUsername), password) match {
     case (Some(user), Some(pass)) if user == testUser && pass == testPass => true
     case _ => false
   }
@@ -49,4 +49,8 @@ class Authentication @Inject() (val config: Configuration, actionBuilder: Defaul
   def adminOnlyAsync(block: (Request[AnyContent]) => Future[Result])(implicit ec: ExecutionContext, parser: BodyParsers.Default): Action[AnyContent] = adminOnly(actionBuilder.async { request =>
     block(request)
   })
+}
+object Authentication {
+  /// The username that must be used for logins to admin panel
+  val AdminUsername = "admin"
 }
