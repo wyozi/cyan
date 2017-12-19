@@ -2,18 +2,17 @@ package controllers.admin
 
 import javax.inject.Inject
 
-import auth.Secured
-import cyan.backend.Backend
-import dao._
-import play.api.mvc.{BodyParsers, Controller}
+import auth.Authentication
+import play.api.mvc.{AbstractController, BodyParsers, ControllerComponents}
 
 import scala.concurrent.ExecutionContext
 
-class GlobalLicenses @Inject() (template: views.html.admin.license_view)(
-  implicit ec: ExecutionContext,
-  parser: BodyParsers.Default
-) extends Controller with Secured {
-    def viewLicense(license: String) = SecureAction {
+class GlobalLicenses @Inject()
+  (cc: ControllerComponents,
+   auth: Authentication,
+   template: views.html.admin.license_view)
+  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends AbstractController(cc) {
+    def viewLicense(license: String) = auth.adminOnly { _ =>
       Ok(template(license))
     }
 }

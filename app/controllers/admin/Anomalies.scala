@@ -1,23 +1,24 @@
 package controllers.admin
 
 import anomalydetection.AnomalyDetector
-import auth.Secured
+import auth.Authentication
 import com.google.inject.Inject
-import dao.ProductsDAO
 import play.api.libs.json.Json
-import play.api.mvc.{BodyParsers, Controller}
+import play.api.mvc.{AbstractController, BodyParsers, ControllerComponents}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Anomalies @Inject()
-  (val detections: java.util.Set[AnomalyDetector], overviewView: views.html.admin.anomaly_overview)
-  (implicit parser: BodyParsers.Default, ex: ExecutionContext) extends Controller with Secured {
+  (val cc: ControllerComponents,
+   auth: Authentication,
+   detections: java.util.Set[AnomalyDetector], overviewView: views.html.admin.anomaly_overview)
+  (implicit parser: BodyParsers.Default, ex: ExecutionContext) extends AbstractController(cc) {
 
-  def overview = SecureAction {
+  def overview = auth.adminOnly { req =>
     Ok(overviewView(detections))
   }
 
-  def fetch(anomalyId: String) = SecureAction.async { req =>
+  def fetch(anomalyId: String) = auth.adminOnlyAsync { req =>
     import scala.collection.JavaConversions._
     detections.find(_.id == anomalyId) match {
       case Some(det) =>

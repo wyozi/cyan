@@ -4,22 +4,23 @@ import java.sql.Timestamp
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 
-import auth.Secured
+import auth.Authentication
 import com.google.inject.Inject
-import cyan.backend.Backend
 import dao.{ProductsDAO, _}
 import model.Ping
-import play.api.mvc.{BodyParsers, Controller}
+import play.api.mvc._
 
 import scala.concurrent.ExecutionContext
 
 class ProductUsers @Inject()
-  (val listTemplate: views.html.admin.prod_user_list,
+  (val cc: ControllerComponents,
+   auth: Authentication,
+   listTemplate: views.html.admin.prod_user_list,
    productsDAO: ProductsDAO,
    usersDAO: UsersDAO)
-  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends Controller with Secured {
+  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends AbstractController(cc) {
 
-  def list(productId: Int, withinHours: Option[Long] = None) = SecureAction.async {
+  def list(productId: Int, withinHours: Option[Long] = None): Action[AnyContent] = auth.adminOnlyAsync { _ =>
     val hours = withinHours.getOrElse(24L)
     val hoursAgo = Timestamp.from(Instant.now().minus(hours, ChronoUnit.HOURS))
 
@@ -31,7 +32,7 @@ class ProductUsers @Inject()
 
   private def buildCSV(users: Seq[Ping]) = "User\n" + users.map(_.user).mkString("\n")
 
-  def export(productId: Int, format: String) = SecureAction.async {
+  def export(productId: Int, format: String): Action[AnyContent] = auth.adminOnlyAsync { _ =>
     val hours = 999999L
     val hoursAgo = Timestamp.from(Instant.now().minus(hours, ChronoUnit.HOURS))
 

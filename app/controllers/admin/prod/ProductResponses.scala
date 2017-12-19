@@ -1,20 +1,22 @@
 package controllers.admin.prod
 
-import auth.Secured
+import auth.Authentication
 import com.google.inject.Inject
 import dao._
 import play.api.data.Form
-import play.api.mvc.{BodyParsers, Controller}
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ProductResponses @Inject()
-  (val listTemplate: views.html.admin.prod_resp_list,
+  (val cc: ControllerComponents,
+   auth: Authentication,
+   listTemplate: views.html.admin.prod_resp_list,
    productsDAO: ProductsDAO,
    pingResponsesDAO: PingResponsesDAO)
-  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends Controller with Secured {
+  (implicit ec: ExecutionContext, parser: BodyParsers.Default) extends AbstractController(cc) {
 
-  def list(prodId: Int) = SecureAction.async {
+  def list(prodId: Int): Action[AnyContent] = auth.adminOnlyAsync { _ =>
     productsDAO.findById(prodId).map {
       case Some(prod) =>
         Ok(listTemplate(prod))
@@ -30,7 +32,7 @@ class ProductResponses @Inject()
     )
   )
 
-  def insert(prodId: Int) = SecureAction.async { implicit request =>
+  def insert(prodId: Int): Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
     responseForm.bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest("Error: " + formWithErrors.toString)), // TODO nicer error display
       pingResponse => {

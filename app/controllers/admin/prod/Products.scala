@@ -2,12 +2,11 @@ package controllers.admin.prod
 
 import javax.inject.Inject
 
-import auth.Secured
-import cyan.backend.Backend
+import auth.Authentication
 import dao._
 import play.api.data.Form
 import play.api.i18n.I18nSupport
-import play.api.mvc.{BaseController, BodyParsers, ControllerComponents}
+import play.api.mvc._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -16,12 +15,14 @@ import scala.concurrent.Future
   * Created by wyozi on 4.2.2016.
   */
 class Products @Inject()
-  (val controllerComponents: ControllerComponents,
+  (val cc: ControllerComponents,
+   auth: Authentication,
+   controllerComponents: ControllerComponents,
    listTemplate: views.html.admin.prods,
    viewTemplate: views.html.admin.prod_view,
    productsDAO: ProductsDAO,
    pingResponsesDAO: PingResponsesDAO)
-  (implicit parser: BodyParsers.Default, productConfigDAO: ProductConfigDAO) extends BaseController with Secured with I18nSupport {
+  (implicit parser: BodyParsers.Default, productConfigDAO: ProductConfigDAO) extends AbstractController(cc) with I18nSupport {
 
   import play.api.data.Forms._
   val productForm = Form(
@@ -31,11 +32,11 @@ class Products @Inject()
     )
   )
 
-  def list = SecureAction.async { implicit request =>
+  def list: Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
     productsDAO.getAll().map(prods => Ok(listTemplate(prods, productForm)))
   }
 
-  def view(prodId: Int) = SecureAction.async { implicit request =>
+  def view(prodId: Int): Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
     val futureProd = productsDAO.findById(prodId)
 
     for {
@@ -49,28 +50,26 @@ class Products @Inject()
   val productResponseForm = Form("response" -> optional(number))
   val productConfigForm = Form("value" -> text)
 
-  def configure(prodId: Int, configKey: String) = SecureAction.async { implicit request =>
+  def configure(prodId: Int, configKey: String): Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
     productsDAO.findById(prodId).flatMap {
       case Some(prod) =>
         val f = configKey match {
-          case "unreg_response" => {
+          case "unreg_response" =>
             productResponseForm.bindFromRequest().fold(
               formWithErrors => Future.failed(new Exception("form error")),
               response => {
                 pingResponsesDAO.upsertExactPingResponse(Some(prodId), None, None, response)
               }
             )
-          }
 
           // assume it's a product config
-          case key => {
+          case key =>
             productConfigForm.bindFromRequest().fold(
               formWithErrors => Future.failed(new Exception("form error")),
               value => {
                 productConfigDAO.upsertValue(prodId, configKey, value)
               }
             )
-          }
         }
 
         f.map { r =>
@@ -79,7 +78,7 @@ class Products @Inject()
     }
   }
 
-  def create = SecureAction { implicit request =>
+  def create: Action[AnyContent] = auth.adminOnly { implicit request =>
     productForm.bindFromRequest().fold(
       formWithErrors => BadRequest(listTemplate(Seq(), formWithErrors)),
       prod => {

@@ -1,22 +1,24 @@
 package controllers.admin
 
-import auth.Secured
+import auth.Authentication
 import com.google.inject.Inject
 import dao._
 import play.api.data.Form
-import play.api.mvc.{BodyParsers, Controller}
+import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Search @Inject()
-  (layout_admin_simple: views.html.admin.layout_admin_simple)
-  (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends Controller with Secured {
+  (cc: ControllerComponents,
+   auth: Authentication,
+   layout_admin_simple: views.html.admin.layout_admin_simple)
+  (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends AbstractController(cc) {
 
   import cyan.util.TwirlHelpers._
   import play.api.data.Forms._
   val queryForm = Form("query" -> text)
 
-  def search = SecureAction.async { implicit request =>
+  def search: Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
     queryForm.bindFromRequest().fold(
       formWithErrors => Future.successful(BadRequest("form errors: " + formWithErrors)), // TODO better error
 
