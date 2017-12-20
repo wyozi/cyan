@@ -17,7 +17,7 @@ class MLOUAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPr
     db.run(
       pingsDAO.Pings
         .groupBy(pi => (pi.productId, pi.userName))
-        .map { case ((prod, userName), rows) => (prod, userName, rows.map(_.license).distinct.length) }
+        .map { case ((prod, userName), rows) => (prod, userName, rows.map(_.license).countDistinct) }
         .filter(r => r._3 >= threshold)
       join
         productsDAO.Products

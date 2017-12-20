@@ -24,7 +24,7 @@ class MUOLAnomalyDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPr
         pingsDAO.Pings
           .filter(_.date >= new Timestamp(since.toDate.getTime))
           .groupBy(pi => (pi.productId, pi.license))
-          .map { case ((prod, license), rows) => (prod, license, rows.map(_.userName).distinct.length) }
+          .map { case ((prod, license), rows) => (prod, license, rows.map(_.userName).countDistinct) }
           .filter(r => r._3 >= threshold)
       join
         productsDAO.Products
