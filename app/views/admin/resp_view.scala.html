@@ -13,11 +13,34 @@
     <div class="panel panel-default">
         <div class="panel-body">
             <div class="panel-body">
-                <b>Response name
-                    <button type="button" class="btn btn-primary btn-xs" id="responseNameEdit">
-                        <span class="glyphicon glyphicon-pencil"></span>
-                    </button>
-                    :</b> <code id="responseName">@resp.name</code>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label">Response name
+                            <button type="button" class="btn btn-primary btn-xs" id="responseNameEdit">
+                                <span class="glyphicon glyphicon-pencil"></span>
+                            </button>
+                            :</label>
+                    </div>
+                    <div class="col-sm-9">
+                        <code id="responseName">@resp.name</code>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <label class="control-label">Color:</label>
+                    </div>
+                    <div class="col-sm-9">
+                        <select id="responseColor">
+                            @for(c <- model.NotificationColor.values) {
+                                <option value="@c.toString"
+                                @if(c == resp.color) {
+                                    selected="selected"
+                                }
+                                >@c.toString</option>
+                            }
+                        </select>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -63,5 +86,15 @@
                 }
             }
         });
+        $("#responseColor").change(function() {
+            $.post("@controllers.admin.routes.Responses.editColor(resp.id)", {
+                "color": $(this).val(),
+                @for(t <- CSRF.getToken) {
+                "@t.name": "@t.value"
+                }
+            }, function(data) {
+                window.location.reload();
+            });
+        })
     </script>
 }

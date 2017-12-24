@@ -42,6 +42,7 @@ POST        /admin/responses                              controllers.admin.Resp
 GET         /admin/responses/:id                          controllers.admin.Responses.view(id: Int)
 POST        /admin/responses/:id/name                     controllers.admin.Responses.editName(id: Int)
 POST        /admin/responses/:id/body                     controllers.admin.Responses.editBody(id: Int)
+POST        /admin/responses/:id/color                    controllers.admin.Responses.editColor(id: Int)
 
 GET         /admin/anomalies                              controllers.admin.Anomalies.overview
 GET         /admin/anomalies/:id                          controllers.admin.Anomalies.fetch(id)

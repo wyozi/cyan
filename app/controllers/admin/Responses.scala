@@ -3,7 +3,10 @@ package controllers.admin
 import auth.Authentication
 import com.google.inject.Inject
 import dao.ResponsesDAO
-import play.api.data.Form
+import model.NotificationColor
+import model.NotificationColor.NotificationColor
+import play.api.data.{Form, FormError}
+import play.api.data.format.Formatter
 import play.api.i18n.I18nSupport
 import play.api.mvc._
 
@@ -61,6 +64,17 @@ class Responses @Inject()
     )
   }
 
+  def editColor(respId: Int): Action[AnyContent] = auth.adminOnlyAsync { implicit request =>
+    val form = Form("color" -> of[NotificationColor])
+
+    form.bindFromRequest.fold(
+      errors => Future.successful(BadRequest("invalid form")),
+      color => responsesDAO.updateColor(respId, color).map { x =>
+        Ok("")
+      }
+    )
+  }
+
   def create: Action[AnyContent] = auth.adminOnly { implicit request =>
     responseForm.bindFromRequest().fold(
       formWithErrors => BadRequest(listTemplate(Seq(), formWithErrors)),
@@ -69,5 +83,16 @@ class Responses @Inject()
         Redirect(routes.Responses.list())
       }
     )
+  }
+
+  implicit private def notificationColorFormat: Formatter[NotificationColor] = new Formatter[NotificationColor] {
+
+    override def bind(key: String, data: Map[String, String]) =
+      data.get(key)
+        .map(NotificationColor.withName)
+        .toRight(Seq(FormError(key, "error.required", Nil)))
+
+    override def unbind(key: String, value: NotificationColor) =
+      Map(key -> value.toString)
   }
 }
