@@ -12,17 +12,23 @@ scalaVersion := "2.11.7"
 
 libraryDependencies ++= Seq( cache , ws, evolutions, specs2 % Test, guice )
 
+// Cyan
 libraryDependencies ++= Seq(
   "com.typesafe.play" %% "play-slick" % "3.0.0",
   "com.typesafe.play" %% "play-slick-evolutions" % "3.0.0",
   "org.postgresql" % "postgresql" % "9.4-1206-jdbc4",
   "com.google.inject.extensions" % "guice-multibindings" % "4.0",
-  "com.chuusai" %% "shapeless" % "2.2.5", // THERE IS NO COMING BACK
-
-  "com.h2database" % "h2" % "1.4.191" % "test", // for development
-  "org.scalatestplus" % "play_2.11" % "1.4.0" % "test"
+  "com.chuusai" %% "shapeless" % "2.2.5" // THERE IS NO COMING BACK
 )
 
+// Test
+libraryDependencies ++= Seq(
+  "org.scalatestplus.play" %% "scalatestplus-play" % "3.1.2" % "test",
+  "com.whisk" %% "docker-testkit-scalatest" % "0.9.5" % "test",
+  "com.whisk" %% "docker-testkit-impl-spotify" % "0.9.5" % "test"
+)
+
+// Web
 libraryDependencies ++= Seq(
   "org.webjars" %% "webjars-play" % "2.6.0-M1",
   "org.webjars" % "jquery" % "2.2.0",

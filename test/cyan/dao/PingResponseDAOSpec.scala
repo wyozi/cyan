@@ -1,9 +1,11 @@
 package cyan.dao
 
-import cyan.DBSpec
+import com.whisk.docker.scalatest.DockerTestKit
+import cyan.util.{DockerPostgresService, DockerTestKitPerTest}
 import dao.{PingResponsesDAO, ResponsesDAO}
 import org.scalatest.TestData
-import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerTest
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
@@ -12,14 +14,20 @@ import util.FutureUtils._
 /**
   * Created by wyozi on 5.2.2016.
   */
-class PingResponseDAOSpec extends PlaySpec with OneAppPerTest with DBSpec {
-  implicit override def newAppForTest(td: TestData): Application =
+
+class PingResponseDAOSpec extends PlaySpec with GuiceOneAppPerTest
+  with DockerPostgresService
+  with DockerTestKitPerTest {
+
+
+  implicit override def newAppForTest(td: TestData): Application = {
     new GuiceApplicationBuilder()
-      .configure(inMemorySlickDatabase())
+      .configure(dbConfig)
       .build()
+  }
 
   "PingResponseRepository" should {
-    "upsert ping response" in new App(){
+    "upsert ping response" in {
       val responsesDAO = app.injector.instanceOf[ResponsesDAO]
       val pingResponsesDAO = app.injector.instanceOf[PingResponsesDAO]
 
@@ -45,7 +53,8 @@ class PingResponseDAOSpec extends PlaySpec with OneAppPerTest with DBSpec {
       val id3 = await(pingResponsesDAO.upsertExactPingResponse(None, None, Some("Mike"), None))
       await(pingResponsesDAO.pingResponseCount) mustEqual 1 // TODO: should this remove the row?
       val pr3 = await(pingResponsesDAO.getPingResponse(id3))
-      pr3 must not be defined
+      pr3 mustBe defined
+      pr3.get.responseId must not be defined
     }
     "return correct exact ping response ids" in {
       val responsesDAO = app.injector.instanceOf[ResponsesDAO]
@@ -99,4 +108,5 @@ class PingResponseDAOSpec extends PlaySpec with OneAppPerTest with DBSpec {
       pingResponsesDAO.getBestPingResponse(Some(1), Some("license"), Some("user2")).await().flatMap(_.responseId) mustEqual Some(prodlicenseRespId)
     }
   }
+
 }
