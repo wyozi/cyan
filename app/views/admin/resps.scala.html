@@ -16,6 +16,6 @@
     <h2>Responses</h2>
 
     @for(resp <- responses) {
-        <a href="@controllers.admin.routes.Responses.view(resp.id)">@resp.name</a> <br>
+        <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-@resp.bootstrap3ClassSuffix">@resp.name</a>
     }
 }

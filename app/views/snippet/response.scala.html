@@ -2,17 +2,9 @@
 @import model.NotificationColor
 @(response: Option[Response])
 
-@clz(c: NotificationColor.NotificationColor) = @{
-    c match {
-        // TODO come up with colors for these
-        case NotificationColor.light | NotificationColor.dark | NotificationColor.secondary => "default"
-        case x => x.toString
-    }
-}
-
 @response match {
     case Some(resp) => {
-        <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-@clz(resp.color)">@resp.name</a>
+        <a href="@controllers.admin.routes.Responses.view(resp.id)" class="btn btn-xs btn-@resp.bootstrap3ClassSuffix">@resp.name</a>
     }
     case _ => { <i>Empty</i> }
 }
