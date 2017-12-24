@@ -3,7 +3,7 @@ package cyan.auth
 import java.nio.charset.StandardCharsets
 
 import auth.Authentication
-import org.scalatest.mock.MockitoSugar
+import org.scalatest.mockito.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.db.DBApi
 import play.api.db.evolutions.EvolutionsModule

@@ -1,10 +1,12 @@
 package cyan.controllers
 
+import com.whisk.docker.scalatest.DockerTestKit
 import controllers.PingReceiver
-import cyan.DBSpec
+import cyan.util.{DockerPostgresService, DockerTestKitPerTest}
 import dao.{PingsDAO, ProductsDAO}
 import model.Product
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.guice.GuiceOneAppPerSuite
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Results
@@ -14,10 +16,12 @@ import play.api.test._
 /**
   * Created by wyozi on 10.2.2016.
   */
-class PingReceiverSpec extends PlaySpec with Results with OneAppPerSuite with DBSpec {
+class PingReceiverSpec extends PlaySpec with Results with GuiceOneAppPerSuite
+  with DockerTestKit
+  with DockerPostgresService {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure(inMemorySlickDatabase())
+    .configure(dbConfig)
     .build()
 
   "PingReceiver" should {
