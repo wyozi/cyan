@@ -9,25 +9,36 @@ ALTER TABLE pings
   FOREIGN KEY (product_id)
   REFERENCES products(id);
 
--- Set values to the right product
+-- Update product_id field using the existing product field
 UPDATE pings
-SET product_id = prods.id
-FROM products prods
-WHERE pings.product = prods.short_name;
+  SET product_id = prods.id
+  FROM products prods
+  WHERE pings.product = prods.short_name;
 
 ALTER TABLE pings
   ALTER COLUMN product_id
   SET NOT NULL;
 
 ALTER TABLE pings
-  ALTER COLUMN product
-  DROP NOT NULL;
+  DROP COLUMN product;
 
 # --- !Downs
 
 ALTER TABLE pings
-DROP COLUMN product_id;
+  ADD COLUMN product VARCHAR(255),
+  ADD CONSTRAINT pings_product_fkey
+  FOREIGN KEY (product)
+  REFERENCES products(short_name);
+
+-- Update product field using the existing product_id field
+UPDATE pings
+  SET product = prods.short_name
+  FROM products prods
+  WHERE pings.product_id = prods.id;
 
 ALTER TABLE pings
-ALTER COLUMN product
-SET NOT NULL;
+  ALTER COLUMN product
+  SET NOT NULL;
+
+ALTER TABLE pings
+  DROP COLUMN product_id;
