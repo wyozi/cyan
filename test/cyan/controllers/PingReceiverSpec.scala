@@ -73,7 +73,7 @@ class PingReceiverSpec extends PlaySpec with Results with OneAppPerSuite with DB
       prodPings.size mustEqual 1
       prodPings.head.user mustEqual "Mike"
       prodPings.head.license mustEqual "xlicense"
-      prodPings.head.product mustEqual "banana"
+      prodPings.head.productId mustEqual productId
     }
   }
 }
