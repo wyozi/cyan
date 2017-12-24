@@ -30,15 +30,25 @@
                         <label class="control-label">Color:</label>
                     </div>
                     <div class="col-sm-9">
-                        <select id="responseColor">
-                            @for(c <- model.NotificationColor.values) {
-                                <option value="@c.toString"
-                                @if(c == resp.color) {
-                                    selected="selected"
-                                }
-                                >@c.toString</option>
+                        <form action="@controllers.admin.routes.Responses.editColor(resp.id)" method="post">
+                            @for(t <- CSRF.getToken) {
+                                <input type="hidden" name="@t.name" value="@t.value"/>
                             }
-                        </select>
+                            <div class="input-group">
+                                <select name="color" class="form-control">
+                                @for(c <- model.NotificationColor.values) {
+                                    <option value="@c.toString"
+                                        @if(c == resp.color) {
+                                            selected="selected"
+                                            }
+                                    >@c.toString</option>
+                                }
+                                </select>
+                                <span class="input-group-btn">
+                                    <button type="submit" class="btn btn-primary">Set</button>
+                                </span>
+                            </div>
+                        </form>
                     </div>
                 </div>
             </div>
@@ -86,15 +96,5 @@
                 }
             }
         });
-        $("#responseColor").change(function() {
-            $.post("@controllers.admin.routes.Responses.editColor(resp.id)", {
-                "color": $(this).val(),
-                @for(t <- CSRF.getToken) {
-                "@t.name": "@t.value"
-                }
-            }, function(data) {
-                window.location.reload();
-            });
-        })
     </script>
 }

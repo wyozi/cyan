@@ -70,7 +70,7 @@ class Responses @Inject()
     form.bindFromRequest.fold(
       errors => Future.successful(BadRequest("invalid form")),
       color => responsesDAO.updateColor(respId, color).map { x =>
-        Ok("")
+        Redirect(routes.Responses.view(respId))
       }
     )
   }
