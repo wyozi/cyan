@@ -23,14 +23,20 @@ class UsersDAO  @Inject() (protected val dbConfigProvider: DatabaseConfigProvide
     * @return the latest ping for each user that has used this product
     */
   def findDistinctUsersOf(prod: model.Product, afterTimestamp: Timestamp): Future[Seq[Ping]] = {
-    val s =
-      sql"""
-           select *
-           from (select distinct on ("user_name") "id", "date", "product", "license", "user_name", "ip", "response_id" from "pings" where ("product" = ${prod.shortName}) and ("date" >= ${afterTimestamp}) order by "user_name", "date" desc) t
-           order by "date" desc
-         """
     db.run(
-      s.as[Ping]
+      pingsDAO.Pings
+        .join (
+          // Following query obtains latest ping by id for each user that pinged with this product after timestamp
+          // TODO: this inner query can probably be removed when slick bug #1340 is fixed
+          pingsDAO.Pings
+            .filter(p => p.productId === prod.id && p.date >= afterTimestamp)
+            .sortBy(r => (r.userName, r.date.desc))
+            .groupBy(_.userName).map(_._2.map(_.id).max)
+        )
+        .on(_.id === _)
+        .map(_._1)
+        .sortBy(_.date.desc)
+        .result
     )
   }
 }
