@@ -1,7 +1,8 @@
 package backend
 
 import java.io.File
-import java.net.URLClassLoader
+import java.net.{JarURLConnection, URLClassLoader}
+import java.util.jar.JarFile
 
 import com.google.inject.AbstractModule
 import cyan.backend.Backend
@@ -12,23 +13,29 @@ import play.api.{Configuration, Environment, Logger}
   * Created by wyozi on 6.2.2016.
   */
 class BackendModule(environment: Environment, configuration: Configuration) extends AbstractModule {
-  def classloader: URLClassLoader = {
-    val jarUrls = new File("extensions/").listFiles.filter(_.getName.endsWith(".jar")).map(_.toURI.toURL)
+  private val jarFiles = new File("extensions/").listFiles.filter(_.getName.endsWith(".jar"))
+  private val jarUrls = jarFiles.map(_.toURI.toURL)
 
-    val beClassDir = configuration.getString("cyan.backend.classpath")
-    val dirUrls = beClassDir.map(s => Seq(new File(s).toURI.toURL)).getOrElse(Seq())
-
-    val lookUrls = jarUrls ++ dirUrls
-    Logger.info("Backend classpath URLs: " + lookUrls.mkString(","))
-
-    new URLClassLoader(lookUrls, environment.classLoader)
+  private val backendClasses = jarFiles.flatMap(f => Option(new JarFile(f).getManifest)).flatMap { manifest =>
+    Option(manifest.getMainAttributes)
+  }.flatMap { mainAttr =>
+    Option(mainAttr.getValue("Backend-Class"))
   }
 
-  override def configure(): Unit = {
-    val be = configuration.getString("cyan.backend.class")
+  private val backendClass = configuration.getOptional[String]("cyan.backend.class").orElse(backendClasses.headOption)
 
-    val backendClass =
-      be.flatMap[Class[_ <: Backend]] { cls =>
+  private val beClassDir = configuration.getOptional[String]("cyan.backend.classpath")
+  private val dirUrls = beClassDir.map(s => Seq(new File(s).toURI.toURL)).getOrElse(Seq())
+  private val lookUrls = jarUrls ++ dirUrls
+  Logger.info("Backend classpath URLs: " + lookUrls.mkString(","))
+  Logger.info("Backend class: " + backendClass)
+
+  val classloader = new URLClassLoader(lookUrls, environment.classLoader)
+
+  override def configure(): Unit = {
+
+    val backendModuleClass =
+      backendClass.flatMap[Class[_ <: Backend]] { cls =>
         try {
           Some(
             classloader
@@ -42,6 +49,6 @@ class BackendModule(environment: Environment, configuration: Configuration) exte
         }
       }.getOrElse(classOf[DefaultBackend])
 
-    bind(classOf[Backend]).to(backendClass)
+    bind(classOf[Backend]).to(backendModuleClass)
   }
 }
