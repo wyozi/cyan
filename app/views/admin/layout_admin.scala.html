@@ -33,6 +33,11 @@
                     </li>
                     <li><a href="@controllers.admin.routes.Responses.list()">Responses</a></li>
                     <li><a href="@controllers.admin.routes.Anomalies.overview()">Anomalies</a></li>
+                    <li>
+                        <a href="#" onclick="this.nextSibling.submit(); return false;">Logout</a>@*
+                        *@<form action="@controllers.admin.routes.Main.logout()" method="POST">
+                        </form>
+                    </li>
                 </ul>
                 <form class="navbar-form navbar-right" action="@controllers.admin.routes.Search.search()" method="post" role="search">
                     <div class="input-group">

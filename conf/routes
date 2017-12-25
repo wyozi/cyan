@@ -8,6 +8,8 @@ GET         /                                             controllers.Applicatio
 POST        /ping                                         controllers.PingReceiver.ping()
 
 GET         /admin                                        controllers.admin.Main.index()
++ nocsrf
+POST        /admin/logout                                 controllers.admin.Main.logout()
 GET         /javascriptRoutes                             controllers.admin.Main.javascriptRoutes
 
 GET         /admin/backend                                controllers.admin.BackendController.view(query, productId: Option[Int], license: Option[String])

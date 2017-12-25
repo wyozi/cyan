@@ -19,6 +19,10 @@ class Main @Inject()
     Ok(template())
   }
 
+  def logout: Action[AnyContent] = auth.adminOnly { _ =>
+    Redirect(controllers.routes.Application.index()).withNewSession
+  }
+
   def javascriptRoutes: Action[AnyContent] = auth.adminOnly { implicit request =>
     Ok(
       JavaScriptReverseRouter("jsAdminRoutes")(
