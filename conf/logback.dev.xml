@@ -1,24 +1,12 @@
 <!-- The default logback configuration that Play uses if no other configuration is provided -->
 <configuration>
 
-    <conversionRule conversionWord="coloredLevel"
-                    converterClass="play.api.libs.logback.ColoredLevel" />
-
-    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
-        <file>${application.home:-.}/logs/application.log</file>
-        <encoder>
-            <pattern>%date [%level] from %logger in %thread - %message%n%xException</pattern>
-        </encoder>
-    </appender>
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel" />
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>%coloredLevel %logger{15} - %message%n%xException{10}</pattern>
+            <pattern>%-5level %logger{15} - %message%n%xException{10}</pattern>
         </encoder>
-    </appender>
-
-    <appender name="ASYNCFILE" class="ch.qos.logback.classic.AsyncAppender">
-        <appender-ref ref="FILE" />
     </appender>
 
     <appender name="ASYNCSTDOUT" class="ch.qos.logback.classic.AsyncAppender">
@@ -26,8 +14,8 @@
     </appender>
 
     <logger name="play" level="INFO" />
-    <logger name="application" level="INFO" />
-    <logger name="slick.jdbc" level="WARN"/>
+    <logger name="application" level="DEBUG" />
+    <logger name="slick.jdbc" level="INFO"/>
 
     <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
     <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />
@@ -37,11 +25,10 @@
     <!-- https://hibernate.atlassian.net/browse/HV-1323 -->
     <logger name="org.hibernate.validator.messageinterpolation.ParameterMessageInterpolator" level="ERROR" />
 
-    <logger name="com.github.koraktor.steamcondenser" level="WARN" />
+    <logger name="com.github.koraktor.steamcondenser" level="INFO" />
 
     <root level="WARN">
-        <appender-ref ref="ASYNCFILE" />
-        <appender-ref ref="ASYNCSTDOUT" />
+        <appender-ref ref="STDOUT" />
     </root>
 
 </configuration>

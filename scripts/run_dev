@@ -1,3 +1,3 @@
 #!/bin/bash
 
-sbt -DapplyEvolutions.default=true -Dcyan.password=test -Dslick.dbs.default.db.url="jdbc:postgresql://db/cyan" -Dslick.dbs.default.db.user=cyan -Dslick.dbs.default.db.password=secretpass run
+sbt -Dplay.applyEvolutions.default=true -Dcyan.password=test -Dslick.dbs.default.db.url="jdbc:postgresql://db/cyan" -Dslick.dbs.default.db.user=cyan -Dslick.dbs.default.db.password=secretpass -Dlogger.resource=logback.dev.xml run
