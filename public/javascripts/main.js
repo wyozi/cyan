@@ -9,6 +9,7 @@ jQuery(document).ready(function($) {
     // Add tooltip functionality
     $('[data-toggle="tooltip"]').tooltip();
 
-    // Convert all datetimes to "x ago"
+    // Setup timeago to use locale titles and enable timeago for all tags that need it
+    jQuery.timeago.settings.localeTitle = true;
     $("time.timeago").timeago();
 });
