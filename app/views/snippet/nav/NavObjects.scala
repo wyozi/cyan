@@ -7,7 +7,7 @@ import play.twirl.api.Html
   * Contains utilities for parsing navigation objects (eg. for breadcrumbs)
   */
 object NavObjects {
-  import cyan.util.TwirlHelpers._
+  import play.twirl.api.StringInterpolation
 
   def parse(obj: Any, active: Boolean = false): (Html, Option[Call]) = obj match {
     case prod: model.Product => (html"${prod.name}", Some(controllers.admin.prod.routes.Products.view(prod.id)))

@@ -14,7 +14,7 @@ class Search @Inject()
    layout_admin_simple: views.html.admin.layout_admin_simple)
   (implicit ec: ExecutionContext, pingsDAO: PingsDAO, parser: BodyParsers.Default, productsDAO: ProductsDAO) extends AbstractController(cc) {
 
-  import cyan.util.TwirlHelpers._
+  import play.twirl.api.StringInterpolation
   import play.api.data.Forms._
   val queryForm = Form("query" -> text)
 
