@@ -28,6 +28,7 @@
     <logger name="play" level="INFO" />
     <logger name="application" level="INFO" />
     <logger name="slick.jdbc" level="WARN"/>
+    <logger name="cyan.authentication" level="INFO"/>
 
     <!-- Off these ones as they are annoying, and anyway we manage configuration ourselves -->
     <logger name="com.avaje.ebean.config.PropertyMapLoader" level="OFF" />

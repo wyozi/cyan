@@ -1,13 +1,14 @@
 package auth
 
 import com.google.inject.Inject
-import play.api.Configuration
+import play.api.{Configuration, Logger}
 import play.api.mvc._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class Authentication @Inject() (val config: Configuration, actionBuilder: DefaultActionBuilder) {
   private lazy val password: Option[String] = config.getOptional[String]("cyan.password")
+  private val authLogger = Logger("cyan.authentication")
 
   private def isAuthorized(req: RequestHeader): Boolean = req.session.get("loggedIn") match {
     case Some("true") => true
@@ -35,9 +36,15 @@ class Authentication @Inject() (val config: Configuration, actionBuilder: Defaul
           }
         }
       } match {
-          case Some(true) => action(request).map(res => withAuthorization(res))
-          case Some(false) => Future.successful(Results.Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Invalid login; try again.""""))
-          case _ => Future.successful(Results.Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Cyan login""""))
+          case Some(true) =>
+            authLogger.info(s"${request.remoteAddress} successfully authenticated at ${request.uri}")
+            action(request).map(res => withAuthorization(res))
+          case Some(false) =>
+            authLogger.debug(s"${request.remoteAddress} nth authentication at ${request.uri}")
+            Future.successful(Results.Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Invalid login; try again.""""))
+          case _ =>
+            authLogger.debug(s"${request.remoteAddress} first authentication at ${request.uri}")
+            Future.successful(Results.Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Cyan login""""))
       }
     }
   }
