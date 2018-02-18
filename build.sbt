@@ -10,7 +10,7 @@ lazy val `cyan` = (project in file("."))
 
 scalaVersion := "2.11.7"
 
-libraryDependencies ++= Seq( cache , ws, evolutions, specs2 % Test, guice )
+libraryDependencies ++= Seq( ws, evolutions, specs2 % Test, guice )
 
 // Cyan
 libraryDependencies ++= Seq(
