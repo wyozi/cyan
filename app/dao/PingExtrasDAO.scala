@@ -98,6 +98,31 @@ class PingExtrasDAO @Inject() (protected val dbConfigProvider: DatabaseConfigPro
         result
     ) map(_.map(l => ProductLicense(prod, l)))
 
+  /**
+    * Finds distinct product license users whose latest ping has given pingextra key->value
+    * @param prod
+    * @param key
+    * @param value
+    * @return
+    */
+  def findProductLicenseUsersByLatestExtraKeyValue(prod: model.Product, key: String, value: String): Future[Seq[(ProductLicense, String, Option[Timestamp])]] =
+    db.run(
+      (
+        pingsDAO.Pings
+          .filter(_.productId === prod.id)
+        join
+          PingExtras
+            .filter(r => r.key === key && r.value === value)
+        on( (a, b) => a.id === b.pingId)
+      )
+        .map { case (pings, extras) => pings }
+        .groupBy(r => (r.license, r.userName))
+        .map {case ((license, user), rows) => (license, user, rows.map(_.date).max) }
+        .sortBy { case (l, u, ts) => ts.desc }
+        result
+    ) map(_.map { case (license, user, latestPingTimestamp) => (ProductLicense(prod, license), user, latestPingTimestamp) })
+
+
   def findExtras(pingId: Int): Future[Seq[PingExtra]] =
     db.run(PingExtras.filter(_.pingId === pingId).result)
 

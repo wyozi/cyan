@@ -5,6 +5,7 @@
 @import org.joda.time.{LocalDate, LocalTime}
 @import util.FutureUtils._
 @import play.twirl.api.StringInterpolation
+@import views.snippet.PingTable._
 
 @import scala.concurrent.ExecutionContext
 @import cyan.backend.Backend
@@ -19,27 +20,61 @@
 
     @snippet.paged_ping_table(page => pingsDAO.findRecentWithExtraValue(pingExtraKey, pingExtraValue, 15, product = Some(prod), offset = 15 * page).await, controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)), showResponse = true)
 
-    <h3>Associated licenses</h3>
-    <i>Includes only licenses whose latest ping had this pingextra key and value </i>
+    @if(reqHeader.getQueryString("showLicenseUsers").exists(_ == "true")) {
+        <h3>Associated license users (<a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue))">hide license users</a>)</h3>
+        <i>Includes only license users whose latest ping had this pingextra key and value </i>
 
-    <div class="table-responsive">
-        <table class="table">
-            <thead>
-                <tr>
-                    <td>License</td>
-                </tr>
-            </thead>
-            <tbody>
-            @for(prodLicense <- pingExtrasDAO.findProductLicensesByLatestExtraKeyValue(prod, pingExtraKey, pingExtraValue).await) {
-                <tr>
-                    <td>
-                    @backend.transformLicenseHtml(model.backendLicense(prodLicense.prod, prodLicense.license)) {
-                        <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prodLicense.prod.id, prodLicense.license)">@prodLicense.license</a>
-                    }
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>License</td>
+                        <td>User</td>
+                        <td>Timestamp</td>
+                    </tr>
+                </thead>
+                <tbody>
+                @for((prodLicense, prodUser, lastDate) <- pingExtrasDAO.findProductLicenseUsersByLatestExtraKeyValue(prod, pingExtraKey, pingExtraValue).await) {
+                    <tr>
+                        <td>
+                        @backend.transformLicenseHtml(model.backendLicense(prodLicense.prod, prodLicense.license)) {
+                            <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prodLicense.prod.id, prodLicense.license)">@prodLicense.license</a>
+                        }
+                        </td>
+                        <td>
+                        @snippet.pinguser(prodUser)
+                        </td>
+                        <td>
+                            @lastDate.map(d => snippet.datetime(d))
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    } else {
+        <h3>Associated licenses (<a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)).withQueryString("showLicenseUsers" -> Seq("true"))">show license users</a>)</h3>
+        <i>Includes only licenses whose latest ping had this pingextra key and value </i>
+
+        <div class="table-responsive">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <td>License</td>
+                    </tr>
+                </thead>
+                <tbody>
+                @for(prodLicense <- pingExtrasDAO.findProductLicensesByLatestExtraKeyValue(prod, pingExtraKey, pingExtraValue).await) {
+                    <tr>
+                        <td>
+                        @backend.transformLicenseHtml(model.backendLicense(prodLicense.prod, prodLicense.license)) {
+                            <a href="@controllers.admin.prod.routes.ProductLicenses.licenseView(prodLicense.prod.id, prodLicense.license)">@prodLicense.license</a>
+                        }
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    }
 }
