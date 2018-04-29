@@ -18,7 +18,10 @@
 @layout_admin_simple(Seq(("Products", controllers.admin.prod.routes.Products.list()), prod, ("Ping extras", controllers.admin.prod.routes.ProductPingExtras.list(prod.id)), (html"Key <code>${pingExtraKey}</code>", controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = None)), html"<code>${pingExtraValue}</code>")) {
     <h3>Recent pings</h3>
 
-    @snippet.paged_ping_table(page => pingsDAO.findRecentWithExtraValue(pingExtraKey, pingExtraValue, 15, product = Some(prod), offset = 15 * page).await, controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)), showResponse = true)
+    @snippet.paged_ping_table(
+        page => pingsDAO.findRecentWithExtraValue(pingExtraKey, pingExtraValue, 15, product = Some(prod), offset = 15 * page).await,
+        (pingsDAO.findEstimatedCountWithExtraValue(pingExtraKey, pingExtraValue, Some(prod)).await / 15.0).ceil.toInt,
+        controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue)), showResponse = true)
 
     @if(reqHeader.getQueryString("showLicenseUsers").exists(_ == "true")) {
         <h3>Associated license users (<a href="@controllers.admin.prod.routes.ProductPingExtras.view(prod.id, pingExtraKey, value = Some(pingExtraValue))">hide license users</a>)</h3>

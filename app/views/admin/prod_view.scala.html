@@ -189,6 +189,9 @@
 
         <h3>Recent pings</h3>
 
-        @snippet.paged_ping_table(page => pingsDAO.findRecentForProduct(prod, Products.PingsPerPage, offset = Products.PingsPerPage * page, ignoredLicense = devLicense).await, controllers.admin.prod.routes.Products.view(prod.id))
+        @snippet.paged_ping_table(
+            page => pingsDAO.findRecentForProduct(prod, Products.PingsPerPage, offset = Products.PingsPerPage * page, ignoredLicense = devLicense).await,
+            (pingsDAO.findEstimatedPingCount(prod).await / Products.PingsPerPage.toDouble).ceil.toInt,
+            controllers.admin.prod.routes.Products.view(prod.id))
     </div>
 }

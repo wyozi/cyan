@@ -11,5 +11,8 @@
 @layout_admin_simple() {
     <h3>Recent pings</h3>
 
-    @snippet.paged_ping_table(page => pingsDAO.findRecent(15, page * 15).await, controllers.admin.routes.Main.index(), showProduct = true)
+    @snippet.paged_ping_table(
+        page => pingsDAO.findRecent(15, page * 15).await,
+        (pingsDAO.findEstimatedCount().await / 15.0).ceil.toInt,
+        controllers.admin.routes.Main.index(), showProduct = true)
 }

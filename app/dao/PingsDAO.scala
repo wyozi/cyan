@@ -20,6 +20,13 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
 
   private[dao] val Pings = TableQuery[PingsTable]
 
+  private def estimatedCount(sql: String): Future[Int] =
+    db.run(
+      sql"""
+            SELECT count_estimate('#${sql}');
+      """.as[Int]
+    ).map(_.headOption.getOrElse(0))
+
   /**
     * Inserts given ping to Pings table and returns id.
     */
@@ -31,6 +38,12 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     */
   def findRecent(amount: Int, offset: Int = 0): Future[Seq[Ping]] =
     db.run(Pings.sortBy(_.id.desc).drop(offset).take(amount).result)
+
+  /**
+    * Finds estimated number of pings in the database
+    */
+  def findEstimatedCount(): Future[Int] =
+    estimatedCount(Pings.map(r => 1:Rep[Int]).result.statements.head)
 
   /**
     * Find recent pings for given product.
@@ -69,30 +82,24 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     db.run(Pings.filter(_.responseId === resp).sortBy(_.id.desc).drop(offset).take(limit).result)
 
   /**
+    * Finds estimated number of pings with given response
+    */
+  def findEstimatedCountWithResponse(resp: Option[Int]): Future[Int] =
+    estimatedCount(Pings.filter(_.responseId === resp).map(r => 1:Rep[Int]).result.statements.head)
+
+  /**
     * Find count of distinct licenses for given product.
     * Uses an estimation function for a faster estimated result
     */
-  def findEstimatedLicenseCount(prod: Product): Future[Int] = {
-    val stmt = Pings.filter(_.productId === prod.id).map(_.license).distinct.result.statements.head
-    db.run(
-      sql"""
-            SELECT count_estimate('#${stmt}');
-      """.as[Int]
-    ).map(_.headOption.getOrElse(0))
-  }
+  def findEstimatedLicenseCount(prod: Product): Future[Int] =
+    estimatedCount(Pings.filter(_.productId === prod.id).map(_.license).distinct.result.statements.head)
 
   /**
     * Find amount of pings for given product.
     * Uses an estimation function for a faster estimated result
     */
-  def findEstimatedPingCount(prod: Product): Future[Int] = {
-    val stmt = Pings.filter(_.productId === prod.id).map(r => 1:Rep[Int]).result.statements.head
-    db.run(
-      sql"""
-            SELECT count_estimate('#${stmt}');
-      """.as[Int]
-    ).map(_.headOption.getOrElse(0))
-  }
+  def findEstimatedPingCount(prod: Product): Future[Int] =
+    estimatedCount(Pings.filter(_.productId === prod.id).map(r => 1:Rep[Int]).result.statements.head)
 
   /**
     * Find recent pings with given license.
@@ -131,6 +138,23 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
           .result
     )
   }
+
+  /**
+    * Find estimated count of pings with given pingextra key->value, optionally input the product
+    */
+  def findEstimatedCountWithExtraValue(pingExtraKey: String, pingExtraValue: String, product: Option[Product])(implicit pingExtrasDAO: PingExtrasDAO): Future[Int] =
+    estimatedCount(
+      (
+        Pings
+          .filter(pi => product.map(_.id).map(pi.productId === _).getOrElse(true:Rep[Boolean]))
+          join
+          pingExtrasDAO.PingExtras
+            .filter(pe => pe.key === pingExtraKey && pe.value === pingExtraValue)
+          on ((a, b) => a.id === b.pingId)
+      )
+        .map(r => 1:Rep[Int])
+        .result.statements.head
+    )
 
   private[dao] class PingsTable(tag: Tag) extends Table[Ping](tag, "pings") {
     def id = column[Int]("id", O.AutoInc)
