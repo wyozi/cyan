@@ -27,33 +27,47 @@
             <thead>
                 <tr>
                     <td>Name</td>
-                    <td>License count</td>
-                    <td>Ping count</td>
+                    <td><i>License count</i> *</td>
+                    <td><i>Ping count</i> *</td>
                     <td>Latest ping</td>
                 </tr>
             </thead>
             <tbody>
-            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(
-                Future.successful(p)::
-                p.queryEstimatedLicenseCount() ::
-                p.queryEstimatedPingCount() ::
-                p.queryRecentPings(1) :: HNil
-            )) awaitAll) {
-                <tr>
-                    <td><a href="@controllers.admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
-                    <td>@licenseCount</td>
-                    <td>@pingCount</td>
-                    <td>
-                    @recentPings.headOption match {
-                        case Some(ping) => {
-                            @snippet.datetime(ping.date)
-                        }
-                        case None => {}
+                @defining(
+                    (
+                        for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(
+                            Future.successful(p)::
+                            p.queryEstimatedLicenseCount() ::
+                            p.queryEstimatedPingCount() ::
+                            p.queryRecentPings(1) :: HNil
+                        )) awaitAll)
+                            yield (prod, licenseCount, pingCount, recentPings)
+                    ).toSeq
+                ) { pings =>
+                    @for((prod, licenseCount, pingCount, recentPings) <- pings) {
+                        <tr>
+                            <td><a href="@controllers.admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
+                            <td><i>@licenseCount</i></td>
+                            <td><i>@pingCount</i></td>
+                            <td>
+                            @recentPings.headOption match {
+                                case Some(ping) => {
+                                    @snippet.datetime(ping.date)
+                                }
+                                case None => {}
+                            }
+                            </td>
+                        </tr>
                     }
-                    </td>
-                </tr>
-            }
+                    <tr>
+                        <td><b>Total</b></td>
+                        <td><i>Cannot sum unique metrics</i></td>
+                        <td><i>@pings.map(_._3).sum</i></td>
+                        <td></td>
+                    </tr>
+                }
             </tbody>
         </table>
+        <i>* estimated counts are only provided to estimate magnitude, not absolute value. Use accordingly.</i>
     </div>
 }
