@@ -9,9 +9,9 @@ import scala.concurrent.Future
   * Created by wyozi on 3.2.2016.
   */
 case class Product(id: Int, name: String, shortName: String) {
-  def queryLicenseCount()(implicit pingsDAO: PingsDAO) = pingsDAO.findLicenseCount(this)
-  def queryPingCount()(implicit pingsDAO: PingsDAO) = pingsDAO.findPingCount(this)
-  def queryRecentPings(limit: Int)(implicit pingsDAO: PingsDAO) = pingsDAO.findRecentForProduct(this, limit)
+  def queryEstimatedLicenseCount()(implicit pingsDAO: PingsDAO): Future[Int] = pingsDAO.findEstimatedLicenseCount(this)
+  def queryEstimatedPingCount()(implicit pingsDAO: PingsDAO): Future[Int] = pingsDAO.findEstimatedPingCount(this)
+  def queryRecentPings(limit: Int)(implicit pingsDAO: PingsDAO): Future[Seq[Ping]] = pingsDAO.findRecentForProduct(this, limit)
 
   def queryDevLicense()(implicit productConfigDAO: ProductConfigDAO): Future[Option[String]] =
     productConfigDAO.getValue(id, ProductConfig.Keys.DevLicense)

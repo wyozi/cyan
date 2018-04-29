@@ -33,7 +33,12 @@
                 </tr>
             </thead>
             <tbody>
-            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(Future.successful(p) :: Future.successful(-1) /*p.queryLicenseCount()*/ ::  /*p.queryPingCount()*/ Future.successful(-1) :: p.queryRecentPings(1) :: HNil)) awaitAll) {
+            @for(prod :: licenseCount :: pingCount :: recentPings :: HNil <- products map (p => hsequence(
+                Future.successful(p)::
+                p.queryEstimatedLicenseCount() ::
+                p.queryEstimatedPingCount() ::
+                p.queryRecentPings(1) :: HNil
+            )) awaitAll) {
                 <tr>
                     <td><a href="@controllers.admin.prod.routes.Products.view(prod.id)">@prod.name</a></td>
                     <td>@licenseCount</td>

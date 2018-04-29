@@ -2,18 +2,18 @@ package dao
 
 import java.sql.Timestamp
 
-import com.google.inject.{Singleton, Inject}
-import model.{ProductLicense, Ping, Product}
+import com.google.inject.{Inject, Singleton}
+import model.{Ping, Product, ProductLicense}
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import slick.jdbc.JdbcProfile
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 /**
   * Created by wyozi on 8.2.2016.
   */
 @Singleton
-class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)
+class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider)(implicit val ec: ExecutionContext)
   extends HasDatabaseConfigProvider[JdbcProfile] {
 
   import profile.api._
@@ -70,15 +70,29 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
 
   /**
     * Find count of distinct licenses for given product.
+    * Uses an estimation function for a faster estimated result
     */
-  def findLicenseCount(prod: Product): Future[Int] =
-    db.run(Pings.filter(_.productId === prod.id).map(_.license).distinct.length.result)
+  def findEstimatedLicenseCount(prod: Product): Future[Int] = {
+    val stmt = Pings.filter(_.productId === prod.id).map(_.license).distinct.length.result.statements.head
+    db.run(
+      sql"""
+            SELECT count_estimate('#${stmt}');
+      """.as[Int]
+    ).map(_.headOption.getOrElse(0))
+  }
 
   /**
     * Find amount of pings for given product.
+    * Uses an estimation function for a faster estimated result
     */
-  def findPingCount(prod: Product): Future[Int] =
-    db.run(Pings.filter(_.productId === prod.id).length.result)
+  def findEstimatedPingCount(prod: Product): Future[Int] = {
+    val stmt = Pings.filter(_.productId === prod.id).length.result.statements.head
+    db.run(
+      sql"""
+            SELECT count_estimate('#${stmt}');
+      """.as[Int]
+    ).map(_.headOption.getOrElse(0))
+  }
 
   /**
     * Find recent pings with given license.
