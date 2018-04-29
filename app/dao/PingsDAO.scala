@@ -73,7 +73,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     * Uses an estimation function for a faster estimated result
     */
   def findEstimatedLicenseCount(prod: Product): Future[Int] = {
-    val stmt = Pings.filter(_.productId === prod.id).map(_.license).distinct.length.result.statements.head
+    val stmt = Pings.filter(_.productId === prod.id).map(_.license).distinct.result.statements.head
     db.run(
       sql"""
             SELECT count_estimate('#${stmt}');
@@ -86,7 +86,7 @@ class PingsDAO @Inject() (protected val dbConfigProvider: DatabaseConfigProvider
     * Uses an estimation function for a faster estimated result
     */
   def findEstimatedPingCount(prod: Product): Future[Int] = {
-    val stmt = Pings.filter(_.productId === prod.id).length.result.statements.head
+    val stmt = Pings.filter(_.productId === prod.id).map(r => 1:Rep[Int]).result.statements.head
     db.run(
       sql"""
             SELECT count_estimate('#${stmt}');
